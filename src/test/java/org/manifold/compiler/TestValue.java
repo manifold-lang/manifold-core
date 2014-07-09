@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import java.util.HashMap;
-import org.manifold.compiler.back.SchematicException;
+import org.manifold.compiler.middle.SchematicException;
 
 public class TestValue {
 

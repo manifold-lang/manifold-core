@@ -1,6 +1,6 @@
 package org.manifold.compiler;
 
-import org.manifold.compiler.back.SchematicException;
+import org.manifold.compiler.middle.SchematicException;
 
 public class MultipleDefinitionException extends SchematicException {
   

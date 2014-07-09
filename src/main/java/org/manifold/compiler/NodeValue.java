@@ -2,7 +2,7 @@ package org.manifold.compiler;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.manifold.compiler.back.SchematicException;
+import org.manifold.compiler.middle.SchematicException;
 
 public class NodeValue extends Value {
 

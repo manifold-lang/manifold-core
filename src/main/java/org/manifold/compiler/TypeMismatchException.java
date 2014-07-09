@@ -1,6 +1,6 @@
 package org.manifold.compiler;
 
-import org.manifold.compiler.back.SchematicException;
+import org.manifold.compiler.middle.SchematicException;
 
 public class TypeMismatchException extends SchematicException {
   private static final long serialVersionUID = 7730618233489002412L;

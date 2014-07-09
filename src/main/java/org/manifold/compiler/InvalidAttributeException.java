@@ -1,6 +1,6 @@
 package org.manifold.compiler;
 
-import org.manifold.compiler.back.SchematicException;
+import org.manifold.compiler.middle.SchematicException;
 
 public class InvalidAttributeException extends SchematicException {
   private static final long serialVersionUID = 3865358184369013184L;

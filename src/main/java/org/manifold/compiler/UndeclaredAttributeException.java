@@ -1,6 +1,6 @@
 package org.manifold.compiler;
 
-import org.manifold.compiler.back.SchematicException;
+import org.manifold.compiler.middle.SchematicException;
 
 public class UndeclaredAttributeException extends SchematicException {
   private static final long serialVersionUID = 3901819872140384623L;

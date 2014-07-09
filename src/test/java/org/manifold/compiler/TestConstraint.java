@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import com.google.common.collect.ImmutableMap;
 
 import org.junit.Test;
-import org.manifold.compiler.back.SchematicException;
+import org.manifold.compiler.middle.SchematicException;
 
 public class TestConstraint {
 
