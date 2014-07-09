@@ -13,23 +13,23 @@ import org.manifold.compiler.back.SchematicException;
 
 public class TestPort {
 
-  private static final Type boolType = BooleanType.getInstance();
-  private static final PortType defaultPortType =
-      new PortType(ImmutableMap.of("v", boolType));
+  private static final TypeValue boolType = BooleanTypeValue.getInstance();
+  private static final PortTypeValue defaultPortType =
+      new PortTypeValue(ImmutableMap.of("v", boolType));
   private static final String PORT_NAME = "testport";
-  private static final Value v = new BooleanValue(boolType, true);
+  private static final Value v = BooleanValue.getInstance(true);
   
-  private Node parent;
-  private Port port;
+  private NodeValue parent;
+  private PortValue port;
   
   @Before
   public void setup() throws SchematicException {
-    Map<String, PortType> portTypeMap =
+    Map<String, PortTypeValue> portTypeMap =
         ImmutableMap.of(PORT_NAME, defaultPortType);
     Map<String, Map<String, Value>> portMap =
         ImmutableMap.of(PORT_NAME, ImmutableMap.of("v", v));
-    NodeType parentType = new NodeType(new HashMap<>(), portTypeMap);
-    parent = new Node(parentType, new HashMap<>(), portMap);
+    NodeTypeValue parentType = new NodeTypeValue(new HashMap<>(), portTypeMap);
+    parent = new NodeValue(parentType, new HashMap<>(), portMap);
     port = parent.getPort(PORT_NAME);
   }
 

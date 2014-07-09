@@ -13,79 +13,89 @@ import org.manifold.compiler.back.SchematicException;
 
 public class TestNode {
 
-  private static final PortType defaultPortDefinition =
-      new PortType(new HashMap<>());
-  private static final Type boolType = BooleanType.getInstance();
+  private static final PortTypeValue defaultPortDefinition =
+      new PortTypeValue(new HashMap<>());
+  private static final TypeValue boolType = BooleanTypeValue.getInstance();
   private static final String PORT_NAME = "testport";
   private static final String PORT_ATTR_KEY = "the truth will set you free";
   private static final Map<String, Map<String, Value>> PORT_ATTRS =
       ImmutableMap.of(PORT_NAME, ImmutableMap.of());
   
-  private NodeType hasNoAttrs;
-  private NodeType hasABCNodeAttr;
+  private NodeTypeValue hasNoAttrs;
+  private NodeTypeValue hasABCNodeAttr;
   
   @Before
   public void setup() {
-    Map<String, PortType> portMap =
+    Map<String, PortTypeValue> portMap =
         ImmutableMap.of(PORT_NAME, defaultPortDefinition);
-    hasNoAttrs = new NodeType(new HashMap<>(), portMap);
-    hasABCNodeAttr = new NodeType(ImmutableMap.of("abc", boolType), portMap);
+    hasNoAttrs = new NodeTypeValue(new HashMap<>(), portMap);
+    hasABCNodeAttr = new NodeTypeValue(
+        ImmutableMap.of("abc", boolType),
+        portMap
+    );
   }
 
   @Test(
       expected = org.manifold.compiler.InvalidIdentifierException.class)
   public void testCreateWithMissingPort() throws SchematicException {
-    Value v = new BooleanValue(boolType, true);
-    new Node(hasABCNodeAttr, ImmutableMap.of("abc", v), new HashMap<>());
+    Value v = BooleanValue.getInstance(true);
+    new NodeValue(hasABCNodeAttr, ImmutableMap.of("abc", v), new HashMap<>());
   }
   
   @Test(
       expected = org.manifold.compiler.UndeclaredIdentifierException.class)
   public void testCreateWithInvalidPortName() throws SchematicException {
-    Value v = new BooleanValue(boolType, true);
+    Value v = BooleanValue.getInstance(true);
     Map<String, Map<String, Value>> portAttrMap = ImmutableMap.of(
         PORT_NAME, new HashMap<>(),
         "bogusPort", new HashMap<>());
-    new Node(hasABCNodeAttr, ImmutableMap.of("abc", v), portAttrMap);
+    new NodeValue(hasABCNodeAttr, ImmutableMap.of("abc", v), portAttrMap);
   }
 
   @Test
   public void testGetAttribute() throws SchematicException {
-    Value v = new BooleanValue(boolType, true);
-    Node n = new Node(hasABCNodeAttr, ImmutableMap.of("abc", v), PORT_ATTRS);
+    Value v = BooleanValue.getInstance(true);
+    NodeValue n = new NodeValue(
+        hasABCNodeAttr,
+        ImmutableMap.of("abc", v),
+        PORT_ATTRS
+    );
     assertEquals(v, n.getAttribute("abc"));
   }
 
   @Test(expected = org.manifold.compiler.UndeclaredAttributeException.class)
   public void testGetAttribute_nonexistent() throws SchematicException {
-    Node n = new Node(hasNoAttrs, new HashMap<>(), PORT_ATTRS);
+    NodeValue n = new NodeValue(hasNoAttrs, new HashMap<>(), PORT_ATTRS);
     n.getAttribute("bogus");
   }
 
   @Test
   public void testGetPort() throws SchematicException {
-    Node n = new Node(hasNoAttrs, new HashMap<>(), PORT_ATTRS);
-    Port port = n.getPort(PORT_NAME);
+    NodeValue n = new NodeValue(hasNoAttrs, new HashMap<>(), PORT_ATTRS);
+    PortValue port = n.getPort(PORT_NAME);
     assertEquals(defaultPortDefinition, port.getType());
   }
 
   @Test(expected = UndeclaredIdentifierException.class)
   public void testGetPort_nonexistent() throws SchematicException {
-    Node n = new Node(hasNoAttrs, new HashMap<>(), PORT_ATTRS);
+    NodeValue n = new NodeValue(hasNoAttrs, new HashMap<>(), PORT_ATTRS);
     n.getPort("bogus");
   }
 
   @Test
   public void testPortsWithValidAttributes() throws SchematicException {
-    PortType portTypeWithAttr =
-        new PortType(ImmutableMap.of(PORT_ATTR_KEY, boolType));
-    Map<String, PortType> portTypeMap =
+    PortTypeValue portTypeWithAttr =
+        new PortTypeValue(ImmutableMap.of(PORT_ATTR_KEY, boolType));
+    Map<String, PortTypeValue> portTypeMap =
         ImmutableMap.of(PORT_NAME, portTypeWithAttr);
-    NodeType withPortAttrs = new NodeType(ImmutableMap.of(), portTypeMap);
-    BooleanValue v = new BooleanValue(boolType, false);
+    NodeTypeValue withPortAttrs = new NodeTypeValue(
+        ImmutableMap.of(),
+        portTypeMap
+    );
+    BooleanValue v = BooleanValue.getInstance(false);
     Map<String, Map<String, Value>> portAttrMap = ImmutableMap.of(PORT_NAME,
         ImmutableMap.of(PORT_ATTR_KEY, v));
-    Node n = new Node(withPortAttrs, ImmutableMap.of(), portAttrMap);
+    NodeValue n = new NodeValue(withPortAttrs, ImmutableMap.of(), portAttrMap);
     assertEquals(v, n.getPort(PORT_NAME).getAttribute(PORT_ATTR_KEY));
   }
 }

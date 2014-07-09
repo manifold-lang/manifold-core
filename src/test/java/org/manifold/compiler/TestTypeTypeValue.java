@@ -4,8 +4,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.manifold.compiler.front.BooleanTypeValue;
-import org.manifold.compiler.front.TypeTypeValue;
 
 public class TestTypeTypeValue {
 

@@ -3,11 +3,7 @@ package org.manifold.compiler;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.manifold.compiler.front.BooleanTypeValue;
-import org.manifold.compiler.front.BooleanValue;
 import org.manifold.compiler.front.TypeMismatchException;
-import org.manifold.compiler.front.TypeValue;
-import org.manifold.compiler.front.Value;
 
 public class TestTypeMismatchException {
 

@@ -11,10 +11,10 @@ public class TestValue {
 
   @Test
   public void testRetrieveType() throws SchematicException {
-    NodeType nDef = new NodeType(new HashMap<>(), new HashMap<>());
-    Value dom = new Node(nDef, new HashMap<>(), new HashMap<>());
-    Type expected = nDef;
-    Type actual = dom.getType();
+    NodeTypeValue nDef = new NodeTypeValue(new HashMap<>(), new HashMap<>());
+    Value dom = new NodeValue(nDef, new HashMap<>(), new HashMap<>());
+    TypeValue expected = nDef;
+    TypeValue actual = dom.getType();
     assertEquals(expected, actual);
   }
 

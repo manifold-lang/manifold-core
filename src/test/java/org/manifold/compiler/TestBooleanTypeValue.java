@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.manifold.compiler.front.BooleanTypeValue;
 
 public class TestBooleanTypeValue {
 
@@ -21,7 +20,7 @@ public class TestBooleanTypeValue {
   }
   
   @Test
-  public void testVerify() {
+  public void testVerify() throws Exception {
     getInstance().verify();
   }
 

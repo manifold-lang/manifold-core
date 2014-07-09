@@ -3,9 +3,6 @@ package org.manifold.compiler;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.manifold.compiler.front.BooleanTypeValue;
-import org.manifold.compiler.front.TypeTypeValue;
-import org.manifold.compiler.front.TypeValue;
 
 public class TestTypeValue {
 

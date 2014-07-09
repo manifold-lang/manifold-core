@@ -8,12 +8,14 @@ public class TestArrayType {
 
   @Test
   public void testGetElementType() {
-    Type elementType = BooleanType.getInstance();
-    ArrayType aType = new ArrayType(elementType);
+    TypeValue elementType = BooleanTypeValue.getInstance();
+    
+    ArrayTypeValue arrayType = new ArrayTypeValue(elementType);
+    
     assertEquals(
         "element type not Boolean",
         elementType,
-        aType.getElementType()
+        arrayType.getElementType()
     );
   }
 

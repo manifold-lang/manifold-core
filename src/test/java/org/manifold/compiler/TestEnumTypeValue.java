@@ -7,14 +7,10 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Set;
-import org.manifold.compiler.front.BooleanTypeValue;
-import org.manifold.compiler.front.BooleanValue;
 import org.manifold.compiler.front.EnumIdentifierNotDefined;
 import org.manifold.compiler.front.EnumTypeValue;
 import org.manifold.compiler.front.EnumValue;
 import org.manifold.compiler.front.TypeMismatchException;
-import org.manifold.compiler.front.TypeTypeValue;
-import org.manifold.compiler.front.Value;
 
 public class TestEnumTypeValue {
 

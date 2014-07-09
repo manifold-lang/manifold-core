@@ -1,16 +1,33 @@
 package org.manifold.compiler;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public abstract class Value {
+
+  protected TypeValue type;
   
-  private Type type = null;
-  
-  public Type getType(){
-    return type;
+  protected Value(Value type) {
+    assert type instanceof TypeValue;
+    this.type = (TypeValue) type;
   }
   
-  public Value(Type type){
-    this.type = checkNotNull(type);
+  public TypeValue getType() {
+    return this.type;
   }
+  
+  /*
+   * Executed during formal verification pass. Any errors should result in an
+   * exception.
+   */
+  public void verify() throws Exception {}
+  
+  /*
+   * Returns true if this value can be evaulated at compiletime.
+   * Either this or isSynthesizable or both must return true.
+   */
+  public abstract boolean isCompiletimeEvaluable();
+  
+  /*
+   * Returns true if this value is synthesizable, able to be represented in
+   * hardware.
+   */
+  public abstract boolean isSynthesizable();
 }

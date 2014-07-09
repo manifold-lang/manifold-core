@@ -4,7 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 
-public class Connection extends Value {
+public class ConnectionValue extends Value {
 
   private final Attributes attributes;
 
@@ -13,17 +13,17 @@ public class Connection extends Value {
     return attributes.get(attrName);
   }
   
-  private Port portFrom = null, portTo = null;
+  private PortValue portFrom = null, portTo = null;
   
-  public Port getFrom() {
+  public PortValue getFrom() {
     return portFrom;
   }
   
-  public Port getTo() {
+  public PortValue getTo() {
     return portTo;
   }
 
-  public Connection(ConnectionType type, Port from, Port to,
+  public ConnectionValue(ConnectionType type, PortValue from, PortValue to,
       Map<String, Value> attrs)
       throws UndeclaredAttributeException, InvalidAttributeException {
     super(type);
@@ -36,6 +36,16 @@ public class Connection extends Value {
         "Cannot create connection from a port to itself"
       );
     }
+  }
+
+  @Override
+  public boolean isCompiletimeEvaluable() {
+    return false;
+  }
+
+  @Override
+  public boolean isSynthesizable() {
+    return true;
   }
 
 }

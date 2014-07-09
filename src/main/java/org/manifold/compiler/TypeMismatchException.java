@@ -4,18 +4,18 @@ import org.manifold.compiler.back.SchematicException;
 
 public class TypeMismatchException extends SchematicException {
   private static final long serialVersionUID = 7730618233489002412L;
-  private final Type expected;
-  private final Type actual;
+  private final TypeValue expected;
+  private final TypeValue actual;
 
-  public TypeMismatchException(Type expected, Type actual){
+  public TypeMismatchException(TypeValue expected, TypeValue actual){
     this.expected = expected;
     this.actual = actual;
   }
 
-  public Type getExpectedType(){
+  public TypeValue getExpectedType(){
     return this.expected;
   }
-  public Type getActualType(){
+  public TypeValue getActualType(){
     return this.actual;
   }
 

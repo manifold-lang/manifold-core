@@ -7,9 +7,9 @@ import java.util.Map;
 public class Attributes {
   private final Map<String, Value> data;
 
-  public Attributes(Map<String, Type> types, Map<String, Value> data)
+  public Attributes(Map<String, TypeValue> types, Map<String, Value> data)
       throws UndeclaredAttributeException, InvalidAttributeException {
-    for (Map.Entry<String, Type> entry : types.entrySet()) {
+    for (Map.Entry<String, TypeValue> entry : types.entrySet()) {
       String attrName = entry.getKey();
       if (!data.containsKey(attrName)) {
         throw new UndeclaredAttributeException(attrName);
