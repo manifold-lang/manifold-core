@@ -2,19 +2,13 @@ package org.manifold.compiler;
 
 public class TypeTypeValue extends TypeValue {
 
-  private static final TypeTypeValue instance = new TypeTypeValue();
+  private static TypeTypeValue instance = new TypeTypeValue();
 
-  public static TypeTypeValue getInstance(){
+  public static TypeTypeValue getInstance() {    
     return instance;
   }
 
-  private TypeTypeValue() { }
-
-  public TypeTypeValue getType() {
-    return instance;
-  }
-
-  public void verify() { }
+  private TypeTypeValue() {}
 
   // We override the isSubtypeOf method to prevent recursive loops.
   @Override

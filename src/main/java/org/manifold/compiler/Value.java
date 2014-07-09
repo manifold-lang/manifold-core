@@ -2,10 +2,12 @@ package org.manifold.compiler;
 
 public abstract class Value {
 
-  protected TypeValue type;
+  private TypeValue type = null;
   
   protected Value(Value type) {
-    assert type instanceof TypeValue;
+    // Allow a "null" type so that TypeTypeValue can escape the circular
+    // dependency on itself (it will override getType)
+    assert type instanceof TypeValue || type == null;
     this.type = (TypeValue) type;
   }
   

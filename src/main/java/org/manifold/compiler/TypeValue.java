@@ -15,9 +15,10 @@ public abstract class TypeValue extends Value {
   */
   
   public TypeValue() {
-    super(TypeTypeValue.getInstance());
+    super(null);
   }
 
+  @Override
   public TypeValue getType() {
     return TypeTypeValue.getInstance();
   }
@@ -35,10 +36,12 @@ public abstract class TypeValue extends Value {
     }
   }
 
+  @Override
   public boolean isCompiletimeEvaluable() {
     return true;
   }
 
+  @Override
   public boolean isSynthesizable() {
     return false;
   }

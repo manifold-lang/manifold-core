@@ -30,15 +30,5 @@ public class TestTypeTypeValue {
   public void isSubtypeOf_true() {
     assertTrue(getInstance().isSubtypeOf(getInstance()));
   }
-  
-  @Test
-  public void verify() {
-    getInstance().verify();
-  }
-  
-  @Test
-  public void testVerify() {
-    getInstance().verify();
-  }
 
 }
