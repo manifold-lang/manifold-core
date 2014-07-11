@@ -15,6 +15,8 @@ import org.manifold.compiler.ConstraintValue;
 import org.manifold.compiler.UndefinedBehaviourError;
 import org.manifold.compiler.BooleanTypeValue;
 import org.manifold.compiler.IntegerTypeValue;
+
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -213,6 +215,10 @@ public class Schematic {
     } else {
       throw new UndeclaredIdentifierException(instanceName);
     }
+  }
+  
+  public Map<String, ConnectionValue> getConnections() {
+    return ImmutableMap.copyOf(connections);
   }
   
   public void addConstraint(String instanceName, ConstraintValue constraint)
