@@ -1,30 +1,30 @@
 package org.manifold.compiler.middle;
 
-import org.manifold.compiler.MultipleDefinitionException;
-import org.manifold.compiler.StringTypeValue;
-import org.manifold.compiler.MultipleAssignmentException;
-import org.manifold.compiler.NodeValue;
-import org.manifold.compiler.ConnectionValue;
-import org.manifold.compiler.ConnectionType;
-import org.manifold.compiler.NodeTypeValue;
-import org.manifold.compiler.PortTypeValue;
-import org.manifold.compiler.TypeValue;
-import org.manifold.compiler.UndeclaredIdentifierException;
-import org.manifold.compiler.ConstraintType;
-import org.manifold.compiler.ConstraintValue;
-import org.manifold.compiler.UndefinedBehaviourError;
-import org.manifold.compiler.BooleanTypeValue;
-import org.manifold.compiler.IntegerTypeValue;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import org.manifold.compiler.BooleanTypeValue;
+import org.manifold.compiler.ConnectionType;
+import org.manifold.compiler.ConnectionValue;
+import org.manifold.compiler.ConstraintType;
+import org.manifold.compiler.ConstraintValue;
+import org.manifold.compiler.IntegerTypeValue;
+import org.manifold.compiler.MultipleAssignmentException;
+import org.manifold.compiler.MultipleDefinitionException;
+import org.manifold.compiler.NodeTypeValue;
+import org.manifold.compiler.NodeValue;
+import org.manifold.compiler.PortTypeValue;
+import org.manifold.compiler.StringTypeValue;
+import org.manifold.compiler.TypeValue;
+import org.manifold.compiler.UndeclaredIdentifierException;
+import org.manifold.compiler.UndefinedBehaviourError;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * A Schematic contains all the information needed by the intermediate
@@ -215,6 +215,10 @@ public class Schematic {
     } else {
       throw new UndeclaredIdentifierException(instanceName);
     }
+  }
+  
+  public Map<String, NodeValue> getNodes() {
+    return ImmutableMap.copyOf(nodes);
   }
   
   public Map<String, ConnectionValue> getConnections() {

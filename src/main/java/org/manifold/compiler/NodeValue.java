@@ -2,13 +2,20 @@ package org.manifold.compiler;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.manifold.compiler.middle.SchematicException;
+
+import com.google.common.collect.ImmutableMap;
 
 public class NodeValue extends Value {
 
   private final Attributes attributes;
   private final Map<String, PortValue> ports;
 
+  public Map<String, PortValue> getPorts() {
+    return ImmutableMap.copyOf(ports);
+  }
+  
   public Value getAttribute(String attrName)
       throws UndeclaredAttributeException {
     return attributes.get(attrName);
