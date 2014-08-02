@@ -1,0 +1,46 @@
+{
+  "name": "dogematics",
+  "userDefinedTypes": {
+    "Bool": {},
+    "String": {},
+    "Int": {}
+  },
+  "portTypes": {
+    "digital_out": {
+      "attributes": {
+        "width": "Int"
+      }
+    },
+    "digital_in": {
+      "attributes": {
+        "width": "Int"
+      }
+    }
+  },
+  "nodeTypes": {
+    "out_node": {
+      "attributes": {},
+      "ports": {
+        "out1": "digital_out",
+        "out2": "digital_out"
+      }
+    },
+    "in_node": {
+      "attributes": {},
+      "ports": {
+        "in1": "digital_in",
+        "in2": "digital_in"
+      }
+    },
+    "and": {
+      "attributes": {},
+      "ports": {
+        "in1": "digital_in",
+        "in2": "digital_in",
+        "out1": "digital_out"
+      }
+    }
+  },
+  "connectionTypes": {},
+  "constraintTypes": {}
+}
