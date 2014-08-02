@@ -32,8 +32,8 @@ public class SchematicDeserializer {
 
   private Gson gson = new GsonBuilder().create();
 
-  private HashMap<String, TypeValue> getAttributes(Schematic sch, JsonObject obj)
-      throws UndeclaredIdentifierException {
+  private HashMap<String, TypeValue> getAttributes(Schematic sch,
+      JsonObject obj) throws UndeclaredIdentifierException {
     JsonObject attributeMapJson = obj.getAsJsonObject(ATTRIBUTES);
     HashMap<String, TypeValue> attributeMap = new HashMap<>();
 

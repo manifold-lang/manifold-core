@@ -70,7 +70,8 @@ public class TestSerialization {
     doutPortMap.put(OUT_PORT_NAME, dout);
 
     NodeTypeValue dinNodeType = new NodeTypeValue(new HashMap<>(), dinPortMap);
-    NodeTypeValue doutNodeType = new NodeTypeValue(new HashMap<>(), doutPortMap);
+    NodeTypeValue doutNodeType = new NodeTypeValue(new HashMap<>(),
+        doutPortMap);
 
     testSchematic.addNodeType(IN_NODE_NAME, dinNodeType);
     testSchematic.addNodeType(OUT_NODE_NAME, doutNodeType);
@@ -90,7 +91,8 @@ public class TestSerialization {
     // connection
     ConnectionType conType = new ConnectionType(new HashMap<>());
     ConnectionValue con = new ConnectionValue(conType, inNode
-        .getPort(IN_PORT_NAME), outNode.getPort(OUT_PORT_NAME), new HashMap<>());
+        .getPort(IN_PORT_NAME), outNode.getPort(OUT_PORT_NAME),
+        new HashMap<>());
 
     testSchematic.addConnection(CONNECTION_NAME, con);
   }
@@ -111,9 +113,11 @@ public class TestSerialization {
     final String OUT_NODE_NAME = "out_node";
     final String DIGITAL_IN_PORT_NAME = "digital_in";
     final String DIGITAL_OUT_PORT_NAME = "digital_out";
+    
+    URL url = Resources.getResource(
+        "org/manifold/compiler/serialization/data/"
+        + "deserialization-types-test.json");
 
-    URL url = this.getClass().getResource(
-        "data/deserialization-types-test.json");
     JsonObject json = new JsonParser().parse(
         Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
     Schematic sch = new SchematicDeserializer().deserialize(json);
