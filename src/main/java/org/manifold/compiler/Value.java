@@ -22,14 +22,13 @@ public abstract class Value {
   public void verify() throws Exception {}
   
   /*
-   * Returns true if this value can be evaulated at compiletime.
-   * Either this or isSynthesizable or both must return true.
+   * Returns true if this value can be known during elaboration.
+   * Either this or isRuntimeKnowable or both must return true.
    */
-  public abstract boolean isCompiletimeEvaluable();
+  public abstract boolean isElaborationtimeKnowable();
   
   /*
-   * Returns true if this value is synthesizable, able to be represented in
-   * hardware.
+   * Returns true if this value is able to be represented the intermediate.
    */
-  public abstract boolean isSynthesizable();
+  public abstract boolean isRuntimeKnowable();
 }
