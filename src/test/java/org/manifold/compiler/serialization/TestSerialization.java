@@ -130,7 +130,7 @@ public class TestSerialization {
     PortTypeValue digitalIn = sch.getPortType(DIGITAL_IN_PORT_NAME);
     PortTypeValue digitalOut = sch.getPortType(DIGITAL_OUT_PORT_NAME);
 
-    assertEquals("dogematics", sch.getName());
+    assertEquals(TEST_SCHEMATIC_NAME, sch.getName());
     assertEquals(sch.getUserDefinedType("Int"), digitalIn.getAttributes().get(
         "width"));
 
