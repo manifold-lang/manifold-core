@@ -31,7 +31,9 @@
       }
     },
     "and": {
-      "attributes": {},
+      "attributes": {
+        "is_awesome": "Bool"
+      },
       "ports": {
         "in1": "digital_in",
         "in2": "digital_in",
@@ -52,7 +54,7 @@
   "nodes": {
     "and_node": {
       "type": "and",
-      "attributes": {},
+      "attributes": { "is_awesome": false },
       "portAttrs": {
         "in1": {},
         "in2": {},
@@ -61,7 +63,7 @@
     },
     "and_node2": {
       "type": "and",
-      "attributes": {},
+      "attributes": { "is_awesome": true },
       "portAttrs": {
         "in1": {},
         "in2": {},

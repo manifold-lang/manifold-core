@@ -4,9 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
+import org.manifold.compiler.IntegerTypeValue;
+import org.manifold.compiler.IntegerValue;
 import org.manifold.compiler.InvalidAttributeException;
 import org.manifold.compiler.MultipleAssignmentException;
 import org.manifold.compiler.MultipleDefinitionException;
@@ -14,6 +17,8 @@ import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.PortValue;
+import org.manifold.compiler.StringTypeValue;
+import org.manifold.compiler.StringValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
 import org.manifold.compiler.UndeclaredIdentifierException;
@@ -73,8 +78,9 @@ public class SchematicDeserializer {
     return attributeMap;
   }
 
-  private Map<String, Value> getValueAttributes(Schematic sch, JsonObject obj)
-      throws UndeclaredIdentifierException {
+  private Map<String, Value> getValueAttributes(Schematic sch,
+      Map<String, TypeValue> expectedTypes, JsonObject obj)
+      throws UndeclaredIdentifierException, UndeclaredAttributeException {
     JsonObject attributeMapJson = obj.getAsJsonObject(ATTRIBUTES);
     HashMap<String, Value> attributeMap = new HashMap<>();
 
@@ -82,7 +88,37 @@ public class SchematicDeserializer {
       return attributeMap;
     }
 
+    // Ideally, some kind of createInstance(String) method on each TypeValue?
+    TypeValue bool = sch.getUserDefinedType("Bool");
+    TypeValue integer = sch.getUserDefinedType("Int");
+    TypeValue str = sch.getUserDefinedType("String");
+    
+    for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
+      TypeValue type = expectedTypes.get(attrEntry.getKey());
+      Value attrValue = null;
+      
+      String valueString = attrEntry.getValue().getAsString();
+
+      if (type == null) {
+        throw new UndeclaredAttributeException(attrEntry.getKey());
+      }
+
+      if (type.equals(bool)) {
+        attrValue = BooleanValue.getInstance(Boolean.valueOf(valueString));
+      } else if (type.equals(integer)) {
+        attrValue = new IntegerValue(IntegerTypeValue.getInstance(),
+              Integer.valueOf(valueString));
+      } else if (type.equals(str)) {
+        attrValue = new StringValue(StringTypeValue.getInstance(), valueString);
+      } else {
+        throw new UndeclaredAttributeException(attrEntry.getKey());
+      }
+      
+      attributeMap.put(attrEntry.getKey(), attrValue);
+    }
+
     // TODO (max): read these, dependent on IR attribute/type overhaul
+
 
     return attributeMap;
   }
@@ -175,14 +211,15 @@ public class SchematicDeserializer {
 
       NodeTypeValue nodeType = sch
           .getNodeType(nodeDef.get(TYPE).getAsString());
-      Map<String, Value> attributeMap = getValueAttributes(sch, nodeDef);
+      Map<String, Value> attributeMap = getValueAttributes(sch, nodeType
+          .getAttributes(), nodeDef);
       Map<String, Map<String, Value>> portAttrMap = new HashMap<>();
 
       JsonObject portAttrJson = nodeDef.getAsJsonObject(NODE_PORT_ATTRS);
 
       for (Entry<String, JsonElement> p : portAttrJson.entrySet()) {
-        portAttrMap.put(p.getKey(), getValueAttributes(sch, p.getValue()
-            .getAsJsonObject()));
+        portAttrMap.put(p.getKey(), getValueAttributes(sch, nodeType
+            .getAttributes(), p.getValue().getAsJsonObject()));
       }
 
       NodeValue node = new NodeValue(nodeType, attributeMap, portAttrMap);
@@ -212,7 +249,8 @@ public class SchematicDeserializer {
 
       ConnectionType conType = sch.getConnectionType(obj.get(TYPE)
           .getAsString());
-      Map<String, Value> attributeMap = getValueAttributes(sch, obj);
+      Map<String, Value> attributeMap = getValueAttributes(sch, conType
+          .getAttributes(), obj);
       ConnectionValue conVal = new ConnectionValue(conType,
           getPortValue(sch, obj.get(CONNECTION_FROM).getAsString()),
           getPortValue(sch, obj.get(CONNECTION_TO).getAsString()),
