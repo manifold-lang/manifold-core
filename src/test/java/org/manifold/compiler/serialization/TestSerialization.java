@@ -146,8 +146,10 @@ public class TestSerialization {
     assertEquals(sch.getNodeType("and"), andNode.getType());
     assertEquals(andNode.getType(), andNode2.getType());
     assertEquals(digitalIn, andNode.getPort("in1").getType());
-    assertFalse(((BooleanValue)andNode.getAttribute("is_awesome")).toBoolean());
-    assertTrue(((BooleanValue)andNode2.getAttribute("is_awesome")).toBoolean());
+    assertFalse(((BooleanValue) andNode.getAttribute("is_awesome"))
+        .toBoolean());
+    assertTrue(((BooleanValue) andNode2.getAttribute("is_awesome"))
+        .toBoolean());
 
     ConnectionValue conVal = sch.getConnection("con1");
     assertEquals(andNode.getPort("out1"), conVal.getFrom());
