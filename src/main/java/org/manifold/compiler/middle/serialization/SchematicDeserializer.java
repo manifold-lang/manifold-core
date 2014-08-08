@@ -104,7 +104,12 @@ public class SchematicDeserializer {
       }
 
       if (type.equals(bool)) {
-        attrValue = BooleanValue.getInstance(Boolean.valueOf(valueString));
+        if (!(Boolean.TRUE.toString().equals(valueString) ||
+              Boolean.FALSE.toString().equals(valueString))) {
+          throw new IllegalArgumentException(String.format(
+              "Expected boolean value of true or false, got %s", valueString));
+        }
+        attrValue = BooleanValue.getInstance(Boolean.parseBoolean(valueString));
       } else if (type.equals(integer)) {
         attrValue = new IntegerValue(IntegerTypeValue.getInstance(),
               Integer.valueOf(valueString));
