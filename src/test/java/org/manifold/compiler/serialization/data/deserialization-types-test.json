@@ -8,12 +8,10 @@
   "portTypes": {
     "digital_out": {
       "attributes": {
-        "width": "Int"
       }
     },
     "digital_in": {
       "attributes": {
-        "width": "Int"
       }
     }
   },
@@ -33,7 +31,9 @@
       }
     },
     "and": {
-      "attributes": {},
+      "attributes": {
+        "is_awesome": "Bool"
+      },
       "ports": {
         "in1": "digital_in",
         "in2": "digital_in",
@@ -41,6 +41,42 @@
       }
     }
   },
-  "connectionTypes": {},
-  "constraintTypes": {}
+  "connectionTypes": {
+    "wire": {
+      "attributes": {}
+    }
+  },
+  "constraintTypes": {
+    "rope": {
+      "attributes": {}
+    }
+  },
+  "nodes": {
+    "and_node": {
+      "type": "and",
+      "attributes": { "is_awesome": false },
+      "portAttrs": {
+        "in1": {},
+        "in2": {},
+        "out1": {}
+      }
+    },
+    "and_node2": {
+      "type": "and",
+      "attributes": { "is_awesome": true },
+      "portAttrs": {
+        "in1": {},
+        "in2": {},
+        "out1": {}
+      }
+    }
+  },
+  "connections": {
+    "con1": {
+      "type": "wire",
+      "attributes": {},
+      "from": "and_node:out1",
+      "to": "and_node2:in2"
+    }
+  }
 }

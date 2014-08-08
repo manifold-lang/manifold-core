@@ -1,6 +1,8 @@
 package org.manifold.compiler.serialization;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -12,11 +14,13 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
+import org.manifold.compiler.UndeclaredAttributeException;
 import org.manifold.compiler.UndeclaredIdentifierException;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
@@ -108,15 +112,15 @@ public class TestSerialization {
 
   @Test
   public void testDeserialize() throws IOException,
-      UndeclaredIdentifierException {
+      UndeclaredIdentifierException, UndeclaredAttributeException {
     final String IN_NODE_NAME = "in_node";
     final String OUT_NODE_NAME = "out_node";
     final String DIGITAL_IN_PORT_NAME = "digital_in";
     final String DIGITAL_OUT_PORT_NAME = "digital_out";
-    
-    URL url = Resources.getResource(
-        "org/manifold/compiler/serialization/data/"
-        + "deserialization-types-test.json");
+
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "deserialization-types-test.json");
 
     JsonObject json = new JsonParser().parse(
         Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
@@ -131,12 +135,24 @@ public class TestSerialization {
     PortTypeValue digitalOut = sch.getPortType(DIGITAL_OUT_PORT_NAME);
 
     assertEquals(TEST_SCHEMATIC_NAME, sch.getName());
-    assertEquals(sch.getUserDefinedType("Int"), digitalIn.getAttributes().get(
-        "width"));
-
     assertEquals(digitalIn, inNodePorts.get("in1"));
     assertEquals(digitalIn, inNodePorts.get("in2"));
     assertEquals(digitalOut, outNodePorts.get("out2"));
     assertEquals(digitalOut, outNodePorts.get("out2"));
+
+    NodeValue andNode = sch.getNode("and_node");
+    NodeValue andNode2 = sch.getNode("and_node2");
+
+    assertEquals(sch.getNodeType("and"), andNode.getType());
+    assertEquals(andNode.getType(), andNode2.getType());
+    assertEquals(digitalIn, andNode.getPort("in1").getType());
+    assertFalse(((BooleanValue) andNode.getAttribute("is_awesome"))
+        .toBoolean());
+    assertTrue(((BooleanValue) andNode2.getAttribute("is_awesome"))
+        .toBoolean());
+
+    ConnectionValue conVal = sch.getConnection("con1");
+    assertEquals(andNode.getPort("out1"), conVal.getFrom());
+    assertEquals(andNode2.getPort("in2"), conVal.getTo());
   }
 }
