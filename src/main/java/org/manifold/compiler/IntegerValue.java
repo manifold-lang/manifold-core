@@ -1,11 +1,12 @@
 package org.manifold.compiler;
 
+import org.manifold.compiler.IntegerTypeValue;
 
 public class IntegerValue extends Value {
 
   private final Integer val;
-  public IntegerValue(TypeValue t, Integer val){
-    super(t);
+  public IntegerValue(Integer val){
+    super(IntegerTypeValue.getInstance());
     this.val = val;
   }
 
@@ -18,5 +19,5 @@ public class IntegerValue extends Value {
   public boolean isRuntimeKnowable() {
     return false;
   }
-  
+
 }

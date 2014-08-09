@@ -92,11 +92,11 @@ public class SchematicDeserializer {
     TypeValue bool = sch.getUserDefinedType("Bool");
     TypeValue integer = sch.getUserDefinedType("Int");
     TypeValue str = sch.getUserDefinedType("String");
-    
+
     for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
       TypeValue type = expectedTypes.get(attrEntry.getKey());
       Value attrValue = null;
-      
+
       String valueString = attrEntry.getValue().getAsString();
 
       if (type == null) {
@@ -111,14 +111,13 @@ public class SchematicDeserializer {
         }
         attrValue = BooleanValue.getInstance(Boolean.parseBoolean(valueString));
       } else if (type.equals(integer)) {
-        attrValue = new IntegerValue(IntegerTypeValue.getInstance(),
-              Integer.valueOf(valueString));
+        attrValue = new IntegerValue(Integer.valueOf(valueString));
       } else if (type.equals(str)) {
         attrValue = new StringValue(StringTypeValue.getInstance(), valueString);
       } else {
         throw new UndeclaredAttributeException(attrEntry.getKey());
       }
-      
+
       attributeMap.put(attrEntry.getKey(), attrValue);
     }
 
@@ -193,7 +192,7 @@ public class SchematicDeserializer {
 
   /**
    * Node defn:
-   * 
+   *
    * <pre>
    * nodes: {
    *  node_one: {
