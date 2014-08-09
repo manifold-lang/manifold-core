@@ -1,7 +1,5 @@
 package org.manifold.compiler.middle;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -23,8 +21,6 @@ import org.manifold.compiler.UndeclaredIdentifierException;
 import org.manifold.compiler.UndefinedBehaviourError;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * A Schematic contains all the information needed by the intermediate
@@ -249,20 +245,4 @@ public class Schematic {
   // TODO do we add nodes as a function of their node definition right away, or
   // just record that the node "will" exist with such-and-such definition and
   // elaborate it later?
-
-  public void serialize(BufferedWriter out, boolean pretty) throws IOException {
-    Gson gson;
-    if (pretty) {
-      gson = new GsonBuilder().setPrettyPrinting().create();
-    } else {
-      gson = new Gson();
-    }
-    out.write(gson.toJson(this));
-    out.flush();
-  }
-
-  public void serialize(BufferedWriter out) throws IOException {
-    serialize(out, false);
-  }
-
 }

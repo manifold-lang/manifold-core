@@ -44,10 +44,10 @@ public class TestEnumValue {
     EnumValue foo1 = new EnumValue(type, "foo");
     foo1.verify();
     assertEquals(
-      foo1.getValue().isCompiletimeEvaluable(),
-      foo1.isCompiletimeEvaluable()
+      foo1.getValue().isElaborationtimeKnowable(),
+      foo1.isElaborationtimeKnowable()
     );
-    assertEquals(foo1.getValue().isSynthesizable(), foo1.isSynthesizable());
+    assertEquals(foo1.getValue().isRuntimeKnowable(), foo1.isRuntimeKnowable());
   }
 
   @Test
