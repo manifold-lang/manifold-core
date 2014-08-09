@@ -1,7 +1,5 @@
 package org.manifold.compiler;
 
-import org.manifold.compiler.IntegerTypeValue;
-
 public class IntegerValue extends Value {
 
   private final Integer val;
