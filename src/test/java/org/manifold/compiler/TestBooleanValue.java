@@ -37,12 +37,12 @@ public class TestBooleanValue {
   
   @Test
   public void testIsCompiletimeEvaluable() {
-    assertTrue(getInstance(false).isCompiletimeEvaluable());
+    assertTrue(getInstance(false).isElaborationtimeKnowable());
   }
   
   @Test
   public void testIsSynthesizable() {
-    assertTrue(getInstance(false).isSynthesizable());
+    assertTrue(getInstance(false).isRuntimeKnowable());
   }
   
   @Test

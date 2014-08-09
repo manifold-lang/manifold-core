@@ -15,7 +15,7 @@ public class NodeValue extends Value {
   public Map<String, PortValue> getPorts() {
     return ImmutableMap.copyOf(ports);
   }
-  
+
   public Value getAttribute(String attrName)
       throws UndeclaredAttributeException {
     return attributes.get(attrName);
@@ -23,7 +23,7 @@ public class NodeValue extends Value {
 
   public PortValue getPort(String portName)
       throws UndeclaredIdentifierException {
-    if (ports.containsKey(portName)){
+    if (ports.containsKey(portName)) {
       return ports.get(portName);
     } else {
       throw new UndeclaredIdentifierException(portName);
@@ -43,7 +43,7 @@ public class NodeValue extends Value {
           throw new UndeclaredIdentifierException(portName);
         }
       }
-      
+
       Map<String, PortTypeValue> ports = type.getPorts();
       for (Map.Entry<String, PortTypeValue> portEntry : ports.entrySet()) {
         String portName = portEntry.getKey();
@@ -58,12 +58,12 @@ public class NodeValue extends Value {
   }
 
   @Override
-  public boolean isCompiletimeEvaluable() {
+  public boolean isElaborationtimeKnowable() {
     return false;
   }
 
   @Override
-  public boolean isSynthesizable() {
+  public boolean isRuntimeKnowable() {
     return true;
   }
 }
