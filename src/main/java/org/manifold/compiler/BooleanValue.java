@@ -28,12 +28,12 @@ public class BooleanValue extends Value {
   public void verify() { }
 
   @Override
-  public boolean isCompiletimeEvaluable() {
+  public boolean isElaborationtimeKnowable() {
     return true;
   }
 
   @Override
-  public boolean isSynthesizable() {
+  public boolean isRuntimeKnowable() {
     return true;
   }
 }

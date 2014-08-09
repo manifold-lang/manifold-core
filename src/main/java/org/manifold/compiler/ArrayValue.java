@@ -41,9 +41,9 @@ public class ArrayValue extends Value {
   }
 
   @Override
-  public boolean isCompiletimeEvaluable() {
+  public boolean isElaborationtimeKnowable() {
     for (Value element : elements) {
-      if (!element.isCompiletimeEvaluable()) {
+      if (!element.isElaborationtimeKnowable()) {
         return false;
       }
     }
@@ -51,9 +51,9 @@ public class ArrayValue extends Value {
   }
 
   @Override
-  public boolean isSynthesizable() {
+  public boolean isRuntimeKnowable() {
     for (Value element : elements) {
-      if (!element.isSynthesizable()) {
+      if (!element.isRuntimeKnowable()) {
         return false;
       }
     }
