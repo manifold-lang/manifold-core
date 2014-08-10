@@ -12,18 +12,19 @@ public class ConstraintValue extends Value {
   }
 
   public ConstraintValue(ConstraintType type, Map<String, Value> attrs)
-      throws UndeclaredAttributeException, InvalidAttributeException {
+      throws UndeclaredAttributeException, InvalidAttributeException,
+      TypeMismatchException {
     super(type);
     this.attributes = new Attributes(type.getAttributes(), attrs);
   }
 
   @Override
-  public boolean isCompiletimeEvaluable() {
+  public boolean isElaborationtimeKnowable() {
     return false;
   }
 
   @Override
-  public boolean isSynthesizable() {
+  public boolean isRuntimeKnowable() {
     return true;
   }
 }

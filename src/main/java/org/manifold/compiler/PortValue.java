@@ -7,7 +7,7 @@ import java.util.Map;
 public class PortValue extends Value {
 
   private final Attributes attributes;
-  private final NodeValue parent;
+  private final transient NodeValue parent;
 
   public Value getAttribute(String attrName)
       throws UndeclaredAttributeException {
@@ -18,24 +18,22 @@ public class PortValue extends Value {
     return parent;
   }
 
-  public PortValue(
-      PortTypeValue type,
-      NodeValue parent,
-      Map<String, Value> attrMap
-  ) throws UndeclaredAttributeException, InvalidAttributeException {
-    
+  public PortValue(PortTypeValue type, NodeValue parent,
+      Map<String, Value> attrMap) throws UndeclaredAttributeException,
+      InvalidAttributeException, TypeMismatchException {
+
     super(type);
     this.attributes = new Attributes(type.getAttributes(), attrMap);
     this.parent = checkNotNull(parent);
   }
 
   @Override
-  public boolean isCompiletimeEvaluable() {
+  public boolean isElaborationtimeKnowable() {
     return false;
   }
 
   @Override
-  public boolean isSynthesizable() {
+  public boolean isRuntimeKnowable() {
     return true;
   }
 }

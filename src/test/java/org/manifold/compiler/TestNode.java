@@ -6,10 +6,10 @@ import com.google.common.collect.ImmutableMap;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.manifold.compiler.middle.SchematicException;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.manifold.compiler.middle.SchematicException;
 
 public class TestNode {
 
@@ -42,6 +42,7 @@ public class TestNode {
     new NodeValue(hasABCNodeAttr, ImmutableMap.of("abc", v), new HashMap<>());
   }
   
+
   @Test(
       expected = org.manifold.compiler.UndeclaredIdentifierException.class)
   public void testCreateWithInvalidPortName() throws SchematicException {
@@ -61,6 +62,12 @@ public class TestNode {
         PORT_ATTRS
     );
     assertEquals(v, n.getAttribute("abc"));
+  }
+
+  @Test(expected = org.manifold.compiler.TypeMismatchException.class)
+  public void testCreateWithInvalidPortType() throws SchematicException {
+    Value vInt = new IntegerValue(42);
+    new NodeValue(hasABCNodeAttr, ImmutableMap.of("abc", vInt), PORT_ATTRS);
   }
 
   @Test(expected = org.manifold.compiler.UndeclaredAttributeException.class)

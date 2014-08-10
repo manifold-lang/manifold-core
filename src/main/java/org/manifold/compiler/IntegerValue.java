@@ -1,22 +1,21 @@
 package org.manifold.compiler;
 
-
 public class IntegerValue extends Value {
 
   private final Integer val;
-  public IntegerValue(TypeValue t, Integer val){
-    super(t);
+  public IntegerValue(Integer val){
+    super(IntegerTypeValue.getInstance());
     this.val = val;
   }
 
   @Override
-  public boolean isCompiletimeEvaluable() {
+  public boolean isElaborationtimeKnowable() {
     return true;
   }
 
   @Override
-  public boolean isSynthesizable() {
+  public boolean isRuntimeKnowable() {
     return false;
   }
-  
+
 }

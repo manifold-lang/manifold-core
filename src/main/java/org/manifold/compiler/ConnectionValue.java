@@ -25,7 +25,8 @@ public class ConnectionValue extends Value {
 
   public ConnectionValue(ConnectionType type, PortValue from, PortValue to,
       Map<String, Value> attrs)
-      throws UndeclaredAttributeException, InvalidAttributeException {
+      throws UndeclaredAttributeException, InvalidAttributeException,
+      TypeMismatchException {
     super(type);
     this.attributes = new Attributes(type.getAttributes(), attrs);
     this.portFrom = checkNotNull(from);
@@ -39,12 +40,12 @@ public class ConnectionValue extends Value {
   }
 
   @Override
-  public boolean isCompiletimeEvaluable() {
+  public boolean isElaborationtimeKnowable() {
     return false;
   }
 
   @Override
-  public boolean isSynthesizable() {
+  public boolean isRuntimeKnowable() {
     return true;
   }
 

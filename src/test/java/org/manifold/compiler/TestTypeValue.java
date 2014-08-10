@@ -56,12 +56,12 @@ public class TestTypeValue {
 
   @Test
   public void testIsCompiletimeEvaluable() {
-    assertTrue(getInstance().isCompiletimeEvaluable());
+    assertTrue(getInstance().isElaborationtimeKnowable());
   }
 
   @Test
   public void testIsSynthesizable() {
-    assertFalse(getInstance().isSynthesizable());
+    assertFalse(getInstance().isRuntimeKnowable());
   }
 
 }
