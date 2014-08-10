@@ -3,25 +3,44 @@ package org.manifold.compiler;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
+import java.util.Set;
 
 public class Attributes {
   private final Map<String, Value> data;
 
   public Attributes(Map<String, TypeValue> types, Map<String, Value> data)
+      throws UndeclaredAttributeException, InvalidAttributeException,
+      TypeMismatchException {
+    validateAttrNames(types.keySet(), data.keySet());
+    validateAttrTypes(types, data);
+    this.data = ImmutableMap.copyOf(data);
+  }
+
+  private static void validateAttrNames(Set<String> typeNames,
+      Set<String> attrNames)
       throws UndeclaredAttributeException, InvalidAttributeException {
+    for (String name : attrNames) {
+      if (!typeNames.contains(name)) {
+        throw new InvalidAttributeException(name);
+      }
+    }
+    for (String name : typeNames) {
+      if (!attrNames.contains(name)) {
+        throw new UndeclaredAttributeException(name);
+      }
+    }
+  }
+
+  private static void validateAttrTypes(Map<String, TypeValue> types,
+      Map<String, Value> data) throws TypeMismatchException {
     for (Map.Entry<String, TypeValue> entry : types.entrySet()) {
       String attrName = entry.getKey();
-      if (!data.containsKey(attrName)) {
-        throw new UndeclaredAttributeException(attrName);
-      }
-      // TODO: Add attribute type checking in another diff.
-    }
-    for (String attrName : data.keySet()) {
-      if (!types.containsKey(attrName)) {
-        throw new InvalidAttributeException(attrName);
+      TypeValue expectedType = data.get(attrName).getType();
+      TypeValue actualType = entry.getValue();
+      if (!expectedType.isSubtypeOf(actualType)) {
+        throw new TypeMismatchException(expectedType, actualType);
       }
     }
-    this.data = ImmutableMap.copyOf(data);
   }
 
   public Value get(String attrName) throws UndeclaredAttributeException {
