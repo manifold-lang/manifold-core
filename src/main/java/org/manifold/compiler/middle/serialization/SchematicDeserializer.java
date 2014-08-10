@@ -1,5 +1,6 @@
 package org.manifold.compiler.middle.serialization;
 
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,7 +9,6 @@ import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
-import org.manifold.compiler.IntegerTypeValue;
 import org.manifold.compiler.IntegerValue;
 import org.manifold.compiler.InvalidAttributeException;
 import org.manifold.compiler.MultipleAssignmentException;
@@ -19,6 +19,7 @@ import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.PortValue;
 import org.manifold.compiler.StringTypeValue;
 import org.manifold.compiler.StringValue;
+import org.manifold.compiler.TypeMismatchException;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
 import org.manifold.compiler.UndeclaredIdentifierException;
@@ -246,7 +247,8 @@ public class SchematicDeserializer {
    */
   private void deserializeConnections(Schematic sch, JsonObject in)
       throws UndeclaredIdentifierException, UndeclaredAttributeException,
-      InvalidAttributeException, MultipleAssignmentException {
+      InvalidAttributeException, MultipleAssignmentException,
+      TypeMismatchException {
 
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       JsonObject obj = entry.getValue().getAsJsonObject();

@@ -12,7 +12,8 @@ public class ConstraintValue extends Value {
   }
 
   public ConstraintValue(ConstraintType type, Map<String, Value> attrs)
-      throws UndeclaredAttributeException, InvalidAttributeException {
+      throws UndeclaredAttributeException, InvalidAttributeException,
+      TypeMismatchException {
     super(type);
     this.attributes = new Attributes(type.getAttributes(), attrs);
   }

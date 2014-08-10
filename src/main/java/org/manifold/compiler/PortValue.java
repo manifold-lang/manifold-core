@@ -20,7 +20,7 @@ public class PortValue extends Value {
 
   public PortValue(PortTypeValue type, NodeValue parent,
       Map<String, Value> attrMap) throws UndeclaredAttributeException,
-      InvalidAttributeException {
+      InvalidAttributeException, TypeMismatchException {
 
     super(type);
     this.attributes = new Attributes(type.getAttributes(), attrMap);
