@@ -1,6 +1,8 @@
 package org.manifold.compiler;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -63,5 +65,4 @@ public class TestTypeValue {
   public void testIsSynthesizable() {
     assertFalse(getInstance().isRuntimeKnowable());
   }
-
 }
