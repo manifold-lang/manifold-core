@@ -68,5 +68,4 @@ public class TestTypeValue {
   public void testIsSynthesizable() {
     assertFalse(getInstance().isRuntimeKnowable());
   }
-
 }

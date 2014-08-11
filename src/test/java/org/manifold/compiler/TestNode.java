@@ -2,14 +2,14 @@ package org.manifold.compiler;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.common.collect.ImmutableMap;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.manifold.compiler.middle.SchematicException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class TestNode {
 

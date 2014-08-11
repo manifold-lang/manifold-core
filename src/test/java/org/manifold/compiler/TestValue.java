@@ -2,9 +2,9 @@ package org.manifold.compiler;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
-
 import java.util.HashMap;
+
+import org.junit.Test;
 import org.manifold.compiler.middle.SchematicException;
 
 public class TestValue {
@@ -17,5 +17,4 @@ public class TestValue {
     TypeValue actual = dom.getType();
     assertEquals(expected, actual);
   }
-
 }
