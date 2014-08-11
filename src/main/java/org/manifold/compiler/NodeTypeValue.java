@@ -1,8 +1,8 @@
 package org.manifold.compiler;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 public class NodeTypeValue extends TypeValue {
 
@@ -23,4 +23,10 @@ public class NodeTypeValue extends TypeValue {
   public Map<String, PortTypeValue> getPorts() {
     return this.ports;
   }
+  
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }

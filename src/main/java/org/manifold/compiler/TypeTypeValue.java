@@ -15,4 +15,10 @@ public class TypeTypeValue extends TypeValue {
   public boolean isSubtypeOf(TypeValue type) {
     return this == type;
   }
+  
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }
