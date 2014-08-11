@@ -10,4 +10,9 @@ public class BooleanTypeValue extends TypeValue {
 
   private BooleanTypeValue() { }
 
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }

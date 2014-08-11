@@ -22,6 +22,9 @@ public class TestTypeValue {
 
     @Override
     public void verify() {}
+
+    @Override
+    public void accept(ValueVisitor visitor) {}
   }
 
   private TypeValue getInstance() {

@@ -17,5 +17,10 @@ public class IntegerValue extends Value {
   public boolean isRuntimeKnowable() {
     return false;
   }
+  
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
+  }
 
 }

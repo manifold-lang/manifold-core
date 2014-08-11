@@ -1,8 +1,8 @@
 package org.manifold.compiler;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 
 public class ConstraintType extends TypeValue {
@@ -15,4 +15,10 @@ public class ConstraintType extends TypeValue {
   public ImmutableMap<String, TypeValue> getAttributes() {
     return attributes;
   }
+  
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }

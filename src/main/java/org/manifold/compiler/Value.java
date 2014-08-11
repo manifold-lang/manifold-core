@@ -1,5 +1,6 @@
 package org.manifold.compiler;
 
+
 public abstract class Value {
 
   private TypeValue type = null;
@@ -31,4 +32,6 @@ public abstract class Value {
    * Returns true if this value is able to be represented the intermediate.
    */
   public abstract boolean isRuntimeKnowable();
+  
+  public abstract void accept(ValueVisitor visitor);
 }

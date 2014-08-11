@@ -27,4 +27,10 @@ public class ConstraintValue extends Value {
   public boolean isRuntimeKnowable() {
     return true;
   }
+  
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }
