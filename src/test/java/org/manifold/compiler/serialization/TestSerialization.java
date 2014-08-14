@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +24,6 @@ import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
 import org.manifold.compiler.middle.serialization.SchematicDeserializer;
-import org.manifold.compiler.middle.serialization.SchematicSerializer;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -104,10 +101,6 @@ public class TestSerialization {
   @Ignore
   @Test
   public void testSerialize() throws IOException {
-    StringWriter outbuffer = new StringWriter();
-    new SchematicSerializer().serialize(testSchematic, new BufferedWriter(
-        outbuffer), true);
-    String result = outbuffer.toString();
   }
 
   @Test
