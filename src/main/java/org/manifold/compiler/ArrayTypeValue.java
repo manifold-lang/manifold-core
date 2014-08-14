@@ -13,4 +13,9 @@ public class ArrayTypeValue extends TypeValue {
     this.elementType = elementType;
   }
   
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }

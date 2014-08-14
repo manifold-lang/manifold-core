@@ -1,7 +1,8 @@
 package org.manifold.compiler;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 public class ArrayValue extends Value {
 
@@ -20,18 +21,18 @@ public class ArrayValue extends Value {
       }
     }
     // now we can copy the new list into our object
-    this.elements = new ArrayList<Value>(elements);
+    this.elements = ImmutableList.copyOf(elements);
   }
 
   public TypeValue getElementType(){
     return this.elementType;
   }
 
-  public Value get(Integer i){
+  public Value get(int i) {
     return elements.get(i);
   }
 
-  public Integer length(){
+  public int length() {
     return elements.size();
   }
 
@@ -58,6 +59,11 @@ public class ArrayValue extends Value {
       }
     }
     return true;
+  }
+  
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
   }
 
 }

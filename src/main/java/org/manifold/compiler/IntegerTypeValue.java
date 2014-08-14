@@ -10,4 +10,10 @@ public class IntegerTypeValue extends TypeValue {
   public static IntegerTypeValue getInstance() {
     return instance;
   }
+  
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }

@@ -1,7 +1,8 @@
 package org.manifold.compiler;
 
-import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 public class PortTypeValue extends TypeValue {
   private final Map<String, TypeValue> attributes;
@@ -13,4 +14,10 @@ public class PortTypeValue extends TypeValue {
   public Map<String, TypeValue> getAttributes() {
     return this.attributes;
   }
+  
+  @Override
+  public void accept(ValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }
