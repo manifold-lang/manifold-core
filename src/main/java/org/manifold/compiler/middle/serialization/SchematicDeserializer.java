@@ -34,7 +34,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
-public class SchematicDeserializer implements SeralizationConsts {
+public class SchematicDeserializer implements SerializationConsts {
 
   private Gson gson = new GsonBuilder().create();
 
