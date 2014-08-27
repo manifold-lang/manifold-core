@@ -34,36 +34,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
-public class SchematicDeserializer {
-
-  private static final String NODE_PORT_DELIM = ":";
-
-  private static final String NAME = "name";
-  private static final String ATTRIBUTES = "attributes";
-  private static final String TYPE = "type";
-
-  private static final String USER_DEF_TYPES = "userDefinedTypes";
-
-  private static final String PORT_TYPES = "portTypes";
-
-  private static final String NODE_TYPES = "nodeTypes";
-  private static final String NODE_TYPE_PORT_MAP = "ports";
-
-  private static final String CONNECTION_TYPES = "connectionTypes";
-  private static final String CONSTRAINT_TYPES = "constraintTypes";
-
-  private static final String NODES = "nodes";
-  private static final String NODE_PORT_ATTRS = "portAttrs";
-
-  private static final String CONNECTIONS = "connections";
-  private static final String CONNECTION_FROM = "from";
-  private static final String CONNECTION_TO = "to";
+public class SchematicDeserializer implements SerializationConsts {
 
   private Gson gson = new GsonBuilder().create();
 
   private Map<String, TypeValue> getTypeDefAttributes(Schematic sch,
       JsonObject obj) throws UndeclaredIdentifierException {
-    JsonObject attributeMapJson = obj.getAsJsonObject(ATTRIBUTES);
+    JsonObject attributeMapJson = obj.getAsJsonObject(GlobalConsts.ATTRIBUTES);
     HashMap<String, TypeValue> attributeMap = new HashMap<>();
 
     if (attributeMapJson == null) {
@@ -82,7 +59,7 @@ public class SchematicDeserializer {
   private Map<String, Value> getValueAttributes(Schematic sch,
       Map<String, TypeValue> expectedTypes, JsonObject obj)
       throws UndeclaredIdentifierException, UndeclaredAttributeException {
-    JsonObject attributeMapJson = obj.getAsJsonObject(ATTRIBUTES);
+    JsonObject attributeMapJson = obj.getAsJsonObject(GlobalConsts.ATTRIBUTES);
     HashMap<String, Value> attributeMap = new HashMap<>();
 
     if (attributeMapJson == null) {
@@ -130,7 +107,7 @@ public class SchematicDeserializer {
 
   private PortValue getPortValue(Schematic sch, String ref)
       throws UndeclaredIdentifierException {
-    int delim = ref.indexOf(NODE_PORT_DELIM);
+    int delim = ref.indexOf(GlobalConsts.NODE_PORT_DELIM);
     NodeValue node = sch.getNode(ref.substring(0, delim));
     return node.getPort(ref.substring(delim + 1));
   }
@@ -157,7 +134,7 @@ public class SchematicDeserializer {
 
       Map<String, PortTypeValue> portMap = new HashMap<>();
       JsonObject portMapJson = entry.getValue().getAsJsonObject()
-          .getAsJsonObject(NODE_TYPE_PORT_MAP);
+          .getAsJsonObject(NodeTypeConsts.PORT_MAP);
 
       for (Entry<String, JsonElement> portEntry : portMapJson.entrySet()) {
         portMap.put(portEntry.getKey(), sch.getPortType(portEntry.getValue()
@@ -215,12 +192,12 @@ public class SchematicDeserializer {
       JsonObject nodeDef = entry.getValue().getAsJsonObject();
 
       NodeTypeValue nodeType = sch
-          .getNodeType(nodeDef.get(TYPE).getAsString());
+          .getNodeType(nodeDef.get(GlobalConsts.TYPE).getAsString());
       Map<String, Value> attributeMap = getValueAttributes(sch, nodeType
           .getAttributes(), nodeDef);
       Map<String, Map<String, Value>> portAttrMap = new HashMap<>();
 
-      JsonObject portAttrJson = nodeDef.getAsJsonObject(NODE_PORT_ATTRS);
+      JsonObject portAttrJson = nodeDef.getAsJsonObject(NodeConsts.PORT_ATTRS);
 
       for (Entry<String, JsonElement> p : portAttrJson.entrySet()) {
         portAttrMap.put(p.getKey(), getValueAttributes(sch, nodeType
@@ -253,13 +230,13 @@ public class SchematicDeserializer {
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       JsonObject obj = entry.getValue().getAsJsonObject();
 
-      ConnectionType conType = sch.getConnectionType(obj.get(TYPE)
+      ConnectionType conType = sch.getConnectionType(obj.get(GlobalConsts.TYPE)
           .getAsString());
       Map<String, Value> attributeMap = getValueAttributes(sch, conType
           .getAttributes(), obj);
       ConnectionValue conVal = new ConnectionValue(conType,
-          getPortValue(sch, obj.get(CONNECTION_FROM).getAsString()),
-          getPortValue(sch, obj.get(CONNECTION_TO).getAsString()),
+          getPortValue(sch, obj.get(ConnectionConsts.FROM).getAsString()),
+          getPortValue(sch, obj.get(ConnectionConsts.TO).getAsString()),
           attributeMap);
 
       sch.addConnection(entry.getKey(), conVal);
@@ -267,18 +244,22 @@ public class SchematicDeserializer {
   }
 
   public Schematic deserialize(JsonObject in) {
-    Schematic sch = new Schematic(in.get(NAME).getAsString());
+    Schematic sch = new Schematic(
+        in.get(GlobalConsts.SCHEMATIC_NAME).getAsString());
 
     try {
       // how to do this? should we have these in the IR at all? or should they
       // just be unrolled into the base types?
       // deserializeUserDefinedTypes(sch, in.getAsJsonObject(USER_DEF_TYPES));
-      deserializePortTypes(sch, in.getAsJsonObject(PORT_TYPES));
-      deserializeNodeTypes(sch, in.getAsJsonObject(NODE_TYPES));
-      deserializeConnectionTypes(sch, in.getAsJsonObject(CONNECTION_TYPES));
-      deserializeConstraintTypes(sch, in.getAsJsonObject(CONSTRAINT_TYPES));
-      deserializeNodes(sch, in.getAsJsonObject(NODES));
-      deserializeConnections(sch, in.getAsJsonObject(CONNECTIONS));
+      deserializePortTypes(sch, in.getAsJsonObject(SchematicConsts.PORT_TYPES));
+      deserializeNodeTypes(sch, in.getAsJsonObject(SchematicConsts.NODE_TYPES));
+      deserializeConnectionTypes(sch,
+          in.getAsJsonObject(SchematicConsts.CONNECTION_TYPES));
+      deserializeConstraintTypes(sch,
+          in.getAsJsonObject(SchematicConsts.CONSTRAINT_TYPES));
+      deserializeNodes(sch, in.getAsJsonObject(SchematicConsts.NODE_DEFS));
+      deserializeConnections(sch,
+          in.getAsJsonObject(SchematicConsts.CONNECTION_DEFS));
       // TODO (max): constraints once they're fleshed out
     } catch (Exception e) {
       Throwables.propagate(e);
