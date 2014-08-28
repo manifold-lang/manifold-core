@@ -49,9 +49,6 @@ public class ConnectionValue extends Value {
     return true;
   }
 
-  @Override
-  public void accept(ValueVisitor visitor) {
-    visitor.visit(this);
-  }
+  
   
 }

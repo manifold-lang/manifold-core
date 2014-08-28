@@ -16,9 +16,6 @@ public class TypeTypeValue extends TypeValue {
     return this == type;
   }
   
-  @Override
-  public void accept(ValueVisitor visitor) {
-    visitor.visit(this);
-  }
+  
   
 }

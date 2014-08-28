@@ -9,9 +9,6 @@ public class NilTypeValue extends TypeValue {
 
   private NilTypeValue() { }
   
-  @Override
-  public void accept(ValueVisitor visitor) {
-    visitor.visit(this);
-  }
+  
   
 }

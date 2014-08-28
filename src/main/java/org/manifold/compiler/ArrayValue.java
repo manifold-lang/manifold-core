@@ -61,9 +61,6 @@ public class ArrayValue extends Value {
     return true;
   }
   
-  @Override
-  public void accept(ValueVisitor visitor) {
-    visitor.visit(this);
-  }
+  
 
 }

@@ -10,9 +10,6 @@ public class StringTypeValue extends TypeValue {
     return instance;
   }
   
-  @Override
-  public void accept(ValueVisitor visitor) {
-    visitor.visit(this);
-  }
+  
   
 }

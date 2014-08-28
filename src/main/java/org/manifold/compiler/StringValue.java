@@ -19,9 +19,6 @@ public class StringValue extends Value {
     return false;
   }
 
-  @Override
-  public void accept(ValueVisitor visitor) {
-    visitor.visit(this);
-  }
+  
   
 }

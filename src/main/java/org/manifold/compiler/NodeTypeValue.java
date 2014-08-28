@@ -24,9 +24,6 @@ public class NodeTypeValue extends TypeValue {
     return this.ports;
   }
   
-  @Override
-  public void accept(ValueVisitor visitor) {
-    visitor.visit(this);
-  }
+  
   
 }

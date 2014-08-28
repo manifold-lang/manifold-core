@@ -16,9 +16,6 @@ public class ConstraintType extends TypeValue {
     return attributes;
   }
   
-  @Override
-  public void accept(ValueVisitor visitor) {
-    visitor.visit(this);
-  }
+  
   
 }

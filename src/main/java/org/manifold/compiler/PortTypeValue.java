@@ -15,9 +15,6 @@ public class PortTypeValue extends TypeValue {
     return this.attributes;
   }
   
-  @Override
-  public void accept(ValueVisitor visitor) {
-    visitor.visit(this);
-  }
+  
   
 }

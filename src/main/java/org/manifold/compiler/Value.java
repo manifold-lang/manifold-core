@@ -33,5 +33,4 @@ public abstract class Value {
    */
   public abstract boolean isRuntimeKnowable();
   
-  public abstract void accept(ValueVisitor visitor);
 }
