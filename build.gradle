@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
-apply plugin: 'coveralls'
+apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'checkstyle'
 apply plugin:'application'
 
@@ -39,7 +39,7 @@ buildscript {
 
   dependencies {
     classpath 'org.ajoberstar:gradle-jacoco:0.2.0'
-    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.3.0'
+    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:1.0.2'
   }
 }
 
