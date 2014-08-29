@@ -78,3 +78,13 @@ checkstyle {
   toolVersion = "5.7"
 }
 
+task jenkinsTest {
+  inputs.files test.outputs.files
+  doLast {
+    def timestamp = System.currentTimeMillis()
+    testResultsDir.eachFile { it.lastModified = timestamp }
+  }
+}
+
+build.dependsOn(jenkinsTest)
+
