@@ -3,12 +3,16 @@ apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'checkstyle'
-apply plugin:'application'
+apply plugin: 'application'
+apply plugin: 'maven'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = '0.1.0'
+group = "org.manifold"
+// name = "manifold-core"
+version = '0.1.0-SNAPSHOT'
+
 jar {
   manifest {
     attributes 'Implementation-Title': 'Manifold Core', 'Implementation-Version': version
@@ -88,3 +92,10 @@ task jenkinsTest {
 
 build.dependsOn(jenkinsTest)
 
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      repository(url: "file://localhost/var/www/releases")
+    }
+  }
+}
