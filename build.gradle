@@ -3,12 +3,12 @@ apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'checkstyle'
-apply plugin:'application'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = '0.1.0'
+version = '0.1.0-SNAPSHOT'
 jar {
   manifest {
     attributes 'Implementation-Title': 'Manifold Core', 'Implementation-Version': version
