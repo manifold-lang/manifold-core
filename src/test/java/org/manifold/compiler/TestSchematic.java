@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.junit.Test;
 import org.manifold.compiler.middle.Schematic;
@@ -155,6 +156,116 @@ public class TestSchematic {
     // try to add another constraint type with the same name
     ConstraintType cv2 = new ConstraintType(attributes);
     sch.addConstraintType(constraintTypeName, cv2);
+  }
+  
+  @Test(expected = MultipleAssignmentException.class)
+  public void testAddNode_AlreadyDeclared_ThrowsException()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    // create a test node type
+    String nodeTypeName = "TestNode";
+    Map<String, TypeValue> attributes = new HashMap<>();
+    Map<String, PortTypeValue> ports = new HashMap<>();
+    NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
+    sch.addNodeType(nodeTypeName, nodeType);
+    // create a node based on this type
+    String nodeName = "testNode";
+    Map<String, Value> nodeAttrs = new HashMap<>();
+    Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
+    try {
+      NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+      sch.addNode(nodeName, node1);
+    } catch (MultipleAssignmentException e) {
+      fail("exception thrown too early");
+    }
+    // try to add another node with the same name
+    NodeValue node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+    sch.addNode(nodeName, node2);
+  }
+  
+  @Test
+  public void testGetNodeName()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    // create a test node type
+    String nodeTypeName = "TestNode";
+    Map<String, TypeValue> attributes = new HashMap<>();
+    Map<String, PortTypeValue> ports = new HashMap<>();
+    NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
+    sch.addNodeType(nodeTypeName, nodeType);
+    // create a node based on this type
+    String nodeName = "testNode";
+    Map<String, Value> nodeAttrs = new HashMap<>();
+    Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
+    NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+    sch.addNode(nodeName, node1);
+    String retrievedNodeName = sch.getNodeName(node1);
+    assertEquals(nodeName, retrievedNodeName);
+  }
+  
+  @Test(expected = NoSuchElementException.class)
+  public void testGetNodeName_Undeclared_ThrowsException()
+      throws NoSuchElementException, SchematicException {
+    Schematic sch = new Schematic("test");
+    // create a test node type
+    String nodeTypeName = "TestNode";
+    Map<String, TypeValue> attributes = new HashMap<>();
+    Map<String, PortTypeValue> ports = new HashMap<>();
+    NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
+    sch.addNodeType(nodeTypeName, nodeType);
+    // create a node based on this type
+    String nodeName = "testNode";
+    Map<String, Value> nodeAttrs = new HashMap<>();
+    Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
+    NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+    // don't add this node to the schematic, but instead try to get its name
+    String retrievedName = sch.getNodeName(node1);
+  }
+  
+  @Test(expected = MultipleAssignmentException.class)
+  public void testAddConnection_AlreadyDeclared_ThrowsException()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    ConnectionType connType = null;
+    NodeValue node1 = null, node2 = null;
+    Map<String, Value> connAttrs = null;
+    String connName = "conn1";
+    try {
+      // create a test port type
+      String portTypeName = "TestPort";
+      Map<String, TypeValue> portAttributes = new HashMap<>();
+      PortTypeValue portType = new PortTypeValue(portAttributes);
+      sch.addPortType(portTypeName, portType);
+      // create a test node type
+      String nodeTypeName = "TestNode";
+      Map<String, TypeValue> attributes = new HashMap<>();
+      Map<String, PortTypeValue> ports = new HashMap<>();
+      ports.put("p", portType);
+      NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
+      sch.addNodeType(nodeTypeName, nodeType);
+      // create two nodes based on this type
+      Map<String, Value> nodeAttrs = new HashMap<>();
+      Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
+      nodePortAttrs.put("p", new HashMap<>());
+      node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+      sch.addNode("node1", node1);
+      node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+      sch.addNode("node2", node2);
+      // create a test connection type
+      String connTypeName = "TestConn";
+      connType = new ConnectionType(attributes);
+      sch.addConnectionType(connTypeName, connType);
+      // create the first connection
+      connAttrs = new HashMap<>();
+      ConnectionValue conn1 = new ConnectionValue(
+          connType, node1.getPort("p"), node2.getPort("p"), connAttrs);
+      sch.addConnection(connName, conn1);
+    } catch (MultipleAssignmentException e) {
+      fail("exception thrown too early");
+    }
+    ConnectionValue conn2 = new ConnectionValue(
+        connType, node1.getPort("p"), node2.getPort("p"), connAttrs);
+    sch.addConnection(connName, conn2);
   }
   
 }
