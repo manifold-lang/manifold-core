@@ -16,6 +16,8 @@ public class ConstraintType extends TypeValue {
     return attributes;
   }
   
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }

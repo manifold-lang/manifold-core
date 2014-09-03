@@ -10,6 +10,8 @@ public class StringTypeValue extends TypeValue {
     return instance;
   }
   
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }

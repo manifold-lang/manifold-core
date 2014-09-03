@@ -19,6 +19,8 @@ public class StringValue extends Value {
     return false;
   }
 
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }

@@ -67,6 +67,8 @@ public class NodeValue extends Value {
     return true;
   }
   
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }
