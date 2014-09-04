@@ -83,6 +83,45 @@ public class TestSchematic {
         connections.isEmpty());
   }
   
+  @Test
+  public void testGetNodeName()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    // create a test node type
+    String nodeTypeName = "TestNode";
+    Map<String, TypeValue> attributes = new HashMap<>();
+    Map<String, PortTypeValue> ports = new HashMap<>();
+    NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
+    sch.addNodeType(nodeTypeName, nodeType);
+    // create a node based on this type
+    String nodeName = "testNode";
+    Map<String, Value> nodeAttrs = new HashMap<>();
+    Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
+    NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+    sch.addNode(nodeName, node1);
+    String retrievedNodeName = sch.getNodeName(node1);
+    assertEquals(nodeName, retrievedNodeName);
+  }
+  
+  @Test(expected = NoSuchElementException.class)
+  public void testGetNodeName_Undeclared_ThrowsException()
+      throws NoSuchElementException, SchematicException {
+    Schematic sch = new Schematic("test");
+    // create a test node type
+    String nodeTypeName = "TestNode";
+    Map<String, TypeValue> attributes = new HashMap<>();
+    Map<String, PortTypeValue> ports = new HashMap<>();
+    NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
+    sch.addNodeType(nodeTypeName, nodeType);
+    // create a node based on this type
+    String nodeName = "testNode";
+    Map<String, Value> nodeAttrs = new HashMap<>();
+    Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
+    NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+    // don't add this node to the schematic, but instead try to get its name
+    String retrievedName = sch.getNodeName(node1);
+  }
+  
   @Test(expected = MultipleDefinitionException.class)
   public void testAddUserDefinedType_AlreadyDefined_ThrowsException()
       throws SchematicException {
@@ -195,45 +234,6 @@ public class TestSchematic {
     // try to add another node with the same name
     NodeValue node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
     sch.addNode(nodeName, node2);
-  }
-  
-  @Test
-  public void testGetNodeName()
-      throws SchematicException {
-    Schematic sch = new Schematic("test");
-    // create a test node type
-    String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
-    Map<String, PortTypeValue> ports = new HashMap<>();
-    NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
-    sch.addNodeType(nodeTypeName, nodeType);
-    // create a node based on this type
-    String nodeName = "testNode";
-    Map<String, Value> nodeAttrs = new HashMap<>();
-    Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
-    NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
-    sch.addNode(nodeName, node1);
-    String retrievedNodeName = sch.getNodeName(node1);
-    assertEquals(nodeName, retrievedNodeName);
-  }
-  
-  @Test(expected = NoSuchElementException.class)
-  public void testGetNodeName_Undeclared_ThrowsException()
-      throws NoSuchElementException, SchematicException {
-    Schematic sch = new Schematic("test");
-    // create a test node type
-    String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
-    Map<String, PortTypeValue> ports = new HashMap<>();
-    NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
-    sch.addNodeType(nodeTypeName, nodeType);
-    // create a node based on this type
-    String nodeName = "testNode";
-    Map<String, Value> nodeAttrs = new HashMap<>();
-    Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
-    NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
-    // don't add this node to the schematic, but instead try to get its name
-    String retrievedName = sch.getNodeName(node1);
   }
   
   @Test(expected = MultipleAssignmentException.class)
