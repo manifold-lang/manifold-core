@@ -41,6 +41,13 @@ public class TestSchematic {
   }
   
   @Test(expected = UndeclaredIdentifierException.class)
+  public void testGetConstraintType_Undeclared_ThrowsException()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    ConstraintType tv = sch.getConstraintType("bogus");
+  }
+  
+  @Test(expected = UndeclaredIdentifierException.class)
   public void testGetNode_Undeclared_ThrowsException()
       throws SchematicException {
     Schematic sch = new Schematic("test");
@@ -52,6 +59,13 @@ public class TestSchematic {
       throws SchematicException {
     Schematic sch = new Schematic("test");
     ConnectionValue cv = sch.getConnection("bogus");
+  }
+  
+  @Test(expected = UndeclaredIdentifierException.class)
+  public void testGetConstraint_Undeclared_ThrowsException()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    ConstraintValue cv = sch.getConstraint("bogus");
   }
   
   @Test
@@ -266,6 +280,25 @@ public class TestSchematic {
     ConnectionValue conn2 = new ConnectionValue(
         connType, node1.getPort("p"), node2.getPort("p"), connAttrs);
     sch.addConnection(connName, conn2);
+  }
+  
+  @Test(expected = MultipleAssignmentException.class)
+  public void testAddConstraint_AlreadyDeclared_ThrowsException()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    // create a test constraint type
+    Map<String, TypeValue> typeAttrs = new HashMap<>();
+    ConstraintType cxtType = new ConstraintType(typeAttrs);
+    String cxtName = "cxt1";
+    Map<String, Value> attrs = new HashMap<>();
+    try {
+      ConstraintValue cxt1 = new ConstraintValue(cxtType, attrs);
+      sch.addConstraint(cxtName, cxt1);
+    } catch (MultipleAssignmentException e) {
+      fail("exception thrown too early");
+    }
+    ConstraintValue cxt2 = new ConstraintValue(cxtType, attrs);
+    sch.addConstraint(cxtName, cxt2);
   }
   
 }
