@@ -19,7 +19,6 @@ import org.manifold.compiler.StringTypeValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredIdentifierException;
 import org.manifold.compiler.UndefinedBehaviourError;
-import org.manifold.compiler.middle.serialization.SchematicSerializer;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -218,14 +217,6 @@ public class Schematic {
     }
   }
 
-  public Map<String, NodeValue> getNodes() {
-    return ImmutableMap.copyOf(nodes);
-  }
-
-  public Map<String, ConnectionValue> getConnections() {
-    return ImmutableMap.copyOf(connections);
-  }
-
   public void addConstraint(String instanceName, ConstraintValue constraint)
       throws MultipleAssignmentException {
     if (constraints.containsKey(instanceName)) {
@@ -243,16 +234,36 @@ public class Schematic {
     }
   }
 
+  public Map<String, TypeValue> getUserDefinedTypes() {
+    return ImmutableMap.copyOf(userDefinedTypes);
+  }
+
+  public Map<String, PortTypeValue> getPortTypes() {
+    return ImmutableMap.copyOf(portTypes);
+  }
+
+  public Map<String, NodeTypeValue> getNodeTypes() {
+    return ImmutableMap.copyOf(nodeTypes);
+  }
+
+  public Map<String, ConnectionType> getConnectionTypes() {
+    return ImmutableMap.copyOf(connectionTypes);
+  }
+
+  public Map<String, ConstraintType> getConstraintTypes() {
+    return ImmutableMap.copyOf(constraintTypes);
+  }
+
+  public Map<String, NodeValue> getNodes() {
+    return ImmutableMap.copyOf(nodes);
+  }
+
+  public Map<String, ConnectionValue> getConnections() {
+    return ImmutableMap.copyOf(connections);
+  }
+
+
   // TODO do we add nodes as a function of their node definition right away, or
   // just record that the node "will" exist with such-and-such definition and
   // elaborate it later?
-
-  public void serialize(SchematicSerializer serializer) {
-    // kind of a hacky way to expose the mappings
-    serializer.addUserDefType(userDefinedTypes);
-    serializer.addPortTypes(portTypes);
-    serializer.addNodeTypes(nodeTypes);
-    serializer.addConnectionTypes(connectionTypes);
-    serializer.addConstraintTypes(constraintTypes);
-  }
 }

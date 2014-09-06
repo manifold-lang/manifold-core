@@ -58,8 +58,7 @@ public class SchematicSerializer {
       if (key.equals("Bool") || key.equals("Int") || key.equals("String")) {
         return;
       }
-      // TODO: Add user def types once we have them
-      });
+    });
     schJson.add(USER_DEF_TYPES, collection);
   }
 
@@ -105,8 +104,7 @@ public class SchematicSerializer {
       rConnectionTypeMap.put(val, key);
 
       JsonObject single = new JsonObject();
-      single.add(ATTRIBUTES,
-          serializeTypeAttr(val.getAttributes()));
+      single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
       collection.add(key, single);
     });
 
@@ -133,7 +131,11 @@ public class SchematicSerializer {
 
   public static JsonObject serialize(Schematic sch) {
     SchematicSerializer serializer = new SchematicSerializer(sch);
-    sch.serialize(serializer);
+    serializer.addUserDefType(sch.getUserDefinedTypes());
+    serializer.addPortTypes(sch.getPortTypes());
+    serializer.addNodeTypes(sch.getNodeTypes());
+    serializer.addConnectionTypes(sch.getConnectionTypes());
+    serializer.addConstraintTypes(sch.getConstraintTypes());
     return serializer.getJson();
   }
 }
