@@ -15,6 +15,8 @@ public class PortTypeValue extends TypeValue {
     return this.attributes;
   }
   
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }

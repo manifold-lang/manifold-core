@@ -6,4 +6,5 @@
 
 <suppressions>
   <suppress checks=".*" files="build[\\/]generated-src[\\/]" />
+  <suppress checks=".*" files="src[\\/]main[\\/]java[\\/]org[\\/]manifold[\\/]compiler[\\/]middle[\\/]serialization[\\/]SchematicSerializer.java" />
 </suppressions>

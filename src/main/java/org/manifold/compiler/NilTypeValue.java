@@ -9,6 +9,8 @@ public class NilTypeValue extends TypeValue {
 
   private NilTypeValue() { }
   
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }
