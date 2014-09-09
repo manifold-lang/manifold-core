@@ -24,6 +24,8 @@ public class NodeTypeValue extends TypeValue {
     return this.ports;
   }
   
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }

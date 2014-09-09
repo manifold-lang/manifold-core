@@ -49,6 +49,8 @@ public class ConnectionValue extends Value {
     return true;
   }
 
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }
