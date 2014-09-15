@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
@@ -24,9 +23,13 @@ import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
 import org.manifold.compiler.middle.serialization.SchematicDeserializer;
+import org.manifold.compiler.middle.serialization.SchematicSerializer;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -98,9 +101,25 @@ public class TestSerialization {
     testSchematic.addConnection(CONNECTION_NAME, con);
   }
 
-  @Ignore
   @Test
   public void testSerialize() throws IOException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "deserialization-types-test.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+
+    JsonObject result = SchematicSerializer.serialize(sch);
+
+    // fuck this pretty printing
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
   }
 
   @Test

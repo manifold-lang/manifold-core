@@ -10,6 +10,8 @@ public class BooleanTypeValue extends TypeValue {
 
   private BooleanTypeValue() { }
 
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }

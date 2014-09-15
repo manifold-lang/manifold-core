@@ -33,4 +33,12 @@ public abstract class Value {
    */
   public abstract boolean isRuntimeKnowable();
   
+  /*
+   * Allows SchematicValueVisitors to process this Value.
+   * Must be overridden in every subclass of Value that can be instantiated,
+   * usually with code of the form "visitor.visit(this);".
+   */
+  
+  public abstract void accept(SchematicValueVisitor visitor);
+  
 }

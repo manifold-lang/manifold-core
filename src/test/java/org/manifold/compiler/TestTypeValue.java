@@ -22,6 +22,10 @@ public class TestTypeValue {
 
     @Override
     public void verify() {}
+    
+    // Not tested.
+    public void accept(SchematicValueVisitor visitor) {}
+    
   }
 
   private TypeValue getInstance() {

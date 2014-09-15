@@ -16,6 +16,8 @@ public class TypeTypeValue extends TypeValue {
     return this == type;
   }
   
-  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
   
 }

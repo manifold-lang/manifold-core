@@ -217,14 +217,6 @@ public class Schematic {
     }
   }
 
-  public Map<String, NodeValue> getNodes() {
-    return ImmutableMap.copyOf(nodes);
-  }
-  
-  public Map<String, ConnectionValue> getConnections() {
-    return ImmutableMap.copyOf(connections);
-  }
-
   public void addConstraint(String instanceName, ConstraintValue constraint)
       throws MultipleAssignmentException {
     if (constraints.containsKey(instanceName)) {
@@ -241,6 +233,35 @@ public class Schematic {
       throw new UndeclaredIdentifierException(instanceName);
     }
   }
+
+  public Map<String, TypeValue> getUserDefinedTypes() {
+    return ImmutableMap.copyOf(userDefinedTypes);
+  }
+
+  public Map<String, PortTypeValue> getPortTypes() {
+    return ImmutableMap.copyOf(portTypes);
+  }
+
+  public Map<String, NodeTypeValue> getNodeTypes() {
+    return ImmutableMap.copyOf(nodeTypes);
+  }
+
+  public Map<String, ConnectionType> getConnectionTypes() {
+    return ImmutableMap.copyOf(connectionTypes);
+  }
+
+  public Map<String, ConstraintType> getConstraintTypes() {
+    return ImmutableMap.copyOf(constraintTypes);
+  }
+
+  public Map<String, NodeValue> getNodes() {
+    return ImmutableMap.copyOf(nodes);
+  }
+
+  public Map<String, ConnectionValue> getConnections() {
+    return ImmutableMap.copyOf(connections);
+  }
+
 
   // TODO do we add nodes as a function of their node definition right away, or
   // just record that the node "will" exist with such-and-such definition and
