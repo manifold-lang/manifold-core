@@ -1,6 +1,8 @@
 package org.manifold.compiler;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,6 +83,14 @@ public class TestSchematic {
     Map<String, ConnectionValue> connections = sch.getConnections();
     assertTrue("schematic connection map not initially empty", 
         connections.isEmpty());
+  }
+  
+  @Test
+  public void testGetConstraints_InitiallyEmpty() {
+    Schematic sch = new Schematic("test");
+    Map<String, ConstraintValue> constraints = sch.getConstraints();
+    assertTrue("schematic constraint map not initially empty", 
+        constraints.isEmpty());
   }
   
   @Test
@@ -252,6 +262,115 @@ public class TestSchematic {
     NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
     // don't add this node to the schematic, but instead try to get its name
     String retrievedName = sch.getNodeName(node1);
+  }
+  
+  @Test
+  public void testGetConnectionName()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    // create a test port type
+    String portTypeName = "TestPort";
+    Map<String, TypeValue> portAttributes = new HashMap<>();
+    PortTypeValue portType1 = new PortTypeValue(portAttributes);
+    sch.addPortType(portTypeName, portType1);
+    
+    // create a test node type
+    String nodeTypeName = "TestNode";
+    Map<String, TypeValue> attributes = new HashMap<>();
+    Map<String, PortTypeValue> ports = new HashMap<>();
+    ports.put("p0", portType1);
+
+    NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
+    sch.addNodeType(nodeTypeName, nodeType);
+    // create two nodes based on this type
+    Map<String, Value> nodeAttrs = new HashMap<>();
+    Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
+    nodePortAttrs.put("p0", new HashMap<>());
+    NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+    sch.addNode("testNode1", node1);
+    NodeValue node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+    sch.addNode("testNode2", node2);
+    
+    // now create a test connection type
+    String connTypeName = "TestConnection";
+    ConnectionType ct1 = new ConnectionType(attributes);
+    sch.addConnectionType(connTypeName, ct1);
+    // create a connection based on this type
+    String connName = "testConn1";
+    ConnectionValue conn = new ConnectionValue(ct1, 
+        node1.getPort("p0"), node2.getPort("p0"), nodeAttrs);
+    sch.addConnection(connName, conn);
+    String retrievedName = sch.getConnectionName(conn);
+    assertEquals(connName, retrievedName);
+  }
+
+  @Test(expected = NoSuchElementException.class)
+  public void testGetConnectionName_Undeclared_ThrowsException()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    // create a test port type
+    String portTypeName = "TestPort";
+    Map<String, TypeValue> portAttributes = new HashMap<>();
+    PortTypeValue portType1 = new PortTypeValue(portAttributes);
+    sch.addPortType(portTypeName, portType1);
+    
+    // create a test node type
+    String nodeTypeName = "TestNode";
+    Map<String, TypeValue> attributes = new HashMap<>();
+    Map<String, PortTypeValue> ports = new HashMap<>();
+    ports.put("p0", portType1);
+
+    NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
+    sch.addNodeType(nodeTypeName, nodeType);
+    // create two nodes based on this type
+    Map<String, Value> nodeAttrs = new HashMap<>();
+    Map<String, Map<String, Value>> nodePortAttrs = new HashMap<>();
+    nodePortAttrs.put("p0", new HashMap<>());
+    NodeValue node1 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+    sch.addNode("testNode1", node1);
+    NodeValue node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
+    sch.addNode("testNode2", node2);
+    
+    // now create a test connection type
+    String connTypeName = "TestConnection";
+    ConnectionType ct1 = new ConnectionType(attributes);
+    sch.addConnectionType(connTypeName, ct1);
+    // create a connection based on this type
+    String connName = "testConn1";
+    ConnectionValue conn = new ConnectionValue(ct1, 
+        node1.getPort("p0"), node2.getPort("p0"), nodeAttrs);
+    //sch.addConnection(connName, conn);
+    String retrievedName = sch.getConnectionName(conn);
+  }
+  
+  @Test
+  public void testGetConstraintName() throws SchematicException {
+    Schematic sch = new Schematic("test");
+    Map<String, TypeValue> attributeTypes = new HashMap<>();
+    ConstraintType cxtType1 = new ConstraintType(attributeTypes);
+    sch.addConstraintType("TestConstraint", cxtType1);
+    
+    String cxtName = "constraint1";
+    Map<String, Value> attrs = new HashMap<>();
+    ConstraintValue cxt1 = new ConstraintValue(cxtType1, attrs);
+    sch.addConstraint(cxtName, cxt1);
+    String retrievedName = sch.getConstraintName(cxt1);
+    assertEquals(cxtName, retrievedName);
+  }
+  
+  @Test(expected = NoSuchElementException.class)
+  public void testGetConstraintName_Undeclared_ThrowsException() 
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    Map<String, TypeValue> attributeTypes = new HashMap<>();
+    ConstraintType cxtType1 = new ConstraintType(attributeTypes);
+    sch.addConstraintType("TestConstraint", cxtType1);
+    
+    String cxtName = "constraint1";
+    Map<String, Value> attrs = new HashMap<>();
+    ConstraintValue cxt1 = new ConstraintValue(cxtType1, attrs);
+    //sch.addConstraint(cxtName, cxt1);
+    String retrievedName = sch.getConstraintName(cxt1);
   }
   
   @Test(expected = MultipleDefinitionException.class)
