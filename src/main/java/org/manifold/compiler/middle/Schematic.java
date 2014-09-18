@@ -47,7 +47,9 @@ public class Schematic {
   private final Map<String, NodeValue> nodes;
   private final Map<NodeValue, String> reverseNodeMap;
   private final Map<String, ConnectionValue> connections;
+  private final Map<ConnectionValue, String> reverseConnectionMap;
   private final Map<String, ConstraintValue> constraints;
+  private final Map<ConstraintValue, String> reverseConstraintMap;
 
   public Schematic(String name) {
     this.name = name;
@@ -63,7 +65,9 @@ public class Schematic {
     this.nodes = new HashMap<>();
     this.reverseNodeMap = new HashMap<>();
     this.connections = new HashMap<>();
+    this.reverseConnectionMap = new HashMap<>();
     this.constraints = new HashMap<>();
+    this.reverseConstraintMap = new HashMap<>();
   }
 
   /*
@@ -206,6 +210,7 @@ public class Schematic {
       throw new MultipleAssignmentException("connection", instanceName);
     }
     connections.put(instanceName, conn);
+    reverseConnectionMap.put(conn, instanceName);
   }
 
   public ConnectionValue getConnection(String instanceName)
@@ -216,6 +221,13 @@ public class Schematic {
       throw new UndeclaredIdentifierException(instanceName);
     }
   }
+  
+  public String getConnectionName(ConnectionValue instance) {
+    if (reverseConnectionMap.containsKey(instance)) {
+      return reverseConnectionMap.get(instance);
+    }
+    throw new NoSuchElementException();
+  }
 
   public void addConstraint(String instanceName, ConstraintValue constraint)
       throws MultipleAssignmentException {
@@ -223,6 +235,7 @@ public class Schematic {
       throw new MultipleAssignmentException("constraint", instanceName);
     }
     constraints.put(instanceName, constraint);
+    reverseConstraintMap.put(constraint, instanceName);
   }
 
   public ConstraintValue getConstraint(String instanceName)
@@ -232,6 +245,13 @@ public class Schematic {
     } else {
       throw new UndeclaredIdentifierException(instanceName);
     }
+  }
+  
+  public String getConstraintName(ConstraintValue instance) {
+    if (reverseConstraintMap.containsKey(instance)) {
+      return reverseConstraintMap.get(instance);
+    }
+    throw new NoSuchElementException();
   }
 
   public Map<String, TypeValue> getUserDefinedTypes() {
@@ -260,6 +280,10 @@ public class Schematic {
 
   public Map<String, ConnectionValue> getConnections() {
     return ImmutableMap.copyOf(connections);
+  }
+  
+  public Map<String, ConstraintValue> getConstraints() {
+    return ImmutableMap.copyOf(constraints);
   }
 
 
