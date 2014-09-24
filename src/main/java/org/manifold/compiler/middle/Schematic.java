@@ -15,6 +15,7 @@ import org.manifold.compiler.MultipleDefinitionException;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
+import org.manifold.compiler.RealTypeValue;
 import org.manifold.compiler.StringTypeValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredIdentifierException;
@@ -72,18 +73,19 @@ public class Schematic {
 
   /*
    * Add "library standard" type definitions for basic types such as integer,
-   * string, and boolean. Every class in .intermediate.types should be
-   * represented in here.
+   * string, and boolean.
    */
   private void populateDefaultType() {
     TypeValue boolType = BooleanTypeValue.getInstance();
     TypeValue intType = IntegerTypeValue.getInstance();
     TypeValue stringType = StringTypeValue.getInstance();
+    TypeValue realType = RealTypeValue.getInstance();
 
     try {
       addUserDefinedType("Bool", boolType);
       addUserDefinedType("Int", intType);
       addUserDefinedType("String", stringType);
+      addUserDefinedType("Real", realType);
     } catch (MultipleDefinitionException mde) {
       // this should not actually be possible unless there is something wrong
       // with the compiler itself

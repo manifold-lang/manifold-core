@@ -38,4 +38,8 @@ public interface SchematicValueVisitor {
 
   void visit(ArrayValue arrayValue);
 
+  void visit(RealTypeValue realTypeValue);
+  
+  void visit(RealValue realValue);
+  
 }
