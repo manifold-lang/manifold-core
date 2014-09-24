@@ -7,23 +7,17 @@ import com.google.common.collect.ImmutableMap;
 
 public class ConnectionType extends TypeValue {
   private final ImmutableMap<String, TypeValue> attributes;
-  private final TypeValue supertype;
-
-  @Override
-  public TypeValue getSupertype() {
-    return this.supertype;
-  }
 
   public ConnectionType(Map<String, TypeValue> attributes) {
+    super();
     this.attributes = ImmutableMap.copyOf(attributes);
-    this.supertype = TypeTypeValue.getInstance();
   }
 
   public ConnectionType(Map<String, TypeValue> attributes, 
       TypeValue supertype) {
+    super(supertype);
     // supertype must be a ConnectionType for inheritance to work
     if (!(supertype instanceof ConnectionType)) {
-      // TODO we could throw a TypeMismatchException here
       throw new UndefinedBehaviourError(
           "supertype of ConnectionType must be a ConnectionType");
     }
@@ -34,7 +28,6 @@ public class ConnectionType extends TypeValue {
     // TODO strategy for dealing with duplicates?
     mixedAttrs.putAll(attributes);
     this.attributes = ImmutableMap.copyOf(mixedAttrs);
-    this.supertype = supertype;
   }
 
   public ImmutableMap<String, TypeValue> getAttributes() {

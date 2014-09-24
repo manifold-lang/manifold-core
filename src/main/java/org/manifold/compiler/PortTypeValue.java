@@ -7,22 +7,15 @@ import com.google.common.collect.ImmutableMap;
 
 public class PortTypeValue extends TypeValue {
   private final Map<String, TypeValue> attributes;
-  private final TypeValue supertype;
-  
-  @Override
-  public TypeValue getSupertype() {
-    return this.supertype;
-  }
   
   public PortTypeValue(Map<String, TypeValue> attributes){
     this.attributes = ImmutableMap.copyOf(attributes);
-    this.supertype = TypeTypeValue.getInstance();
   }
   
   public PortTypeValue(Map<String, TypeValue> attributes, TypeValue supertype) {
+    super(supertype);
     // supertype must be a PortTypeValue for inheritance to work
     if (!(supertype instanceof PortTypeValue)) {
-      // TODO we could throw a TypeMismatchException here
       throw new UndefinedBehaviourError(
           "supertype of PortTypeValue must be a PortTypeValue");
     }
@@ -33,7 +26,6 @@ public class PortTypeValue extends TypeValue {
     // TODO strategy for dealing with duplicates?
     mixedAttrs.putAll(attributes);
     this.attributes = ImmutableMap.copyOf(mixedAttrs);
-    this.supertype = supertype;
   }
   
   public Map<String, TypeValue> getAttributes() {

@@ -9,28 +9,21 @@ public class NodeTypeValue extends TypeValue {
 
   private final Map<String, TypeValue> attributes;
   private final Map<String, PortTypeValue> ports;
-  private final TypeValue supertype;
-  
-  @Override
-  public TypeValue getSupertype() {
-    return this.supertype;
-  }
 
   public NodeTypeValue(
       Map<String, TypeValue> attributes,
       Map<String, PortTypeValue> ports) {
     this.attributes = ImmutableMap.copyOf(attributes);
     this.ports = ImmutableMap.copyOf(ports);
-    this.supertype = TypeTypeValue.getInstance();
   }
   
   public NodeTypeValue(
       Map<String, TypeValue> attributes,
       Map<String, PortTypeValue> ports,
       TypeValue supertype) {
+    super(supertype);
     // supertype must be a NodeType for inheritance to work
     if (!(supertype instanceof NodeTypeValue)) {
-      // TODO we could throw a TypeMismatchException here
       throw new UndefinedBehaviourError(
           "supertype of NodeTypeValue must be a NodeTypeValue");
     }
@@ -46,8 +39,6 @@ public class NodeTypeValue extends TypeValue {
     Map<String, PortTypeValue> mixedPorts = new HashMap<>(superNode.getPorts());
     mixedPorts.putAll(ports);
     this.ports = ImmutableMap.copyOf(mixedPorts);
-    
-    this.supertype = supertype;
   }
   
   public Map<String, TypeValue> getAttributes() {
