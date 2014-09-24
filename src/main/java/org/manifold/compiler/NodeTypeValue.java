@@ -7,13 +7,12 @@ import com.google.common.collect.ImmutableMap;
 
 public class NodeTypeValue extends TypeValue {
 
-  private final Map<String, TypeValue> attributes;
   private final Map<String, PortTypeValue> ports;
 
   public NodeTypeValue(
       Map<String, TypeValue> attributes,
       Map<String, PortTypeValue> ports) {
-    this.attributes = ImmutableMap.copyOf(attributes);
+    super(attributes);
     this.ports = ImmutableMap.copyOf(ports);
   }
   
@@ -21,7 +20,7 @@ public class NodeTypeValue extends TypeValue {
       Map<String, TypeValue> attributes,
       Map<String, PortTypeValue> ports,
       TypeValue supertype) {
-    super(supertype);
+    super(supertype, attributes);
     // supertype must be a NodeType for inheritance to work
     if (!(supertype instanceof NodeTypeValue)) {
       throw new UndefinedBehaviourError(
@@ -29,20 +28,10 @@ public class NodeTypeValue extends TypeValue {
     }
     
     NodeTypeValue superNode = (NodeTypeValue) supertype;
-    // add specified attributes to inherited supertype attributes
-    Map<String, TypeValue> mixedAttrs = new HashMap<>(
-        superNode.getAttributes());
-    // TODO strategy for dealing with duplicates?
-    mixedAttrs.putAll(attributes);
-    this.attributes = ImmutableMap.copyOf(mixedAttrs);
-    // do the same for ports
+    // add derived ports to inherited ports
     Map<String, PortTypeValue> mixedPorts = new HashMap<>(superNode.getPorts());
     mixedPorts.putAll(ports);
     this.ports = ImmutableMap.copyOf(mixedPorts);
-  }
-  
-  public Map<String, TypeValue> getAttributes() {
-    return this.attributes;
   }
 
   public Map<String, PortTypeValue> getPorts() {
