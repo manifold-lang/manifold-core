@@ -32,11 +32,11 @@ public abstract class TypeValue extends Value {
   private ImmutableMap<String, TypeValue> inheritAttributes(
       Map<String, TypeValue> derivedAttributes) {
     // add specified attributes to inherited supertype attributes
-    Map<String, TypeValue> mixedAttrs = new HashMap<>(
-        getSupertype().getAttributes());
+    ImmutableMap.Builder<String, TypeValue> b = ImmutableMap.builder();
+    b.putAll(getSupertype().getAttributes());
+    b.putAll(derivedAttributes);
     // TODO strategy for dealing with duplicates?
-    mixedAttrs.putAll(derivedAttributes);
-    return ImmutableMap.copyOf(mixedAttrs);
+    return b.build();
   }
   
   public TypeValue(TypeValue supertype, Map<String, TypeValue> attributes) {
@@ -46,15 +46,11 @@ public abstract class TypeValue extends Value {
   }
   
   public TypeValue(Map<String, TypeValue> attributes) {
-    super(null);
-    this.supertype = TypeTypeValue.getInstance();
-    this.attributes = inheritAttributes(attributes);
+    this(TypeTypeValue.getInstance(), attributes);
   }
   
   public TypeValue() {
-    super(null);
-    this.supertype = TypeTypeValue.getInstance();
-    this.attributes = ImmutableMap.of();
+    this(TypeTypeValue.getInstance(), ImmutableMap.of());
   }
 
   @Override
