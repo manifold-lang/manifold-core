@@ -8,13 +8,9 @@ public class PortTypeValue extends TypeValue {
     super(attributes);
   }
   
-  public PortTypeValue(Map<String, TypeValue> attributes, TypeValue supertype) {
+  public PortTypeValue(Map<String, TypeValue> attributes, 
+      PortTypeValue supertype) {
     super(supertype, attributes);
-    // supertype must be a PortTypeValue for inheritance to work
-    if (!(supertype instanceof PortTypeValue)) {
-      throw new UndefinedBehaviourError(
-          "supertype of PortTypeValue must be a PortTypeValue");
-    }
   }
 
   public void accept(SchematicValueVisitor visitor) {

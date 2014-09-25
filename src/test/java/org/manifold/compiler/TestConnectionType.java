@@ -32,10 +32,5 @@ public class TestConnectionType {
     assertTrue(cDerived.getAttributes().containsKey("u"));
     assertTrue(cDerived.getAttributes().containsKey("v"));
   }
-  
-  @Test(expected = UndefinedBehaviourError.class)
-  public void testInheritance_FromWrongSupertype() {
-    new ConnectionType(noAttributes, boolType);
-  }
 
 }

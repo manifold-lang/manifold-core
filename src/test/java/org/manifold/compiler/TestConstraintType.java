@@ -32,10 +32,5 @@ public class TestConstraintType {
     assertTrue(cDerived.getAttributes().containsKey("u"));
     assertTrue(cDerived.getAttributes().containsKey("v"));
   }
-  
-  @Test(expected = UndefinedBehaviourError.class)
-  public void testInheritance_FromWrongSupertype() {
-    new ConstraintType(noAttributes, boolType);
-  }
 
 }

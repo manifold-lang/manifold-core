@@ -9,13 +9,8 @@ public class ConstraintType extends TypeValue {
   }
 
   public ConstraintType(Map<String, TypeValue> attributes, 
-      TypeValue supertype) {
+      ConstraintType supertype) {
     super(supertype, attributes);
-    // supertype must be a ConstraintType for inheritance to work
-    if (!(supertype instanceof ConstraintType)) {
-      throw new UndefinedBehaviourError(
-          "supertype of ConstraintType must be a ConstraintType");
-    }
   }
 
   public void accept(SchematicValueVisitor visitor) {

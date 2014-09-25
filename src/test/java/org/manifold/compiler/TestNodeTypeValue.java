@@ -45,10 +45,5 @@ public class TestNodeTypeValue {
     assertTrue(nDerived.getPorts().containsKey("p"));
     assertTrue(nDerived.getPorts().containsKey("q"));
   }
-  
-  @Test(expected = UndefinedBehaviourError.class)
-  public void testInheritance_FromWrongSupertype() {
-    new NodeTypeValue(noAttributes, noPorts, boolType);
-  }
 
 }

@@ -9,13 +9,8 @@ public class ConnectionType extends TypeValue {
   }
 
   public ConnectionType(Map<String, TypeValue> attributes, 
-      TypeValue supertype) {
+      ConnectionType supertype) {
     super(supertype, attributes);
-    // supertype must be a ConnectionType for inheritance to work
-    if (!(supertype instanceof ConnectionType)) {
-      throw new UndefinedBehaviourError(
-          "supertype of ConnectionType must be a ConnectionType");
-    }
   }
 
   public void accept(SchematicValueVisitor visitor) {

@@ -32,10 +32,5 @@ public class TestPortTypeValue {
     assertTrue(pDerived.getAttributes().containsKey("u"));
     assertTrue(pDerived.getAttributes().containsKey("v"));
   }
-  
-  @Test(expected = UndefinedBehaviourError.class)
-  public void testInheritance_FromWrongSupertype() {
-    new PortTypeValue(noAttributes, boolType);
-  }
 
 }
