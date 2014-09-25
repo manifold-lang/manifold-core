@@ -33,12 +33,13 @@ public abstract class TypeValue extends Value {
       Map<String, TypeValue> derivedAttributes) {
     // add specified attributes to inherited supertype attributes
     ImmutableMap.Builder<String, TypeValue> b = ImmutableMap.builder();
-    b.putAll(getSupertype().getAttributes());
+    if (getSupertype() != null) {
+      b.putAll(getSupertype().getAttributes());
+    }
     b.putAll(derivedAttributes);
-    // TODO strategy for dealing with duplicates?
     return b.build();
   }
-  
+
   public TypeValue(TypeValue supertype, Map<String, TypeValue> attributes) {
     super(null);
     this.supertype = supertype;
