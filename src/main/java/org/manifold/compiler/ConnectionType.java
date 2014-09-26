@@ -2,22 +2,19 @@ package org.manifold.compiler;
 
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-
-
 public class ConnectionType extends TypeValue {
-  private final ImmutableMap<String, TypeValue> attributes;
-  
-  public ConnectionType(Map<String, TypeValue> attributes){
-    this.attributes = ImmutableMap.copyOf(attributes);
+
+  public ConnectionType(Map<String, TypeValue> attributes) {
+    super(attributes);
   }
-  
-  public ImmutableMap<String, TypeValue> getAttributes() {
-    return attributes;
+
+  public ConnectionType(Map<String, TypeValue> attributes, 
+      ConnectionType supertype) {
+    super(supertype, attributes);
   }
-  
+
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
-  
+
 }
