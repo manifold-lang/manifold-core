@@ -1,9 +1,9 @@
 package org.manifold.compiler;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableMap;
 
 public class Attributes {
   private final Map<String, Value> data;
@@ -49,5 +49,9 @@ public class Attributes {
     } else {
       throw new UndeclaredAttributeException(attrName);
     }
+  }
+
+  public Map<String, Value> getAll() {
+    return ImmutableMap.copyOf(data);
   }
 }

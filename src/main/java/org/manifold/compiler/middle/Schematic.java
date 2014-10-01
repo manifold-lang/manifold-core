@@ -262,6 +262,10 @@ public class Schematic {
     return ImmutableMap.copyOf(connections);
   }
 
+  public Map<String, ConstraintValue> getConstraints() {
+    return ImmutableMap.copyOf(constraints);
+  }
+
 
   // TODO do we add nodes as a function of their node definition right away, or
   // just record that the node "will" exist with such-and-such definition and

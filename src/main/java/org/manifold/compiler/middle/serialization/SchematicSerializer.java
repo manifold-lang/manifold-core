@@ -2,9 +2,11 @@ package org.manifold.compiler.middle.serialization;
 
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.ATTRIBUTES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SCHEMATIC_NAME;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeConsts.PORT_ATTRS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeTypeConsts.PORT_MAP;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_TYPES;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.NODE_DEFS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.NODE_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.PORT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.USER_DEF_TYPES;
@@ -13,12 +15,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.manifold.compiler.ConnectionType;
+import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
+import org.manifold.compiler.ConstraintValue;
 import org.manifold.compiler.NodeTypeValue;
+import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.TypeValue;
+import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 public class SchematicSerializer {
@@ -31,6 +39,8 @@ public class SchematicSerializer {
   private Map<ConnectionType, String> rConnectionTypeMap;
   private Map<ConstraintType, String> rConstraintTypeMap;
 
+  private Gson gson;
+
   private SchematicSerializer(Schematic sch) {
     schJson = new JsonObject();
     schJson.addProperty(SCHEMATIC_NAME, sch.getName());
@@ -39,6 +49,8 @@ public class SchematicSerializer {
     rNodeTypeMap = new HashMap<>();
     rConnectionTypeMap = new HashMap<>();
     rConstraintTypeMap = new HashMap<>();
+
+    gson = new GsonBuilder().create();
   }
 
   private JsonObject serializeTypeAttr(Map<String, TypeValue> typeAttr) {
@@ -48,6 +60,12 @@ public class SchematicSerializer {
         rUserDefTypeMap.get(val)));
 
     return typeAttrJson;
+  }
+
+  private JsonObject serializeValueAttr(Map<String, Value> valueAttr) {
+    JsonObject attrs = new JsonObject();
+    valueAttr.forEach((key, val) -> attrs.addProperty(key, val.toString()));
+    return attrs;
   }
 
   public void addUserDefType(Map<String, TypeValue> userDefTypes) {
@@ -125,6 +143,32 @@ public class SchematicSerializer {
     schJson.add(CONSTRAINT_TYPES, collection);
   }
 
+  public void addNodes(Map<String, NodeValue> nodes) {
+    JsonObject collection = new JsonObject();
+
+    nodes.forEach((key, val) -> {
+      JsonObject single = new JsonObject();
+      single.add(ATTRIBUTES, serializeValueAttr(val.getAttributes().getAll()));
+
+      JsonObject portAttrs = new JsonObject();
+      val.getPorts().forEach(
+          (pkey, pval) -> portAttrs.add(
+              pkey, serializeValueAttr(pval.getAttributes().getAll())));
+      single.add(PORT_ATTRS, portAttrs);
+      collection.add(key, single);
+    });
+
+    schJson.add(NODE_DEFS, collection);
+  }
+
+  public void addConnections(Map<String, ConnectionValue> connections) {
+
+  }
+
+  public void addConstraints(Map<String, ConstraintValue> constraints) {
+
+  }
+
   public JsonObject getJson() {
     return schJson;
   }
@@ -136,6 +180,10 @@ public class SchematicSerializer {
     serializer.addNodeTypes(sch.getNodeTypes());
     serializer.addConnectionTypes(sch.getConnectionTypes());
     serializer.addConstraintTypes(sch.getConstraintTypes());
+
+    serializer.addNodes(sch.getNodes());
+    serializer.addConnections(sch.getConnections());
+    serializer.addConstraints(sch.getConstraints());
     return serializer.getJson();
   }
 }

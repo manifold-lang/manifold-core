@@ -36,7 +36,11 @@ public class BooleanValue extends Value {
   public boolean isRuntimeKnowable() {
     return true;
   }
-  
-  
-  
+
+  @Override
+  public String toString() {
+    return String.valueOf(value);
+  }
+
+
 }

@@ -17,7 +17,10 @@ public class IntegerValue extends Value {
   public boolean isRuntimeKnowable() {
     return false;
   }
-  
-  
+
+  @Override
+  public String toString() {
+    return String.valueOf(val);
+  }
 
 }
