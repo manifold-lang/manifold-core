@@ -40,7 +40,9 @@ public class PortValue extends Value {
   public boolean isRuntimeKnowable() {
     return true;
   }
-
-
-
+  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }

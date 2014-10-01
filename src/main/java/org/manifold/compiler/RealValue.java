@@ -1,11 +1,9 @@
 package org.manifold.compiler;
 
-public class StringValue extends Value {
-
-  private final String val;
-
-  public StringValue(TypeValue t, String val) {
-    super(t);
+public class RealValue extends Value {
+  private final Double val;
+  public RealValue(Double val){
+    super(RealTypeValue.getInstance());
     this.val = val;
   }
 
@@ -18,14 +16,12 @@ public class StringValue extends Value {
   public boolean isRuntimeKnowable() {
     return false;
   }
-
-  @Override
-  public String toString() {
-    return val;
-  }
-
+  
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
-
+  
+  public double toDouble() {
+    return val;
+  }
 }

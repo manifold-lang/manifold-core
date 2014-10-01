@@ -22,5 +22,9 @@ public class IntegerValue extends Value {
   public String toString() {
     return String.valueOf(val);
   }
+  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
 
 }

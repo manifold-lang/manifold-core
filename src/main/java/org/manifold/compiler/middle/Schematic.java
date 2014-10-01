@@ -15,6 +15,7 @@ import org.manifold.compiler.MultipleDefinitionException;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
+import org.manifold.compiler.RealTypeValue;
 import org.manifold.compiler.StringTypeValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredIdentifierException;
@@ -47,7 +48,9 @@ public class Schematic {
   private final Map<String, NodeValue> nodes;
   private final Map<NodeValue, String> reverseNodeMap;
   private final Map<String, ConnectionValue> connections;
+  private final Map<ConnectionValue, String> reverseConnectionMap;
   private final Map<String, ConstraintValue> constraints;
+  private final Map<ConstraintValue, String> reverseConstraintMap;
 
   public Schematic(String name) {
     this.name = name;
@@ -63,23 +66,26 @@ public class Schematic {
     this.nodes = new HashMap<>();
     this.reverseNodeMap = new HashMap<>();
     this.connections = new HashMap<>();
+    this.reverseConnectionMap = new HashMap<>();
     this.constraints = new HashMap<>();
+    this.reverseConstraintMap = new HashMap<>();
   }
 
   /*
    * Add "library standard" type definitions for basic types such as integer,
-   * string, and boolean. Every class in .intermediate.types should be
-   * represented in here.
+   * string, and boolean.
    */
   private void populateDefaultType() {
     TypeValue boolType = BooleanTypeValue.getInstance();
     TypeValue intType = IntegerTypeValue.getInstance();
     TypeValue stringType = StringTypeValue.getInstance();
+    TypeValue realType = RealTypeValue.getInstance();
 
     try {
       addUserDefinedType("Bool", boolType);
       addUserDefinedType("Int", intType);
       addUserDefinedType("String", stringType);
+      addUserDefinedType("Real", realType);
     } catch (MultipleDefinitionException mde) {
       // this should not actually be possible unless there is something wrong
       // with the compiler itself
@@ -206,6 +212,7 @@ public class Schematic {
       throw new MultipleAssignmentException("connection", instanceName);
     }
     connections.put(instanceName, conn);
+    reverseConnectionMap.put(conn, instanceName);
   }
 
   public ConnectionValue getConnection(String instanceName)
@@ -216,6 +223,13 @@ public class Schematic {
       throw new UndeclaredIdentifierException(instanceName);
     }
   }
+  
+  public String getConnectionName(ConnectionValue instance) {
+    if (reverseConnectionMap.containsKey(instance)) {
+      return reverseConnectionMap.get(instance);
+    }
+    throw new NoSuchElementException();
+  }
 
   public void addConstraint(String instanceName, ConstraintValue constraint)
       throws MultipleAssignmentException {
@@ -223,6 +237,7 @@ public class Schematic {
       throw new MultipleAssignmentException("constraint", instanceName);
     }
     constraints.put(instanceName, constraint);
+    reverseConstraintMap.put(constraint, instanceName);
   }
 
   public ConstraintValue getConstraint(String instanceName)
@@ -232,6 +247,13 @@ public class Schematic {
     } else {
       throw new UndeclaredIdentifierException(instanceName);
     }
+  }
+  
+  public String getConstraintName(ConstraintValue instance) {
+    if (reverseConstraintMap.containsKey(instance)) {
+      return reverseConstraintMap.get(instance);
+    }
+    throw new NoSuchElementException();
   }
 
   public Map<String, TypeValue> getUserDefinedTypes() {

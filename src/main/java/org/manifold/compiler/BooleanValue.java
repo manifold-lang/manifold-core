@@ -41,6 +41,9 @@ public class BooleanValue extends Value {
   public String toString() {
     return String.valueOf(value);
   }
-
-
+  
+  public void accept(SchematicValueVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }
