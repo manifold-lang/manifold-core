@@ -17,6 +17,7 @@ import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.PortValue;
+import org.manifold.compiler.RealValue;
 import org.manifold.compiler.StringTypeValue;
 import org.manifold.compiler.StringValue;
 import org.manifold.compiler.TypeMismatchException;
@@ -70,6 +71,7 @@ public class SchematicDeserializer implements SerializationConsts {
     TypeValue bool = sch.getUserDefinedType("Bool");
     TypeValue integer = sch.getUserDefinedType("Int");
     TypeValue str = sch.getUserDefinedType("String");
+    TypeValue real = sch.getUserDefinedType("Real");
 
     for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
       TypeValue type = expectedTypes.get(attrEntry.getKey());
@@ -92,6 +94,8 @@ public class SchematicDeserializer implements SerializationConsts {
         attrValue = new IntegerValue(Integer.valueOf(valueString));
       } else if (type.equals(str)) {
         attrValue = new StringValue(StringTypeValue.getInstance(), valueString);
+      } else if (type.equals(real)) {
+        attrValue = new RealValue(Double.parseDouble(valueString));
       } else {
         throw new UndeclaredAttributeException(attrEntry.getKey());
       }
@@ -140,7 +144,21 @@ public class SchematicDeserializer implements SerializationConsts {
         portMap.put(portEntry.getKey(), sch.getPortType(portEntry.getValue()
             .getAsString()));
       }
-      NodeTypeValue nodeTypeValue = new NodeTypeValue(attributeMap, portMap);
+      
+      // get supertype if it exists
+      NodeTypeValue supertype = null;
+      if (entry.getValue().getAsJsonObject().has("supertype")) {
+        String supertypeName = entry.getValue().getAsJsonObject()
+            .get("supertype").getAsString();
+        supertype = sch.getNodeType(supertypeName);
+      }
+      
+      NodeTypeValue nodeTypeValue;
+      if (supertype == null) {
+        nodeTypeValue = new NodeTypeValue(attributeMap, portMap);
+      } else {
+        nodeTypeValue = new NodeTypeValue(attributeMap, portMap, supertype);
+      }
 
       sch.addNodeType(entry.getKey(), nodeTypeValue);
     }

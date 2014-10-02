@@ -32,6 +32,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 public class TestSerialization {
 
@@ -167,4 +168,25 @@ public class TestSerialization {
     assertEquals(andNode.getPort("out1"), conVal.getFrom());
     assertEquals(andNode2.getPort("in2"), conVal.getTo());
   }
+  
+  @Test
+  public void testDeserialize_DerivedNode() 
+      throws JsonSyntaxException, IOException, UndeclaredIdentifierException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "deserialization-derived-node-test.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+    
+    final String BASE_NODE_NAME = "baseNode";
+    final String DERIVED_NODE_NAME = "derivedNode";
+    
+    NodeTypeValue baseNode = sch.getNodeType(BASE_NODE_NAME);
+    NodeTypeValue derivedNode = sch.getNodeType(DERIVED_NODE_NAME);
+    assertTrue(derivedNode.isSubtypeOf(baseNode));
+    
+  }
+  
 }
