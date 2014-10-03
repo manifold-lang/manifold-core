@@ -21,6 +21,7 @@ import org.manifold.compiler.ConstraintValue;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
+import org.manifold.compiler.TypeDependencyTree;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
@@ -97,8 +98,31 @@ public class SchematicSerializer {
   public void addNodeTypes(Map<String, NodeTypeValue> nodeTypes) {
     JsonObject collection = new JsonObject();
 
+    /*
     nodeTypes.forEach((key, val) -> {
       rNodeTypeMap.put(val, key);
+
+      JsonObject single = new JsonObject();
+      single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
+
+      JsonObject ports = new JsonObject();
+      val.getPorts().forEach((pkey, pval) -> {
+        ports.addProperty(pkey, rPortTypeMap.get(pval));
+      });
+
+      single.add(PORT_MAP, ports);
+      collection.add(key, single);
+    });
+    */
+    TypeDependencyTree typeDeps = new TypeDependencyTree();
+    nodeTypes.forEach((key, val) -> {
+      typeDeps.addType(val);
+      rNodeTypeMap.put(val, key);
+    });
+    // now add each NodeTypeValue to the collection
+    typeDeps.forEachDFS((t) -> {
+      NodeTypeValue val = (NodeTypeValue) t;
+      String key = rNodeTypeMap.get(val);
 
       JsonObject single = new JsonObject();
       single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));

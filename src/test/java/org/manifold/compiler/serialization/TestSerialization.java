@@ -170,6 +170,30 @@ public class TestSerialization {
   }
   
   @Test
+  public void testSerialize_DerivedNode() throws SchematicException {
+    // add a derived type to the test schematic
+    NodeTypeValue dInDerived = new NodeTypeValue(
+        new HashMap<>(), new HashMap<>(), 
+        testSchematic.getNodeType(IN_NODE_NAME));
+    String derivedNodeName = IN_NODE_NAME + "Derived"; 
+    testSchematic.addNodeType(derivedNodeName, dInDerived);
+    // serialize, deserialize, check that the type looks okay
+    JsonObject result = SchematicSerializer.serialize(testSchematic);
+    
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
+    
+    Schematic sch = new SchematicDeserializer().deserialize(result);
+    NodeTypeValue tBase = sch.getNodeType(IN_NODE_NAME);
+    NodeTypeValue tDerived = sch.getNodeType(derivedNodeName);
+    assertTrue(tDerived.isSubtypeOf(tBase));
+  }
+  
+  @Test
   public void testDeserialize_DerivedNode() 
       throws JsonSyntaxException, IOException, UndeclaredIdentifierException {
     URL url = Resources

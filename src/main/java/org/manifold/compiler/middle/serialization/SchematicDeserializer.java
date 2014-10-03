@@ -119,6 +119,12 @@ public class SchematicDeserializer implements SerializationConsts {
   private void deserializePortTypes(Schematic sch, JsonObject in)
       throws JsonSyntaxException, MultipleDefinitionException,
       UndeclaredIdentifierException {
+    
+    if (in == null) {
+      // TODO warning?
+      return;
+    }
+    
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
@@ -131,6 +137,12 @@ public class SchematicDeserializer implements SerializationConsts {
   private void deserializeNodeTypes(Schematic sch, JsonObject in)
       throws JsonSyntaxException, MultipleDefinitionException,
       UndeclaredIdentifierException {
+    
+    if (in == null) {
+      // TODO warning?
+      return;
+    }
+    
     for (Entry<String, JsonElement> entry : in.entrySet()) {
 
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
@@ -166,6 +178,12 @@ public class SchematicDeserializer implements SerializationConsts {
 
   private void deserializeConnectionTypes(Schematic sch, JsonObject in)
       throws MultipleDefinitionException, UndeclaredIdentifierException {
+    
+    if (in == null) {
+      // TODO warning?
+      return;
+    }
+    
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
@@ -177,6 +195,12 @@ public class SchematicDeserializer implements SerializationConsts {
 
   private void deserializeConstraintTypes(Schematic sch, JsonObject in)
       throws MultipleDefinitionException, UndeclaredIdentifierException {
+    
+    if (in == null) {
+      // TODO warning?
+      return;
+    }
+    
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
@@ -206,6 +230,12 @@ public class SchematicDeserializer implements SerializationConsts {
    */
   private void deserializeNodes(Schematic sch, JsonObject in)
       throws SchematicException {
+    
+    if (in == null) {
+      // TODO warning?
+      return;
+    }
+    
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       JsonObject nodeDef = entry.getValue().getAsJsonObject();
 
@@ -245,6 +275,11 @@ public class SchematicDeserializer implements SerializationConsts {
       InvalidAttributeException, MultipleAssignmentException,
       TypeMismatchException {
 
+    if (in == null) {
+      // TODO warning?
+      return;
+    }
+    
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       JsonObject obj = entry.getValue().getAsJsonObject();
 
