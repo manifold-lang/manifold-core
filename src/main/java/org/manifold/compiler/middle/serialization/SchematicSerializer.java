@@ -2,6 +2,7 @@ package org.manifold.compiler.middle.serialization;
 
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.ATTRIBUTES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SCHEMATIC_NAME;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeConsts.PORT_ATTRS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeTypeConsts.PORT_MAP;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_TYPES;
@@ -11,8 +12,10 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Sch
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.PORT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.USER_DEF_TYPES;
 
+
 import java.util.HashMap;
 import java.util.Map;
+
 
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
@@ -22,9 +25,11 @@ import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.TypeDependencyTree;
+import org.manifold.compiler.TypeTypeValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
+
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -131,6 +136,11 @@ public class SchematicSerializer {
       val.getPorts().forEach((pkey, pval) -> {
         ports.addProperty(pkey, rPortTypeMap.get(pval));
       });
+      
+      TypeValue supertype = t.getSupertype();
+      if (!(supertype.equals(TypeTypeValue.getInstance()))) {
+        single.addProperty(SUPERTYPE, rNodeTypeMap.get(supertype));
+      }
 
       single.add(PORT_MAP, ports);
       collection.add(key, single);
