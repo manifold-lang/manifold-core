@@ -128,7 +128,21 @@ public class SchematicDeserializer implements SerializationConsts {
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
-      PortTypeValue portTypeValue = new PortTypeValue(attributeMap);
+      
+      // get supertype if it exists
+      PortTypeValue supertype = null;
+      if (entry.getValue().getAsJsonObject().has("supertype")) {
+        String supertypeName = entry.getValue().getAsJsonObject()
+            .get("supertype").getAsString();
+        supertype = sch.getPortType(supertypeName);
+      }
+      
+      PortTypeValue portTypeValue = null;
+      if (supertype == null) {
+        portTypeValue = new PortTypeValue(attributeMap);
+      } else {
+        portTypeValue = new PortTypeValue(attributeMap, supertype);
+      }
 
       sch.addPortType(entry.getKey(), portTypeValue);
     }
@@ -187,7 +201,20 @@ public class SchematicDeserializer implements SerializationConsts {
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
-      ConnectionType connectionType = new ConnectionType(attributeMap);
+      
+      ConnectionType supertype = null;
+      if (entry.getValue().getAsJsonObject().has("supertype")) {
+        String supertypeName = entry.getValue().getAsJsonObject()
+            .get("supertype").getAsString();
+        supertype = sch.getConnectionType(supertypeName);
+      }
+      
+      ConnectionType connectionType;
+      if (supertype == null) {
+        connectionType = new ConnectionType(attributeMap);
+      } else {
+        connectionType = new ConnectionType(attributeMap, supertype);
+      }
 
       sch.addConnectionType(entry.getKey(), connectionType);
     }
@@ -204,7 +231,20 @@ public class SchematicDeserializer implements SerializationConsts {
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
-      ConstraintType constraintType = new ConstraintType(attributeMap);
+      
+      ConstraintType supertype = null;
+      if (entry.getValue().getAsJsonObject().has("supertype")) {
+        String supertypeName = entry.getValue().getAsJsonObject()
+            .get("supertype").getAsString();
+        supertype = sch.getConstraintType(supertypeName);
+      }
+      
+      ConstraintType constraintType = null;
+      if (supertype == null) {
+        constraintType = new ConstraintType(attributeMap);
+      } else {
+        constraintType = new ConstraintType(attributeMap, supertype);
+      }
 
       sch.addConstraintType(entry.getKey(), constraintType);
     }
