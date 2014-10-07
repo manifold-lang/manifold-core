@@ -88,37 +88,35 @@ public class SchematicSerializer {
 
   public void addPortTypes(Map<String, PortTypeValue> portTypes) {
     JsonObject collection = new JsonObject();
-
+    
+    TypeDependencyTree typeDeps = new TypeDependencyTree();
     portTypes.forEach((key, val) -> {
+      typeDeps.addType(val);
       rPortTypeMap.put(val, key);
-
+    });
+    // now add each PortTypeValue to the collection
+    typeDeps.forEachDFS((t) -> {
+      PortTypeValue val = (PortTypeValue) t;
+      String key = rPortTypeMap.get(val);
+      
       JsonObject single = new JsonObject();
+      
+      TypeValue supertype = t.getSupertype();
+      if (!(supertype.equals(TypeTypeValue.getInstance()))) {
+        single.addProperty(SUPERTYPE, rPortTypeMap.get(supertype));
+      }
+      
       single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
       collection.add(key, single);
+      
     });
-
+    
     schJson.add(PORT_TYPES, collection);
   }
 
   public void addNodeTypes(Map<String, NodeTypeValue> nodeTypes) {
     JsonObject collection = new JsonObject();
 
-    /*
-    nodeTypes.forEach((key, val) -> {
-      rNodeTypeMap.put(val, key);
-
-      JsonObject single = new JsonObject();
-      single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
-
-      JsonObject ports = new JsonObject();
-      val.getPorts().forEach((pkey, pval) -> {
-        ports.addProperty(pkey, rPortTypeMap.get(pval));
-      });
-
-      single.add(PORT_MAP, ports);
-      collection.add(key, single);
-    });
-    */
     TypeDependencyTree typeDeps = new TypeDependencyTree();
     nodeTypes.forEach((key, val) -> {
       typeDeps.addType(val);
@@ -152,11 +150,24 @@ public class SchematicSerializer {
   public void addConnectionTypes(Map<String, ConnectionType> conTypes) {
     JsonObject collection = new JsonObject();
 
+    TypeDependencyTree typeDeps = new TypeDependencyTree();
     conTypes.forEach((key, val) -> {
+      typeDeps.addType(val);
       rConnectionTypeMap.put(val, key);
-
+    });
+    // now add each ConnectionType to the collection
+    typeDeps.forEachDFS((t) -> {
+      ConnectionType val = (ConnectionType) t;
+      String key = rConnectionTypeMap.get(val);
+      
       JsonObject single = new JsonObject();
       single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
+      
+      TypeValue supertype = t.getSupertype();
+      if (!(supertype.equals(TypeTypeValue.getInstance()))) {
+        single.addProperty(SUPERTYPE, rConnectionTypeMap.get(supertype));
+      }
+      
       collection.add(key, single);
     });
 
