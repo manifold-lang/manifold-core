@@ -9,6 +9,7 @@ import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
+import org.manifold.compiler.ConstraintValue;
 import org.manifold.compiler.IntegerValue;
 import org.manifold.compiler.InvalidAttributeException;
 import org.manifold.compiler.MultipleAssignmentException;
@@ -335,6 +336,41 @@ public class SchematicDeserializer implements SerializationConsts {
       sch.addConnection(entry.getKey(), conVal);
     }
   }
+  
+  /**
+   * <pre>
+   * constraints: {
+   *  con_one: {
+   *    type: constraint_type
+   *    attributes: { ... }
+   *  },
+   *  ...
+   * }
+   * </pre>
+   */
+  private void deserializeConstraints(Schematic sch, JsonObject in)
+      throws UndeclaredIdentifierException, UndeclaredAttributeException,
+      InvalidAttributeException, MultipleAssignmentException,
+      TypeMismatchException {
+
+    if (in == null) {
+      // TODO warning?
+      return;
+    }
+    
+    for (Entry<String, JsonElement> entry : in.entrySet()) {
+      JsonObject obj = entry.getValue().getAsJsonObject();
+
+      ConstraintType conType = sch.getConstraintType(obj.get(GlobalConsts.TYPE)
+          .getAsString());
+      Map<String, Value> attributeMap = getValueAttributes(sch, conType
+          .getAttributes(), obj);
+      ConstraintValue conVal = new ConstraintValue(conType,
+          attributeMap);
+
+      sch.addConstraint(entry.getKey(), conVal);
+    }
+  }
 
   public Schematic deserialize(JsonObject in) {
     Schematic sch = new Schematic(
@@ -353,7 +389,8 @@ public class SchematicDeserializer implements SerializationConsts {
       deserializeNodes(sch, in.getAsJsonObject(SchematicConsts.NODE_DEFS));
       deserializeConnections(sch,
           in.getAsJsonObject(SchematicConsts.CONNECTION_DEFS));
-      // TODO (max): constraints once they're fleshed out
+      deserializeConstraints(sch,
+          in.getAsJsonObject(SchematicConsts.CONSTRAINT_DEFS));
     } catch (Exception e) {
       Throwables.propagate(e);
     }

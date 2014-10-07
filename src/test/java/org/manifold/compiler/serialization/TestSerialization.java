@@ -95,9 +95,11 @@ public class TestSerialization {
     outNodeAttr.put(OUT_PORT_NAME, new HashMap<>());
 
     NodeValue inNode = new NodeValue(dinNodeType, new HashMap<>(), inNodeAttr);
+    testSchematic.addNode("nIN", inNode);
 
     NodeValue outNode = new NodeValue(doutNodeType, new HashMap<>(),
         outNodeAttr);
+    testSchematic.addNode("nOUT", outNode);
 
     // connection
     ConnectionType conType = new ConnectionType(new HashMap<>());
