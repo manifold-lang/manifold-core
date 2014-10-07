@@ -10,6 +10,10 @@ public class ConstraintValue extends Value {
       UndeclaredAttributeException {
     return attributes.get(attrName);
   }
+  
+  public Attributes getAttributes() {
+    return attributes;
+  }
 
   public ConstraintValue(ConstraintType type, Map<String, Value> attrs)
       throws UndeclaredAttributeException, InvalidAttributeException,

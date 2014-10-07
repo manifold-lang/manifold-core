@@ -10,6 +10,7 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Sch
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.NODE_DEFS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_DEFS;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_DEFS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.NODE_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.PORT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.USER_DEF_TYPES;
@@ -272,7 +273,14 @@ public class SchematicSerializer {
   }
 
   public void addConstraints(Map<String, ConstraintValue> constraints) {
-
+    JsonObject collection = new JsonObject();
+    constraints.forEach((key, val) -> {
+      JsonObject single = new JsonObject();
+      single.add(TYPE, new JsonPrimitive(rConstraintTypeMap.get(val.getType())));
+      single.add(ATTRIBUTES, serializeValueAttr(val.getAttributes().getAll()));
+      collection.add(key, single);
+    });
+    schJson.add(CONSTRAINT_DEFS, collection);
   }
 
   public JsonObject getJson() {
