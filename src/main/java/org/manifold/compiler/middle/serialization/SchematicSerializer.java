@@ -177,6 +177,28 @@ public class SchematicSerializer {
   public void addConstraintTypes(Map<String, ConstraintType> constraintTypes) {
     JsonObject collection = new JsonObject();
 
+    TypeDependencyTree typeDeps = new TypeDependencyTree();
+    constraintTypes.forEach((key, val) -> {
+      typeDeps.addType(val);
+      rConstraintTypeMap.put(val, key);
+    });
+    // now add each ConstraintType to the collection
+    typeDeps.forEachDFS((t) -> {
+      ConstraintType val = (ConstraintType) t;
+      String key = rConstraintTypeMap.get(val);
+      
+      JsonObject single = new JsonObject();
+      single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
+      
+      TypeValue supertype = t.getSupertype();
+      if (!(supertype.equals(TypeTypeValue.getInstance()))) {
+        single.addProperty(SUPERTYPE, rConstraintTypeMap.get(supertype));
+      }
+      
+      collection.add(key, single);
+    });
+    
+    /*
     constraintTypes.forEach((key, val) -> {
       rConstraintTypeMap.put(val, key);
 
@@ -184,6 +206,7 @@ public class SchematicSerializer {
       single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
       collection.add(key, single);
     });
+    */
 
     schJson.add(CONSTRAINT_TYPES, collection);
   }

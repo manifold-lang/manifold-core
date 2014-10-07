@@ -108,6 +108,11 @@ public class TestSerialization {
         new HashMap<>());
 
     testSchematic.addConnection(CONNECTION_NAME, con);
+
+    // constraint
+    ConstraintType constraintType = new ConstraintType(new HashMap<>());
+    testSchematic.addConstraintType(TEST_CONSTRAINT_TYPE_NAME, constraintType);
+    
   }
 
   @Test
@@ -312,7 +317,7 @@ public class TestSerialization {
   @Test
   public void testSerialize_DerivedConstraint() 
       throws UndeclaredIdentifierException, MultipleDefinitionException {
- // add a derived constraint type to the test schematic
+    // add a derived constraint type to the test schematic
     ConstraintType dConDerived = new ConstraintType(new HashMap<>(),
         testSchematic.getConstraintType(TEST_CONSTRAINT_TYPE_NAME));
     String derivedConstraintName = TEST_CONSTRAINT_TYPE_NAME + "Derived";
