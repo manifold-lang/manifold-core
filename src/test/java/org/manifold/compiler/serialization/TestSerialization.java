@@ -3,6 +3,7 @@ package org.manifold.compiler.serialization;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URL;
@@ -14,6 +15,8 @@ import org.junit.Test;
 import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
+import org.manifold.compiler.ConstraintType;
+import org.manifold.compiler.MultipleDefinitionException;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
@@ -32,11 +35,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 public class TestSerialization {
 
   private static final String TEST_SCHEMATIC_NAME = "dogematics";
   private static final String TEST_TYPE_NAME = "very type";
+  private static final String TEST_CONNECTION_TYPE_NAME = "many connect";
   private static final String TEST_CONSTRAINT_TYPE_NAME = "much constraint";
   private static final String TEST_NODE_TYPE_NAME = "such node";
   private static final String TEST_PORT_TYPE_NAME = "wow port";
@@ -52,6 +57,8 @@ public class TestSerialization {
   private static final String OUT_NODE_NAME = "out_node_name";
 
   private static final String CONNECTION_NAME = "wire";
+  
+  private static final String CONSTRAINT_NAME = "rope";
 
   private Schematic testSchematic;
 
@@ -88,17 +95,26 @@ public class TestSerialization {
     outNodeAttr.put(OUT_PORT_NAME, new HashMap<>());
 
     NodeValue inNode = new NodeValue(dinNodeType, new HashMap<>(), inNodeAttr);
+    testSchematic.addNode("nIN", inNode);
 
     NodeValue outNode = new NodeValue(doutNodeType, new HashMap<>(),
         outNodeAttr);
+    testSchematic.addNode("nOUT", outNode);
 
     // connection
     ConnectionType conType = new ConnectionType(new HashMap<>());
+    testSchematic.addConnectionType(TEST_CONNECTION_TYPE_NAME, conType);
+    
     ConnectionValue con = new ConnectionValue(conType, inNode
         .getPort(IN_PORT_NAME), outNode.getPort(OUT_PORT_NAME),
         new HashMap<>());
 
     testSchematic.addConnection(CONNECTION_NAME, con);
+
+    // constraint
+    ConstraintType constraintType = new ConstraintType(new HashMap<>());
+    testSchematic.addConstraintType(TEST_CONSTRAINT_TYPE_NAME, constraintType);
+    
   }
 
   @Test
@@ -167,4 +183,182 @@ public class TestSerialization {
     assertEquals(andNode.getPort("out1"), conVal.getFrom());
     assertEquals(andNode2.getPort("in2"), conVal.getTo());
   }
+  
+  @Test
+  public void testSerialize_DerivedPort()
+      throws UndeclaredIdentifierException, MultipleDefinitionException {
+    // add a derived port type to the test schematic
+    PortTypeValue dPortDerived = new PortTypeValue(new HashMap<>(),
+        testSchematic.getPortType(DIGITAL_IN));
+    String derivedPortName = DIGITAL_IN + "Derived";
+    testSchematic.addPortType(derivedPortName, dPortDerived);
+    // serialize, deserialize, check that the type looks okay
+    JsonObject result = SchematicSerializer.serialize(testSchematic);
+    
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
+    
+    Schematic sch = new SchematicDeserializer().deserialize(result);
+    PortTypeValue tBase = sch.getPortType(DIGITAL_IN);
+    PortTypeValue tDerived = sch.getPortType(derivedPortName);
+    assertTrue(tDerived.isSubtypeOf(tBase));
+  }
+  
+  @Test
+  public void testDeserialize_DerivedPort() 
+      throws JsonSyntaxException, IOException, UndeclaredIdentifierException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "deserialization-derived-port-test.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+    
+    final String BASE_PORT_NAME = "basePort";
+    final String DERIVED_PORT_NAME = "derivedPort";
+    
+    PortTypeValue basePort = sch.getPortType(BASE_PORT_NAME);
+    PortTypeValue derivedPort = sch.getPortType(DERIVED_PORT_NAME);
+    assertTrue(derivedPort.isSubtypeOf(basePort));
+  }
+  
+  @Test
+  public void testSerialize_DerivedNode() throws SchematicException {
+    // add a derived type to the test schematic
+    NodeTypeValue dNodeDerived = new NodeTypeValue(
+        new HashMap<>(), new HashMap<>(),
+        testSchematic.getNodeType(IN_NODE_NAME));
+    String derivedNodeName = IN_NODE_NAME + "Derived"; 
+    testSchematic.addNodeType(derivedNodeName, dNodeDerived);
+    // serialize, deserialize, check that the type looks okay
+    JsonObject result = SchematicSerializer.serialize(testSchematic);
+    
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
+    
+    Schematic sch = new SchematicDeserializer().deserialize(result);
+    NodeTypeValue tBase = sch.getNodeType(IN_NODE_NAME);
+    NodeTypeValue tDerived = sch.getNodeType(derivedNodeName);
+    assertTrue(tDerived.isSubtypeOf(tBase));
+  }
+  
+  @Test
+  public void testDeserialize_DerivedNode() 
+      throws JsonSyntaxException, IOException, UndeclaredIdentifierException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "deserialization-derived-node-test.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+    
+    final String BASE_NODE_NAME = "baseNode";
+    final String DERIVED_NODE_NAME = "derivedNode";
+    
+    NodeTypeValue baseNode = sch.getNodeType(BASE_NODE_NAME);
+    NodeTypeValue derivedNode = sch.getNodeType(DERIVED_NODE_NAME);
+    assertTrue(derivedNode.isSubtypeOf(baseNode));
+    
+  }
+  
+  @Test
+  public void testSerialize_DerivedConnection() 
+      throws UndeclaredIdentifierException, MultipleDefinitionException {
+    // add a derived connection type to the test schematic
+    ConnectionType dConnDerived = new ConnectionType(new HashMap<>(),
+        testSchematic.getConnectionType(TEST_CONNECTION_TYPE_NAME));
+    String derivedConnectionName = TEST_CONNECTION_TYPE_NAME + "Derived";
+    testSchematic.addConnectionType(derivedConnectionName, dConnDerived);
+    // serialize, deserialize, check that the type looks okay
+    JsonObject result = SchematicSerializer.serialize(testSchematic);
+    
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
+    
+    Schematic sch = new SchematicDeserializer().deserialize(result);
+    ConnectionType tBase = sch.getConnectionType(TEST_CONNECTION_TYPE_NAME);
+    ConnectionType tDerived = sch.getConnectionType(derivedConnectionName);
+    assertTrue(tDerived.isSubtypeOf(tBase));
+  }
+  
+  @Test
+  public void testDeserialize_DerivedConnection() 
+      throws JsonSyntaxException, IOException, UndeclaredIdentifierException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "deserialization-derived-connection-test.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+    
+    final String BASE_CONNECTION_NAME = "baseConnection";
+    final String DERIVED_CONNECTION_NAME = "derivedConnection";
+    
+    ConnectionType baseConnection = 
+        sch.getConnectionType(BASE_CONNECTION_NAME);
+    ConnectionType derivedConnection = 
+        sch.getConnectionType(DERIVED_CONNECTION_NAME);
+    assertTrue(derivedConnection.isSubtypeOf(baseConnection));
+  }
+  
+  @Test
+  public void testSerialize_DerivedConstraint() 
+      throws UndeclaredIdentifierException, MultipleDefinitionException {
+    // add a derived constraint type to the test schematic
+    ConstraintType dConDerived = new ConstraintType(new HashMap<>(),
+        testSchematic.getConstraintType(TEST_CONSTRAINT_TYPE_NAME));
+    String derivedConstraintName = TEST_CONSTRAINT_TYPE_NAME + "Derived";
+    testSchematic.addConstraintType(derivedConstraintName, dConDerived);
+    // serialize, deserialize, check that the type looks okay
+    JsonObject result = SchematicSerializer.serialize(testSchematic);
+    
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
+    
+    Schematic sch = new SchematicDeserializer().deserialize(result);
+    ConstraintType tBase = sch.getConstraintType(TEST_CONSTRAINT_TYPE_NAME);
+    ConstraintType tDerived = sch.getConstraintType(derivedConstraintName);
+    assertTrue(tDerived.isSubtypeOf(tBase));
+  }
+  
+  @Test
+  public void testDeserialize_DerivedConstraint() 
+      throws JsonSyntaxException, IOException, UndeclaredIdentifierException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "deserialization-derived-constraint-test.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+    
+    final String BASE_CONSTRAINT_NAME = "baseConstraint";
+    final String DERIVED_CONSTRAINT_NAME = "derivedConstraint";
+    
+    ConstraintType baseConstraint = 
+        sch.getConstraintType(BASE_CONSTRAINT_NAME);
+    ConstraintType derivedConstraint = 
+        sch.getConstraintType(DERIVED_CONSTRAINT_NAME);
+    assertTrue(derivedConstraint.isSubtypeOf(baseConstraint));
+  }
+  
 }

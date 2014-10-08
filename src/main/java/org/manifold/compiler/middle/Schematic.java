@@ -283,7 +283,7 @@ public class Schematic {
   public Map<String, ConnectionValue> getConnections() {
     return ImmutableMap.copyOf(connections);
   }
-  
+
   public Map<String, ConstraintValue> getConstraints() {
     return ImmutableMap.copyOf(constraints);
   }

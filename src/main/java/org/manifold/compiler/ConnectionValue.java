@@ -13,6 +13,10 @@ public class ConnectionValue extends Value {
     return attributes.get(attrName);
   }
   
+  public Attributes getAttributes() {
+    return attributes;
+  }
+  
   private PortValue portFrom = null, portTo = null;
   
   public PortValue getFrom() {

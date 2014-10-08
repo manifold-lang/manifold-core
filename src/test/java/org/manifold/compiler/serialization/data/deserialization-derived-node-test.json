@@ -1,0 +1,51 @@
+{
+  "name": "wowsuchderive",
+  "userDefinedTypes": {
+    "Bool": {},
+    "String": {},
+    "Int": {},
+    "Real": {}
+  },
+  "portTypes": {
+    "testPort": {
+      "attributes": {
+      }
+    }
+  },
+  "nodeTypes": {
+    "baseNode": {
+      "attributes": {},
+      "ports": {
+        "out1": "testPort",
+        "out2": "testPort"
+      }
+    },
+    "derivedNode": {
+      "supertype": "baseNode",
+      "attributes": {},
+      "ports": {}
+    }
+  },
+  "connectionTypes": {},
+  "constraintTypes": {},
+  "nodes": {
+    "n1": {
+      "type": "baseNode",
+      "attributes": {},
+      "portAttrs": {
+        "out1": {},
+        "out2": {}
+      }
+    },
+    "n2": {
+      "type": "derivedNode",
+      "attributes": {},
+      "portAttrs": {
+        "out1": {},
+        "out2": {}
+      }
+    }
+  },
+  "connections": {},
+  "constraints": {}
+}
