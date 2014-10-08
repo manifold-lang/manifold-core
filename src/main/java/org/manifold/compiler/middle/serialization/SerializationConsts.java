@@ -6,6 +6,7 @@ public interface SerializationConsts {
     String SCHEMATIC_NAME = "name";
     String ATTRIBUTES = "attributes";
     String TYPE = "type";
+    String SUPERTYPE = "supertype";
   }
 
   public interface SchematicConsts {

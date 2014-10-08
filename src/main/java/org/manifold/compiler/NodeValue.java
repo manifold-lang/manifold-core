@@ -21,6 +21,10 @@ public class NodeValue extends Value {
     return attributes.get(attrName);
   }
 
+  public Attributes getAttributes() {
+    return attributes;
+  }
+
   public PortValue getPort(String portName)
       throws UndeclaredIdentifierException {
     if (ports.containsKey(portName)) {

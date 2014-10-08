@@ -19,8 +19,13 @@ public class StringValue extends Value {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return val;
+  }
+
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
-  
+
 }

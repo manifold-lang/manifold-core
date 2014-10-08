@@ -14,6 +14,10 @@ public class PortValue extends Value {
     return attributes.get(attrName);
   }
 
+  public Attributes getAttributes() {
+    return attributes;
+  }
+
   public NodeValue getParent() {
     return parent;
   }
