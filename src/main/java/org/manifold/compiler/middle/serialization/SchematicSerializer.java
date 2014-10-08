@@ -1,32 +1,24 @@
 package org.manifold.compiler.middle.serialization;
 
+import static org.manifold.compiler.middle.serialization.SerializationConsts.ConnectionConsts.FROM;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.ConnectionConsts.TO;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.ATTRIBUTES;
-import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SCHEMATIC_NAME;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeConsts.PORT_ATTRS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeTypeConsts.PORT_MAP;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_DEFS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_TYPES;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_DEFS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.NODE_DEFS;
-import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_DEFS;
-import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_DEFS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.NODE_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.PORT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.USER_DEF_TYPES;
-import static org.manifold.compiler.middle.serialization.SerializationConsts.ConnectionConsts.FROM;
-import static org.manifold.compiler.middle.serialization.SerializationConsts.ConnectionConsts.TO;
-
-
-
-
 
 import java.util.HashMap;
 import java.util.Map;
-
-
-
-
 
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
@@ -42,10 +34,6 @@ import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndefinedBehaviourError;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
-
-
-
-
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -97,7 +85,7 @@ public class SchematicSerializer {
   private JsonPrimitive serializeConnectedPort(PortValue port) {
     String nodeName = schematic.getNodeName(port.getParent());
     String portName = null;
-    for (Map.Entry<String, PortValue> entry 
+    for (Map.Entry<String, PortValue> entry
         : port.getParent().getPorts().entrySet()) {
       if (entry.getValue().equals(port)) {
         portName = entry.getKey();
@@ -105,13 +93,13 @@ public class SchematicSerializer {
       }
     }
     if (portName == null) {
-      throw new UndefinedBehaviourError("node '" + nodeName 
+      throw new UndefinedBehaviourError("node '" + nodeName
           + "' does not contain serialized port");
     }
     String portDesc = nodeName + ":" + portName;
     return new JsonPrimitive(portDesc);
   }
-  
+
   public void addUserDefType(Map<String, TypeValue> userDefTypes) {
     JsonObject collection = new JsonObject();
 
@@ -126,7 +114,7 @@ public class SchematicSerializer {
 
   public void addPortTypes(Map<String, PortTypeValue> portTypes) {
     JsonObject collection = new JsonObject();
-    
+
     TypeDependencyTree typeDeps = new TypeDependencyTree();
     portTypes.forEach((key, val) -> {
       typeDeps.addType(val);
@@ -136,19 +124,19 @@ public class SchematicSerializer {
     typeDeps.forEachDFS((t) -> {
       PortTypeValue val = (PortTypeValue) t;
       String key = rPortTypeMap.get(val);
-      
+
       JsonObject single = new JsonObject();
-      
+
       TypeValue supertype = t.getSupertype();
       if (!(supertype.equals(TypeTypeValue.getInstance()))) {
         single.addProperty(SUPERTYPE, rPortTypeMap.get(supertype));
       }
-      
+
       single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
       collection.add(key, single);
-      
+
     });
-    
+
     schJson.add(PORT_TYPES, collection);
   }
 
@@ -172,7 +160,7 @@ public class SchematicSerializer {
       val.getPorts().forEach((pkey, pval) -> {
         ports.addProperty(pkey, rPortTypeMap.get(pval));
       });
-      
+
       TypeValue supertype = t.getSupertype();
       if (!(supertype.equals(TypeTypeValue.getInstance()))) {
         single.addProperty(SUPERTYPE, rNodeTypeMap.get(supertype));
@@ -197,15 +185,15 @@ public class SchematicSerializer {
     typeDeps.forEachDFS((t) -> {
       ConnectionType val = (ConnectionType) t;
       String key = rConnectionTypeMap.get(val);
-      
+
       JsonObject single = new JsonObject();
       single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
-      
+
       TypeValue supertype = t.getSupertype();
       if (!(supertype.equals(TypeTypeValue.getInstance()))) {
         single.addProperty(SUPERTYPE, rConnectionTypeMap.get(supertype));
       }
-      
+
       collection.add(key, single);
     });
 
@@ -224,15 +212,15 @@ public class SchematicSerializer {
     typeDeps.forEachDFS((t) -> {
       ConstraintType val = (ConstraintType) t;
       String key = rConstraintTypeMap.get(val);
-      
+
       JsonObject single = new JsonObject();
       single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
-      
+
       TypeValue supertype = t.getSupertype();
       if (!(supertype.equals(TypeTypeValue.getInstance()))) {
         single.addProperty(SUPERTYPE, rConstraintTypeMap.get(supertype));
       }
-      
+
       collection.add(key, single);
     });
 
@@ -256,10 +244,10 @@ public class SchematicSerializer {
 
     schJson.add(NODE_DEFS, collection);
   }
-  
+
   public void addConnections(Map<String, ConnectionValue> connections) {
     JsonObject collection = new JsonObject();
-    
+
     connections.forEach((key, val) -> {
       JsonObject single = new JsonObject();
       single.add(TYPE, new JsonPrimitive(rConnectionTypeMap.get(val.getType())));
@@ -268,7 +256,7 @@ public class SchematicSerializer {
       single.add(TO, serializeConnectedPort(val.getTo()));
       collection.add(key, single);
     });
-    
+
     schJson.add(CONNECTION_DEFS, collection);
   }
 

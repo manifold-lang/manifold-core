@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
+
 import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
@@ -132,9 +134,9 @@ public class SchematicDeserializer implements SerializationConsts {
       
       // get supertype if it exists
       PortTypeValue supertype = null;
-      if (entry.getValue().getAsJsonObject().has("supertype")) {
+      if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
         String supertypeName = entry.getValue().getAsJsonObject()
-            .get("supertype").getAsString();
+            .get(SUPERTYPE).getAsString();
         supertype = sch.getPortType(supertypeName);
       }
       
@@ -174,9 +176,9 @@ public class SchematicDeserializer implements SerializationConsts {
       
       // get supertype if it exists
       NodeTypeValue supertype = null;
-      if (entry.getValue().getAsJsonObject().has("supertype")) {
+      if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
         String supertypeName = entry.getValue().getAsJsonObject()
-            .get("supertype").getAsString();
+            .get(SUPERTYPE).getAsString();
         supertype = sch.getNodeType(supertypeName);
       }
       
@@ -204,9 +206,9 @@ public class SchematicDeserializer implements SerializationConsts {
           .getValue().getAsJsonObject());
       
       ConnectionType supertype = null;
-      if (entry.getValue().getAsJsonObject().has("supertype")) {
+      if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
         String supertypeName = entry.getValue().getAsJsonObject()
-            .get("supertype").getAsString();
+            .get(SUPERTYPE).getAsString();
         supertype = sch.getConnectionType(supertypeName);
       }
       
@@ -234,9 +236,9 @@ public class SchematicDeserializer implements SerializationConsts {
           .getValue().getAsJsonObject());
       
       ConstraintType supertype = null;
-      if (entry.getValue().getAsJsonObject().has("supertype")) {
+      if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
         String supertypeName = entry.getValue().getAsJsonObject()
-            .get("supertype").getAsString();
+            .get(SUPERTYPE).getAsString();
         supertype = sch.getConstraintType(supertypeName);
       }
       
