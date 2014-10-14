@@ -4,6 +4,7 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Con
 import static org.manifold.compiler.middle.serialization.SerializationConsts.ConnectionConsts.TO;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.ATTRIBUTES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SCHEMATIC_NAME;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SIGNAL_TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeConsts.PORT_ATTRS;
@@ -62,7 +63,6 @@ public class SchematicSerializer {
     rNodeTypeMap = new HashMap<>();
     rConnectionTypeMap = new HashMap<>();
     rConstraintTypeMap = new HashMap<>();
-
     gson = new GsonBuilder().create();
   }
 
@@ -132,7 +132,8 @@ public class SchematicSerializer {
         single.addProperty(SUPERTYPE, rPortTypeMap.get(supertype));
       }
 
-      // TODO(murphy) serialize signal type
+      TypeValue signalType = val.getSignalType();
+      single.addProperty(SIGNAL_TYPE, rUserDefTypeMap.get(signalType));
 
       single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
       collection.add(key, single);
