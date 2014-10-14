@@ -12,17 +12,17 @@ public class ConnectionValue extends Value {
       UndeclaredAttributeException {
     return attributes.get(attrName);
   }
-  
+
   public Attributes getAttributes() {
     return attributes;
   }
-  
+
   private PortValue portFrom = null, portTo = null;
-  
+
   public PortValue getFrom() {
     return portFrom;
   }
-  
+
   public PortValue getTo() {
     return portTo;
   }
@@ -35,11 +35,20 @@ public class ConnectionValue extends Value {
     this.attributes = new Attributes(type.getAttributes(), attrs);
     this.portFrom = checkNotNull(from);
     this.portTo = checkNotNull(to);
-    
+
     if (from == to) {
       throw new UndefinedBehaviourError(
         "Cannot create connection from a port to itself"
       );
+    }
+    // type check: the signal type from the source is a subclass
+    // of the signal type into the destination
+    PortTypeValue portTypeFrom = (PortTypeValue) portFrom.getType();
+    PortTypeValue portTypeTo = (PortTypeValue) portFrom.getType();
+    TypeValue signalTypeFrom = portTypeFrom.getSignalType();
+    TypeValue signalTypeTo = portTypeTo.getSignalType();
+    if (!(signalTypeFrom.isSubtypeOf(signalTypeTo))) {
+      throw new TypeMismatchException(signalTypeFrom, signalTypeTo);
     }
   }
 
@@ -53,8 +62,9 @@ public class ConnectionValue extends Value {
     return true;
   }
 
+  @Override
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
-  
+
 }

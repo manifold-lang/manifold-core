@@ -2,29 +2,29 @@ package org.manifold.compiler;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 import org.manifold.compiler.middle.SchematicException;
+
+import com.google.common.collect.ImmutableMap;
 
 
 public class TestConnection {
-  private static final PortTypeValue defaultPortDefinition =
-      new PortTypeValue(new HashMap<>());
   private static final TypeValue boolType = BooleanTypeValue.getInstance();
+  private static final PortTypeValue defaultPortDefinition =
+      new PortTypeValue(boolType, new HashMap<>());
   private static final String PORT_NAME1 = "testport";
   private static final String PORT_NAME2 = "another port";
-  
+
   private NodeTypeValue nType;
   private NodeValue n;
   private ConnectionType conType;
   private ConnectionValue ept;
   private Value v;
-  
+
   @Before
   public void setup() throws SchematicException {
     Map<String, PortTypeValue> portMap = ImmutableMap.of(
@@ -37,7 +37,7 @@ public class TestConnection {
     n = new NodeValue(nType, new HashMap<>(), portAttrMap);
     v = BooleanValue.getInstance(true);
     conType = new ConnectionType(ImmutableMap.of("v", boolType));
-    
+
     ept = new ConnectionValue(
         conType,
         n.getPort(PORT_NAME1),
@@ -48,7 +48,7 @@ public class TestConnection {
 
   @Test(expected = UndefinedBehaviourError.class)
   public void testIncorrectPortConnection() throws SchematicException {
-    
+
     new ConnectionValue(
       conType,
       n.getPort(PORT_NAME1),
@@ -77,10 +77,10 @@ public class TestConnection {
   @Test(expected = org.manifold.compiler.InvalidAttributeException.class)
   public void testCreateWithInvalidAttribute() throws SchematicException {
     Value v = BooleanValue.getInstance(true);
-    new ConnectionValue(conType, n.getPort(PORT_NAME1), n.getPort(PORT_NAME2), 
+    new ConnectionValue(conType, n.getPort(PORT_NAME1), n.getPort(PORT_NAME2),
         ImmutableMap.of("v", v, "bogus", v));
   }
-  
+
   @Test
   public void testGetPort() throws UndeclaredIdentifierException {
     assertEquals(n.getPort(PORT_NAME1), ept.getFrom());

@@ -1,6 +1,7 @@
 package org.manifold.compiler;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,14 +16,14 @@ public class TestNodeTypeValue {
   private static final TypeValue intType = IntegerTypeValue.getInstance();
   private static final Map<String, TypeValue> noAttributes = new HashMap<>();
   private static final Map<String, PortTypeValue> noPorts = new HashMap<>();
-  
+
   @Test
   public void testGetSupertype() {
     NodeTypeValue nBase = new NodeTypeValue(noAttributes, noPorts);
     NodeTypeValue nDerived = new NodeTypeValue(noAttributes, noPorts, nBase);
     assertEquals(nBase, nDerived.getSupertype());
   }
-  
+
   @Test
   public void testInheritedAttributes() {
     NodeTypeValue nBase =
@@ -33,10 +34,10 @@ public class TestNodeTypeValue {
     assertTrue(nDerived.getAttributes().containsKey("u"));
     assertTrue(nDerived.getAttributes().containsKey("v"));
   }
-  
+
   @Test
   public void testInheritedPorts() {
-    PortTypeValue pType = new PortTypeValue(noAttributes);
+    PortTypeValue pType = new PortTypeValue(boolType, noAttributes);
     NodeTypeValue nBase =
         new NodeTypeValue(noAttributes, ImmutableMap.of("p", pType));
     NodeTypeValue nDerived =

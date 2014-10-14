@@ -1,11 +1,12 @@
 package org.manifold.compiler.middle.serialization;
 
 
+import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SIGNAL_TYPE;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
 
 import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
@@ -122,16 +123,21 @@ public class SchematicDeserializer implements SerializationConsts {
   private void deserializePortTypes(Schematic sch, JsonObject in)
       throws JsonSyntaxException, MultipleDefinitionException,
       UndeclaredIdentifierException {
-    
+
     if (in == null) {
       // TODO warning?
       return;
     }
-    
+
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
-      
+
+      // get signal type
+      String signalTypeName = entry.getValue().getAsJsonObject()
+          .get(SIGNAL_TYPE).getAsString();
+      TypeValue signalType = sch.getUserDefinedType(signalTypeName);
+
       // get supertype if it exists
       PortTypeValue supertype = null;
       if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
@@ -139,12 +145,12 @@ public class SchematicDeserializer implements SerializationConsts {
             .get(SUPERTYPE).getAsString();
         supertype = sch.getPortType(supertypeName);
       }
-      
+
       PortTypeValue portTypeValue = null;
       if (supertype == null) {
-        portTypeValue = new PortTypeValue(attributeMap);
+        portTypeValue = new PortTypeValue(signalType, attributeMap);
       } else {
-        portTypeValue = new PortTypeValue(attributeMap, supertype);
+        portTypeValue = new PortTypeValue(signalType, attributeMap, supertype);
       }
 
       sch.addPortType(entry.getKey(), portTypeValue);
@@ -154,12 +160,12 @@ public class SchematicDeserializer implements SerializationConsts {
   private void deserializeNodeTypes(Schematic sch, JsonObject in)
       throws JsonSyntaxException, MultipleDefinitionException,
       UndeclaredIdentifierException {
-    
+
     if (in == null) {
       // TODO warning?
       return;
     }
-    
+
     for (Entry<String, JsonElement> entry : in.entrySet()) {
 
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
@@ -173,7 +179,7 @@ public class SchematicDeserializer implements SerializationConsts {
         portMap.put(portEntry.getKey(), sch.getPortType(portEntry.getValue()
             .getAsString()));
       }
-      
+
       // get supertype if it exists
       NodeTypeValue supertype = null;
       if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
@@ -181,7 +187,7 @@ public class SchematicDeserializer implements SerializationConsts {
             .get(SUPERTYPE).getAsString();
         supertype = sch.getNodeType(supertypeName);
       }
-      
+
       NodeTypeValue nodeTypeValue;
       if (supertype == null) {
         nodeTypeValue = new NodeTypeValue(attributeMap, portMap);
@@ -195,23 +201,23 @@ public class SchematicDeserializer implements SerializationConsts {
 
   private void deserializeConnectionTypes(Schematic sch, JsonObject in)
       throws MultipleDefinitionException, UndeclaredIdentifierException {
-    
+
     if (in == null) {
       // TODO warning?
       return;
     }
-    
+
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
-      
+
       ConnectionType supertype = null;
       if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
         String supertypeName = entry.getValue().getAsJsonObject()
             .get(SUPERTYPE).getAsString();
         supertype = sch.getConnectionType(supertypeName);
       }
-      
+
       ConnectionType connectionType;
       if (supertype == null) {
         connectionType = new ConnectionType(attributeMap);
@@ -225,23 +231,23 @@ public class SchematicDeserializer implements SerializationConsts {
 
   private void deserializeConstraintTypes(Schematic sch, JsonObject in)
       throws MultipleDefinitionException, UndeclaredIdentifierException {
-    
+
     if (in == null) {
       // TODO warning?
       return;
     }
-    
+
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
-      
+
       ConstraintType supertype = null;
       if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
         String supertypeName = entry.getValue().getAsJsonObject()
             .get(SUPERTYPE).getAsString();
         supertype = sch.getConstraintType(supertypeName);
       }
-      
+
       ConstraintType constraintType = null;
       if (supertype == null) {
         constraintType = new ConstraintType(attributeMap);
@@ -273,12 +279,12 @@ public class SchematicDeserializer implements SerializationConsts {
    */
   private void deserializeNodes(Schematic sch, JsonObject in)
       throws SchematicException {
-    
+
     if (in == null) {
       // TODO warning?
       return;
     }
-    
+
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       JsonObject nodeDef = entry.getValue().getAsJsonObject();
 
@@ -322,7 +328,7 @@ public class SchematicDeserializer implements SerializationConsts {
       // TODO warning?
       return;
     }
-    
+
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       JsonObject obj = entry.getValue().getAsJsonObject();
 
@@ -338,7 +344,7 @@ public class SchematicDeserializer implements SerializationConsts {
       sch.addConnection(entry.getKey(), conVal);
     }
   }
-  
+
   /**
    * <pre>
    * constraints: {
@@ -359,7 +365,7 @@ public class SchematicDeserializer implements SerializationConsts {
       // TODO warning?
       return;
     }
-    
+
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       JsonObject obj = entry.getValue().getAsJsonObject();
 

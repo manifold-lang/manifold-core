@@ -132,6 +132,8 @@ public class SchematicSerializer {
         single.addProperty(SUPERTYPE, rPortTypeMap.get(supertype));
       }
 
+      // TODO(murphy) serialize signal type
+
       single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
       collection.add(key, single);
 

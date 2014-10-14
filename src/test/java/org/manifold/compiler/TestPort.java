@@ -2,26 +2,26 @@ package org.manifold.compiler;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 import org.manifold.compiler.middle.SchematicException;
+
+import com.google.common.collect.ImmutableMap;
 
 public class TestPort {
 
   private static final TypeValue boolType = BooleanTypeValue.getInstance();
   private static final PortTypeValue defaultPortType =
-      new PortTypeValue(ImmutableMap.of("v", boolType));
+      new PortTypeValue(boolType, ImmutableMap.of("v", boolType));
   private static final String PORT_NAME = "testport";
   private static final Value v = BooleanValue.getInstance(true);
-  
+
   private NodeValue parent;
   private PortValue port;
-  
+
   @Before
   public void setup() throws SchematicException {
     Map<String, PortTypeValue> portTypeMap =
@@ -43,7 +43,7 @@ public class TestPort {
       throws UndeclaredAttributeException {
     port.getAttribute("bogus");
   }
-  
+
   @Test
   public void testGetParent() throws UndeclaredIdentifierException {
     assertEquals(parent, parent.getPort(PORT_NAME).getParent());
