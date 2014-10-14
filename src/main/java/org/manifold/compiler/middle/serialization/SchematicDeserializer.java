@@ -134,6 +134,11 @@ public class SchematicDeserializer implements SerializationConsts {
           .getValue().getAsJsonObject());
 
       // get signal type
+      if (!(entry.getValue().getAsJsonObject().has(SIGNAL_TYPE))) {
+        throw new JsonSyntaxException("port type '" + entry.getKey() + "'"
+            + " does not define a signal type;"
+            + " possible schematic version mismatch");
+      }
       String signalTypeName = entry.getValue().getAsJsonObject()
           .get(SIGNAL_TYPE).getAsString();
       TypeValue signalType = sch.getUserDefinedType(signalTypeName);

@@ -7,10 +7,12 @@
   },
   "portTypes": {
     "digital_out": {
+      "signalType": "Bool",
       "attributes": {
       }
     },
     "digital_in": {
+      "signalType": "Bool",
       "attributes": {
       }
     }
