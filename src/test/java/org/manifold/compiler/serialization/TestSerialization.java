@@ -3,6 +3,7 @@ package org.manifold.compiler.serialization;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URL;
@@ -365,6 +366,36 @@ public class TestSerialization {
     ConstraintType derivedConstraint =
         sch.getConstraintType(DERIVED_CONSTRAINT_NAME);
     assertTrue(derivedConstraint.isSubtypeOf(baseConstraint));
+  }
+
+  @Test
+  public void testSerialize_UserDefinedArray()
+      throws MultipleDefinitionException {
+    // add an array UDT to the test schematic
+    TypeValue bitvectorType = new ArrayTypeValue(
+        BooleanTypeValue.getInstance());
+    String typename = "Bitvector";
+    testSchematic.addUserDefinedType(typename, bitvectorType);
+    // serialize, deserialize, check that the type looks okay
+    JsonObject result = SchematicSerializer.serialize(testSchematic);
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
+
+    Schematic sch = new SchematicDeserializer().deserialize(result);
+    try {
+      TypeValue udt = sch.getUserDefinedType(typename);
+      assertTrue(udt instanceof ArrayTypeValue);
+      ArrayTypeValue arrayType = (ArrayTypeValue) udt;
+      assertEquals(BooleanTypeValue.getInstance(), arrayType.getElementType());
+    } catch (UndeclaredIdentifierException e) {
+      fail("undeclared identifier '" + e.getIdentifier() + "'; "
+          + "the user-defined type may not have been serialized");
+    }
   }
 
   @Test
