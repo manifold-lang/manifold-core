@@ -143,12 +143,12 @@ public class SchematicDeserializer implements SerializationConsts {
                 + ARRAY_ELEMENT_TYPE + "'");
           }
         } else {
-          throw new JsonSyntaxException("unknown type value '"
+          throw new JsonSyntaxException("unknown structured type '"
               + typename + "'");
         }
       } else {
-        throw new JsonSyntaxException("type value '" + el.toString() + "'"
-            + " missing required attribute '" + TYPE + "'");
+        throw new JsonSyntaxException("structured type value '" + el.toString()
+            + "' missing required attribute '" + TYPE + "'");
       }
     } else {
       throw new JsonSyntaxException("cannot deserialize type value '"
