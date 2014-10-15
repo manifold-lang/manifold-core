@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.BooleanTypeValue;
 import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
@@ -20,6 +21,7 @@ import org.manifold.compiler.MultipleDefinitionException;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
+import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
 import org.manifold.compiler.UndeclaredIdentifierException;
 import org.manifold.compiler.Value;
@@ -363,6 +365,24 @@ public class TestSerialization {
     ConstraintType derivedConstraint =
         sch.getConstraintType(DERIVED_CONSTRAINT_NAME);
     assertTrue(derivedConstraint.isSubtypeOf(baseConstraint));
+  }
+
+  @Test
+  public void testDeserialize_UserDefinedArray()
+      throws JsonSyntaxException, IOException, UndeclaredIdentifierException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "deserialization-udt-array.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+
+    final String UDT_TYPENAME = "Bitvector";
+    TypeValue udt = sch.getUserDefinedType(UDT_TYPENAME);
+    assertTrue(udt instanceof ArrayTypeValue);
+    ArrayTypeValue arrayType = (ArrayTypeValue) udt;
+    assertEquals(BooleanTypeValue.getInstance(), arrayType.getElementType());
   }
 
 }
