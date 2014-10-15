@@ -1,10 +1,6 @@
 {
   "name": "dogematics",
-  "userDefinedTypes": {
-    "Bool": {},
-    "String": {},
-    "Int": {}
-  },
+  "userDefinedTypes": {},
   "portTypes": {
     "digital_out": {
       "attributes": {

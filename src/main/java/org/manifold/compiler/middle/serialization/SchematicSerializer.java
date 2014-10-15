@@ -105,7 +105,9 @@ public class SchematicSerializer {
 
     userDefTypes.forEach((key, val) -> {
       rUserDefTypeMap.put(val, key);
-      if (key.equals("Bool") || key.equals("Int") || key.equals("String")) {
+      // do not serialize primitive types
+      if (key.equals("Bool") || key.equals("Int")
+          || key.equals("String") || key.equals("Real")) {
         return;
       }
     });
