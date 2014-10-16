@@ -25,6 +25,7 @@ import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
 import org.manifold.compiler.UndeclaredIdentifierException;
+import org.manifold.compiler.UserDefinedTypeValue;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
@@ -167,8 +168,8 @@ public class TestSerialization {
 
     assertEquals(TEST_SCHEMATIC_NAME, sch.getName());
 
-    assertEquals(BooleanTypeValue.getInstance(),
-        sch.getUserDefinedType("Flag"));
+    assertTrue(sch.getUserDefinedType("Flag")
+        .isSubtypeOf(BooleanTypeValue.getInstance()));
 
     assertEquals(digitalIn, inNodePorts.get("in1"));
     assertEquals(digitalIn, inNodePorts.get("in2"));
@@ -375,7 +376,8 @@ public class TestSerialization {
     TypeValue bitvectorType = new ArrayTypeValue(
         BooleanTypeValue.getInstance());
     String typename = "Bitvector";
-    testSchematic.addUserDefinedType(typename, bitvectorType);
+    testSchematic.addUserDefinedType(typename,
+        new UserDefinedTypeValue(bitvectorType));
     // serialize, deserialize, check that the type looks okay
     JsonObject result = SchematicSerializer.serialize(testSchematic);
 
@@ -410,10 +412,11 @@ public class TestSerialization {
     Schematic sch = new SchematicDeserializer().deserialize(json);
 
     final String UDT_TYPENAME = "Bitvector";
-    TypeValue udt = sch.getUserDefinedType(UDT_TYPENAME);
-    assertTrue(udt instanceof ArrayTypeValue);
-    ArrayTypeValue arrayType = (ArrayTypeValue) udt;
-    assertEquals(BooleanTypeValue.getInstance(), arrayType.getElementType());
+    UserDefinedTypeValue udt = sch.getUserDefinedType(UDT_TYPENAME);
+    assertTrue(udt.getTypeAlias() instanceof ArrayTypeValue);
+    ArrayTypeValue arrayType = (ArrayTypeValue) udt.getTypeAlias();
+    assertTrue(arrayType.getElementType()
+        .isSubtypeOf(BooleanTypeValue.getInstance()));
   }
 
 }
