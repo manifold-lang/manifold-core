@@ -30,6 +30,7 @@ import org.manifold.compiler.TypeMismatchException;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
 import org.manifold.compiler.UndeclaredIdentifierException;
+import org.manifold.compiler.UserDefinedTypeValue;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
@@ -165,7 +166,7 @@ public class SchematicDeserializer implements SerializationConsts {
 
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       TypeValue udt = deserializeTypeValue(sch, entry.getValue());
-      sch.addUserDefinedType(entry.getKey(), udt);
+      sch.addUserDefinedType(entry.getKey(), new UserDefinedTypeValue(udt));
     }
   }
 

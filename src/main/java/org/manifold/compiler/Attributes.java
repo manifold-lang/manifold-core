@@ -37,7 +37,7 @@ public class Attributes {
       String attrName = entry.getKey();
       TypeValue expectedType = data.get(attrName).getType();
       TypeValue actualType = entry.getValue();
-      if (!expectedType.isSubtypeOf(actualType)) {
+      if (!actualType.isSubtypeOf(expectedType)) {
         throw new TypeMismatchException(expectedType, actualType);
       }
     }
