@@ -19,10 +19,7 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Sch
 import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.ARRAY_ELEMENT_TYPE;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 
 import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.BooleanTypeValue;
@@ -38,6 +35,7 @@ import org.manifold.compiler.TypeDependencyTree;
 import org.manifold.compiler.TypeTypeValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndefinedBehaviourError;
+import org.manifold.compiler.UserDefinedTypeValue;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 
@@ -51,9 +49,7 @@ public class SchematicSerializer {
   private JsonObject schJson;
 
   // reverse maps of java obj -> name in schematics
-  // the reverse UDT map needs to be different as, e.g. multiple typenames
-  // can alias for "Bool", but there is only ever one BooleanTypeValue.
-  private Map<TypeValue, Set<String>> rUserDefTypeMap;
+  private Map<UserDefinedTypeValue, String> rUserDefTypeMap;
   private Map<PortTypeValue, String> rPortTypeMap;
   private Map<NodeTypeValue, String> rNodeTypeMap;
   private Map<ConnectionType, String> rConnectionTypeMap;
@@ -74,26 +70,11 @@ public class SchematicSerializer {
     gson = new GsonBuilder().create();
   }
 
-  private void addUserDefinedTypeMapping(TypeValue key, String value) {
-    if (!(rUserDefTypeMap.containsKey(key))) {
-      rUserDefTypeMap.put(key, new HashSet<String>());
-    }
-    rUserDefTypeMap.get(key).add(value);
-  }
-
-  private String getUserDefinedTypeMapping(TypeValue key) {
-   // TODO this loses information
-    for (String s : rUserDefTypeMap.get(key)) {
-      return s;
-    }
-    throw new NoSuchElementException();
-  }
-
   private JsonObject serializeTypeAttr(Map<String, TypeValue> typeAttr) {
     JsonObject typeAttrJson = new JsonObject();
 
     typeAttr.forEach((key, val) -> {
-      typeAttrJson.addProperty(key, getUserDefinedTypeMapping(val));
+      typeAttrJson.addProperty(key, rUserDefTypeMap.get(val));
     });
 
     return typeAttrJson;
@@ -124,27 +105,31 @@ public class SchematicSerializer {
     return new JsonPrimitive(portDesc);
   }
 
-  public void addUserDefType(Map<String, TypeValue> userDefTypes) {
+  public void addUserDefinedTypes(
+      Map<String, UserDefinedTypeValue> userDefTypes) {
     JsonObject collection = new JsonObject();
 
     userDefTypes.forEach((key, val) -> {
-      addUserDefinedTypeMapping(val, key);
+      rUserDefTypeMap.put(val, key);
       // do not serialize primitive types
       if (key.equals("Bool") || key.equals("Int")
           || key.equals("String") || key.equals("Real")) {
         return;
       }
-      if (val.equals(BooleanTypeValue.getInstance())) {
+
+      // inspect the aliased value
+      TypeValue aliasedVal = val.getTypeAlias();
+
+      if (aliasedVal.isSubtypeOf(BooleanTypeValue.getInstance())) {
         collection.add(key, new JsonPrimitive("Bool"));
 
-      } else if (val instanceof ArrayTypeValue) {
+      } else if (aliasedVal instanceof ArrayTypeValue) {
         // TODO use a type dependency tree/graph to ensure we don't have a cycle
-        ArrayTypeValue arrayVal = (ArrayTypeValue) val;
+        ArrayTypeValue arrayVal = (ArrayTypeValue) aliasedVal;
         JsonObject arrayJson = new JsonObject();
         arrayJson.add(TYPE, new JsonPrimitive("Array"));
         arrayJson.add(ARRAY_ELEMENT_TYPE,
-            new JsonPrimitive(getUserDefinedTypeMapping(
-                arrayVal.getElementType())));
+            new JsonPrimitive(rUserDefTypeMap.get(arrayVal.getElementType())));
         collection.add(key, arrayJson);
       } else {
         throw new UndefinedBehaviourError(
@@ -319,7 +304,7 @@ public class SchematicSerializer {
 
   public static JsonObject serialize(Schematic sch) {
     SchematicSerializer serializer = new SchematicSerializer(sch);
-    serializer.addUserDefType(sch.getUserDefinedTypes());
+    serializer.addUserDefinedTypes(sch.getUserDefinedTypes());
     serializer.addPortTypes(sch.getPortTypes());
     serializer.addNodeTypes(sch.getNodeTypes());
     serializer.addConnectionTypes(sch.getConnectionTypes());

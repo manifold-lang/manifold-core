@@ -371,10 +371,10 @@ public class TestSerialization {
 
   @Test
   public void testSerialize_UserDefinedArray()
-      throws MultipleDefinitionException {
+      throws SchematicException {
     // add an array UDT to the test schematic
     TypeValue bitvectorType = new ArrayTypeValue(
-        BooleanTypeValue.getInstance());
+        testSchematic.getUserDefinedType("Bool"));
     String typename = "Bitvector";
     testSchematic.addUserDefinedType(typename,
         new UserDefinedTypeValue(bitvectorType));
@@ -390,10 +390,11 @@ public class TestSerialization {
 
     Schematic sch = new SchematicDeserializer().deserialize(result);
     try {
-      TypeValue udt = sch.getUserDefinedType(typename);
-      assertTrue(udt instanceof ArrayTypeValue);
-      ArrayTypeValue arrayType = (ArrayTypeValue) udt;
-      assertEquals(BooleanTypeValue.getInstance(), arrayType.getElementType());
+      UserDefinedTypeValue udt = sch.getUserDefinedType(typename);
+      assertTrue(udt.getTypeAlias() instanceof ArrayTypeValue);
+      ArrayTypeValue arrayType = (ArrayTypeValue) udt.getTypeAlias();
+      assertTrue(arrayType.getElementType()
+          .isSubtypeOf(BooleanTypeValue.getInstance()));
     } catch (UndeclaredIdentifierException e) {
       fail("undeclared identifier '" + e.getIdentifier() + "'; "
           + "the user-defined type may not have been serialized");

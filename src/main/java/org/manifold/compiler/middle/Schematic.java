@@ -258,7 +258,7 @@ public class Schematic {
     throw new NoSuchElementException();
   }
 
-  public Map<String, TypeValue> getUserDefinedTypes() {
+  public Map<String, UserDefinedTypeValue> getUserDefinedTypes() {
     return ImmutableMap.copyOf(userDefinedTypes);
   }
 
