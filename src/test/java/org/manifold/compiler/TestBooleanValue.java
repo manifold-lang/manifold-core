@@ -1,12 +1,14 @@
 package org.manifold.compiler;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 public class TestBooleanValue {
-  
+
   private BooleanValue getInstance(boolean value) {
     return BooleanValue.getInstance(value);
   }
@@ -26,25 +28,25 @@ public class TestBooleanValue {
   @Test
   public void testGetType() {
     assertThat(
-      getInstance(true).getType(),
-      instanceOf(BooleanTypeValue.class)
+        getInstance(true).getType(),
+        instanceOf(BooleanTypeValue.class)
     );
     assertThat(
-      getInstance(false).getType(),
-      instanceOf(BooleanTypeValue.class)
+        getInstance(false).getType(),
+        instanceOf(BooleanTypeValue.class)
     );
   }
-  
+
   @Test
   public void testIsCompiletimeEvaluable() {
     assertTrue(getInstance(false).isElaborationtimeKnowable());
   }
-  
+
   @Test
   public void testIsSynthesizable() {
     assertTrue(getInstance(false).isRuntimeKnowable());
   }
-  
+
   @Test
   public void testVerify() {
     getInstance(true).verify();
