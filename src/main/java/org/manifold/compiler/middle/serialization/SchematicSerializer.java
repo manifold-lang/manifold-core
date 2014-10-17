@@ -104,11 +104,11 @@ public class SchematicSerializer {
     JsonObject collection = new JsonObject();
 
     userDefTypes.forEach((key, val) -> {
-      rUserDefTypeMap.put(val, key);
-      if (key.equals("Bool") || key.equals("Int") || key.equals("String")) {
-        return;
-      }
-    });
+        rUserDefTypeMap.put(val, key);
+        if (key.equals("Bool") || key.equals("Int") || key.equals("String")) {
+          return;
+        }
+      });
     schJson.add(USER_DEF_TYPES, collection);
   }
 
@@ -117,25 +117,25 @@ public class SchematicSerializer {
 
     TypeDependencyTree typeDeps = new TypeDependencyTree();
     portTypes.forEach((key, val) -> {
-      typeDeps.addType(val);
-      rPortTypeMap.put(val, key);
-    });
+        typeDeps.addType(val);
+        rPortTypeMap.put(val, key);
+      });
     // now add each PortTypeValue to the collection
     typeDeps.forEachDFS((t) -> {
-      PortTypeValue val = (PortTypeValue) t;
-      String key = rPortTypeMap.get(val);
+        PortTypeValue val = (PortTypeValue) t;
+        String key = rPortTypeMap.get(val);
 
-      JsonObject single = new JsonObject();
+        JsonObject single = new JsonObject();
 
-      TypeValue supertype = t.getSupertype();
-      if (!(supertype.equals(TypeTypeValue.getInstance()))) {
-        single.addProperty(SUPERTYPE, rPortTypeMap.get(supertype));
-      }
+        TypeValue supertype = t.getSupertype();
+        if (!(supertype.equals(TypeTypeValue.getInstance()))) {
+          single.addProperty(SUPERTYPE, rPortTypeMap.get(supertype));
+        }
 
-      single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
-      collection.add(key, single);
+        single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
+        collection.add(key, single);
 
-    });
+      });
 
     schJson.add(PORT_TYPES, collection);
   }
@@ -145,30 +145,30 @@ public class SchematicSerializer {
 
     TypeDependencyTree typeDeps = new TypeDependencyTree();
     nodeTypes.forEach((key, val) -> {
-      typeDeps.addType(val);
-      rNodeTypeMap.put(val, key);
-    });
+        typeDeps.addType(val);
+        rNodeTypeMap.put(val, key);
+      });
     // now add each NodeTypeValue to the collection
     typeDeps.forEachDFS((t) -> {
-      NodeTypeValue val = (NodeTypeValue) t;
-      String key = rNodeTypeMap.get(val);
+        NodeTypeValue val = (NodeTypeValue) t;
+        String key = rNodeTypeMap.get(val);
 
-      JsonObject single = new JsonObject();
-      single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
+        JsonObject single = new JsonObject();
+        single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
 
-      JsonObject ports = new JsonObject();
-      val.getPorts().forEach((pkey, pval) -> {
-        ports.addProperty(pkey, rPortTypeMap.get(pval));
+        JsonObject ports = new JsonObject();
+        val.getPorts().forEach((pkey, pval) -> {
+            ports.addProperty(pkey, rPortTypeMap.get(pval));
+          });
+
+        TypeValue supertype = t.getSupertype();
+        if (!(supertype.equals(TypeTypeValue.getInstance()))) {
+          single.addProperty(SUPERTYPE, rNodeTypeMap.get(supertype));
+        }
+
+        single.add(PORT_MAP, ports);
+        collection.add(key, single);
       });
-
-      TypeValue supertype = t.getSupertype();
-      if (!(supertype.equals(TypeTypeValue.getInstance()))) {
-        single.addProperty(SUPERTYPE, rNodeTypeMap.get(supertype));
-      }
-
-      single.add(PORT_MAP, ports);
-      collection.add(key, single);
-    });
 
     schJson.add(NODE_TYPES, collection);
   }
@@ -178,24 +178,24 @@ public class SchematicSerializer {
 
     TypeDependencyTree typeDeps = new TypeDependencyTree();
     conTypes.forEach((key, val) -> {
-      typeDeps.addType(val);
-      rConnectionTypeMap.put(val, key);
-    });
+        typeDeps.addType(val);
+        rConnectionTypeMap.put(val, key);
+      });
     // now add each ConnectionType to the collection
     typeDeps.forEachDFS((t) -> {
-      ConnectionType val = (ConnectionType) t;
-      String key = rConnectionTypeMap.get(val);
+        ConnectionType val = (ConnectionType) t;
+        String key = rConnectionTypeMap.get(val);
 
-      JsonObject single = new JsonObject();
-      single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
+        JsonObject single = new JsonObject();
+        single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
 
-      TypeValue supertype = t.getSupertype();
-      if (!(supertype.equals(TypeTypeValue.getInstance()))) {
-        single.addProperty(SUPERTYPE, rConnectionTypeMap.get(supertype));
-      }
+        TypeValue supertype = t.getSupertype();
+        if (!(supertype.equals(TypeTypeValue.getInstance()))) {
+          single.addProperty(SUPERTYPE, rConnectionTypeMap.get(supertype));
+        }
 
-      collection.add(key, single);
-    });
+        collection.add(key, single);
+      });
 
     schJson.add(CONNECTION_TYPES, collection);
   }
@@ -205,24 +205,24 @@ public class SchematicSerializer {
 
     TypeDependencyTree typeDeps = new TypeDependencyTree();
     constraintTypes.forEach((key, val) -> {
-      typeDeps.addType(val);
-      rConstraintTypeMap.put(val, key);
-    });
+        typeDeps.addType(val);
+        rConstraintTypeMap.put(val, key);
+      });
     // now add each ConstraintType to the collection
     typeDeps.forEachDFS((t) -> {
-      ConstraintType val = (ConstraintType) t;
-      String key = rConstraintTypeMap.get(val);
+        ConstraintType val = (ConstraintType) t;
+        String key = rConstraintTypeMap.get(val);
 
-      JsonObject single = new JsonObject();
-      single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
+        JsonObject single = new JsonObject();
+        single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
 
-      TypeValue supertype = t.getSupertype();
-      if (!(supertype.equals(TypeTypeValue.getInstance()))) {
-        single.addProperty(SUPERTYPE, rConstraintTypeMap.get(supertype));
-      }
+        TypeValue supertype = t.getSupertype();
+        if (!(supertype.equals(TypeTypeValue.getInstance()))) {
+          single.addProperty(SUPERTYPE, rConstraintTypeMap.get(supertype));
+        }
 
-      collection.add(key, single);
-    });
+        collection.add(key, single);
+      });
 
     schJson.add(CONSTRAINT_TYPES, collection);
   }
@@ -231,16 +231,17 @@ public class SchematicSerializer {
     JsonObject collection = new JsonObject();
 
     nodes.forEach((key, val) -> {
-      JsonObject single = new JsonObject();
-      single.add(TYPE, new JsonPrimitive(rNodeTypeMap.get(val.getType())));
-      single.add(ATTRIBUTES, serializeValueAttr(val.getAttributes().getAll()));
-      JsonObject portAttrs = new JsonObject();
-      val.getPorts().forEach(
-          (pkey, pval) -> portAttrs.add(
-              pkey, serializeValueAttr(pval.getAttributes().getAll())));
-      single.add(PORT_ATTRS, portAttrs);
-      collection.add(key, single);
-    });
+        JsonObject single = new JsonObject();
+        single.add(TYPE, new JsonPrimitive(rNodeTypeMap.get(val.getType())));
+        single.add(ATTRIBUTES, serializeValueAttr(
+            val.getAttributes().getAll()));
+        JsonObject portAttrs = new JsonObject();
+        val.getPorts().forEach(
+              (pkey, pval) -> portAttrs.add(
+                  pkey, serializeValueAttr(pval.getAttributes().getAll())));
+        single.add(PORT_ATTRS, portAttrs);
+        collection.add(key, single);
+      });
 
     schJson.add(NODE_DEFS, collection);
   }
@@ -249,13 +250,15 @@ public class SchematicSerializer {
     JsonObject collection = new JsonObject();
 
     connections.forEach((key, val) -> {
-      JsonObject single = new JsonObject();
-      single.add(TYPE, new JsonPrimitive(rConnectionTypeMap.get(val.getType())));
-      single.add(ATTRIBUTES, serializeValueAttr(val.getAttributes().getAll()));
-      single.add(FROM, serializeConnectedPort(val.getFrom()));
-      single.add(TO, serializeConnectedPort(val.getTo()));
-      collection.add(key, single);
-    });
+        JsonObject single = new JsonObject();
+        single.add(TYPE, new JsonPrimitive(
+            rConnectionTypeMap.get(val.getType())));
+        single.add(ATTRIBUTES, serializeValueAttr(
+            val.getAttributes().getAll()));
+        single.add(FROM, serializeConnectedPort(val.getFrom()));
+        single.add(TO, serializeConnectedPort(val.getTo()));
+        collection.add(key, single);
+      });
 
     schJson.add(CONNECTION_DEFS, collection);
   }
@@ -263,11 +266,13 @@ public class SchematicSerializer {
   public void addConstraints(Map<String, ConstraintValue> constraints) {
     JsonObject collection = new JsonObject();
     constraints.forEach((key, val) -> {
-      JsonObject single = new JsonObject();
-      single.add(TYPE, new JsonPrimitive(rConstraintTypeMap.get(val.getType())));
-      single.add(ATTRIBUTES, serializeValueAttr(val.getAttributes().getAll()));
-      collection.add(key, single);
-    });
+        JsonObject single = new JsonObject();
+        single.add(TYPE, new JsonPrimitive(rConstraintTypeMap.get(
+            val.getType())));
+        single.add(ATTRIBUTES, serializeValueAttr(
+            val.getAttributes().getAll()));
+        collection.add(key, single);
+      });
     schJson.add(CONSTRAINT_DEFS, collection);
   }
 
