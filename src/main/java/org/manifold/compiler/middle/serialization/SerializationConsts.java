@@ -9,6 +9,10 @@ public interface SerializationConsts {
     String SUPERTYPE = "supertype";
   }
 
+  public interface UDTConsts {
+    String ARRAY_ELEMENT_TYPE = "elementType";
+  }
+
   public interface SchematicConsts {
     String USER_DEF_TYPES = "userDefinedTypes";
     String PORT_TYPES = "portTypes";

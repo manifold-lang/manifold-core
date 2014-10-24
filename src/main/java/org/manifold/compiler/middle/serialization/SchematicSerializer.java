@@ -16,10 +16,13 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Sch
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.NODE_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.PORT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.USER_DEF_TYPES;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.ARRAY_ELEMENT_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.manifold.compiler.ArrayTypeValue;
+import org.manifold.compiler.BooleanTypeValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
@@ -32,6 +35,7 @@ import org.manifold.compiler.TypeDependencyTree;
 import org.manifold.compiler.TypeTypeValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndefinedBehaviourError;
+import org.manifold.compiler.UserDefinedTypeValue;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 
@@ -45,7 +49,7 @@ public class SchematicSerializer {
   private JsonObject schJson;
 
   // reverse maps of java obj -> name in schematics
-  private Map<TypeValue, String> rUserDefTypeMap;
+  private Map<UserDefinedTypeValue, String> rUserDefTypeMap;
   private Map<PortTypeValue, String> rPortTypeMap;
   private Map<NodeTypeValue, String> rNodeTypeMap;
   private Map<ConnectionType, String> rConnectionTypeMap;
@@ -69,8 +73,9 @@ public class SchematicSerializer {
   private JsonObject serializeTypeAttr(Map<String, TypeValue> typeAttr) {
     JsonObject typeAttrJson = new JsonObject();
 
-    typeAttr.forEach((key, val) -> typeAttrJson.addProperty(key,
-        rUserDefTypeMap.get(val)));
+    typeAttr.forEach((key, val) -> {
+        typeAttrJson.addProperty(key, rUserDefTypeMap.get(val));
+      });
 
     return typeAttrJson;
   }
@@ -100,15 +105,39 @@ public class SchematicSerializer {
     return new JsonPrimitive(portDesc);
   }
 
-  public void addUserDefType(Map<String, TypeValue> userDefTypes) {
+  public void addUserDefinedTypes(
+      Map<String, UserDefinedTypeValue> userDefTypes) {
     JsonObject collection = new JsonObject();
 
     userDefTypes.forEach((key, val) -> {
         rUserDefTypeMap.put(val, key);
-        if (key.equals("Bool") || key.equals("Int") || key.equals("String")) {
+        // do not serialize primitive types
+        if (key.equals("Bool") || key.equals("Int")
+            || key.equals("String") || key.equals("Real")) {
           return;
         }
+
+        // inspect the aliased value
+        TypeValue aliasedVal = val.getTypeAlias();
+
+        if (aliasedVal.isSubtypeOf(BooleanTypeValue.getInstance())) {
+          collection.add(key, new JsonPrimitive("Bool"));
+
+        } else if (aliasedVal instanceof ArrayTypeValue) {
+          // TODO use a type dependency tree/graph
+          // to ensure we don't have a cycle
+          ArrayTypeValue arrayVal = (ArrayTypeValue) aliasedVal;
+          JsonObject arrayJson = new JsonObject();
+          arrayJson.add(TYPE, new JsonPrimitive("Array"));
+          arrayJson.add(ARRAY_ELEMENT_TYPE, new JsonPrimitive(
+              rUserDefTypeMap.get(arrayVal.getElementType())));
+          collection.add(key, arrayJson);
+        } else {
+          throw new UndefinedBehaviourError(
+              "don't know how to serialize TypeValue '" + val.toString() + "'");
+        }
       });
+
     schJson.add(USER_DEF_TYPES, collection);
   }
 
@@ -282,7 +311,7 @@ public class SchematicSerializer {
 
   public static JsonObject serialize(Schematic sch) {
     SchematicSerializer serializer = new SchematicSerializer(sch);
-    serializer.addUserDefType(sch.getUserDefinedTypes());
+    serializer.addUserDefinedTypes(sch.getUserDefinedTypes());
     serializer.addPortTypes(sch.getPortTypes());
     serializer.addNodeTypes(sch.getNodeTypes());
     serializer.addConnectionTypes(sch.getConnectionTypes());

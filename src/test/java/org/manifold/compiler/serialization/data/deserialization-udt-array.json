@@ -1,0 +1,23 @@
+{
+  "name": "dogematics",
+  "userDefinedTypes": {
+    "Bitvector": {
+      "type": "Array",
+      "elementType": "Bool"
+    }
+  },
+  "portTypes": {
+  },
+  "nodeTypes": {
+  },
+  "connectionTypes": {
+  },
+  "constraintTypes": {
+  },
+  "nodes": {
+  },
+  "connections": {
+  },
+  "constraints": {
+  }
+}
