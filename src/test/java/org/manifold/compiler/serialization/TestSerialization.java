@@ -420,4 +420,16 @@ public class TestSerialization {
         .isSubtypeOf(BooleanTypeValue.getInstance()));
   }
 
+  @Test
+  public void regressionTestDeserialize_UndeclaredPortAttributeType()
+      throws JsonSyntaxException, IOException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "port_attribute_undeclared_type_positive.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+  }
+
 }
