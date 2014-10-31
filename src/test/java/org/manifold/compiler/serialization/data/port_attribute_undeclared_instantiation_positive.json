@@ -1,0 +1,93 @@
+{
+"name": "InToOut",
+"portTypes": {
+
+"digitalOut": {
+  "attributes": {}
+},
+"digitalIn": {
+  "attributes": {}
+}
+
+},
+"nodeTypes": {
+  "inputPin": {
+    "attributes": {},
+    "ports": { "out": "digitalOut" }
+  },
+  "outputPin": {
+    "attributes": {},
+    "ports": { "in": "digitalIn" }
+  },
+
+  "and": {
+    "attributes": {},
+    "ports": {
+      "in0": "digitalIn",
+      "in1": "digitalIn",
+      "out": "digitalOut"
+    }
+  },
+  "or": {
+    "attributes": {},
+    "ports": {
+      "in0": "digitalIn",
+      "in1": "digitalIn",
+      "out": "digitalOut"
+    }
+  },
+  "not": {
+    "attributes": {},
+    "ports": {
+      "in": "digitalIn",
+      "out": "digitalOut"
+    }
+  },
+
+  "register": {
+    "attributes": { 
+      "initialValue": "Bool",
+      "resetActiveHigh": "Bool",
+      "resetAsynchronous": "Bool",
+      "clockActiveHigh": "Bool"
+    },
+    "ports": { 
+      "clock": "digitalIn",
+      "reset": "digitalIn",
+      "in": "digitalIn",
+      "out": "digitalOut"
+    }
+  }
+},
+"connectionTypes": {
+  "digitalWire": {
+    "attributes": {}
+  }
+},
+"constraintTypes": {
+},
+"nodes": {
+  "i0": {
+    "type": "inputPin",
+    "attributes": {},
+    "portAttrs": {
+      "out": {}
+    }
+  },
+  "o0": {
+    "type": "outputPin",
+    "attributes": {},
+    "portAttrs": {
+      "in": {}
+    }
+  }
+},
+"connections": {
+  "i0_o0": {
+    "type": "digitalWire",
+    "attributes": {},
+    "from": "i0:out",
+    "to": "o0:in"
+  }
+}
+}
