@@ -342,8 +342,16 @@ public class SchematicDeserializer implements SerializationConsts {
       JsonObject portAttrJson = nodeDef.getAsJsonObject(NodeConsts.PORT_ATTRS);
 
       for (Entry<String, JsonElement> p : portAttrJson.entrySet()) {
-        portAttrMap.put(p.getKey(), getValueAttributes(sch, nodeType
-            .getAttributes(), p.getValue().getAsJsonObject()));
+        if (!(nodeType.getPorts().containsKey(p.getKey()))) {
+          throw new UndeclaredIdentifierException(p.getKey());
+        }
+        Map<String, TypeValue> expectedPortAttributes =
+            nodeType.getPorts().get(p.getKey()).getAttributes();
+        portAttrMap.put(p.getKey(), getValueAttributes(
+            sch,
+            // here we want the port attribute map
+            expectedPortAttributes,
+            p.getValue().getAsJsonObject()));
       }
 
       NodeValue node = new NodeValue(nodeType, attributeMap, portAttrMap);

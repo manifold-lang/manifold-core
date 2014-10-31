@@ -420,4 +420,121 @@ public class TestSerialization {
         .isSubtypeOf(BooleanTypeValue.getInstance()));
   }
 
+  @Test
+  public void regressionTestDeserialize_UndeclaredNodeAttributeInst_correct()
+      throws JsonSyntaxException, IOException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "node_attribute_undeclared_instantiation_positive.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+  }
+
+  @Test
+  public void regressionTestDeserialize_UndeclaredNodeAttributeInst_incorrect()
+    throws JsonSyntaxException, IOException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "node_attribute_undeclared_instantiation_negative.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    try {
+      Schematic sch = new SchematicDeserializer().deserialize(json);
+      fail("deserialization failed to detect incorrect schematic");
+    } catch (RuntimeException e) {
+      if (e.getCause() instanceof UndeclaredAttributeException) {
+        UndeclaredAttributeException uae =
+            (UndeclaredAttributeException) e.getCause();
+        assertEquals("initialValue", uae.name);
+      } else {
+        fail(e.getMessage());
+      }
+    }
+  }
+
+  @Test
+  public void regressionTestDeserialize_UndeclaredNodeAttributeType_correct()
+      throws JsonSyntaxException, IOException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "node_attribute_undeclared_type_positive.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+  }
+
+  @Test
+  public void regressionTestDeserialize_UndeclaredNodeAttributeType_incorrect()
+    throws JsonSyntaxException, IOException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "node_attribute_undeclared_type_negative.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    try {
+      Schematic sch = new SchematicDeserializer().deserialize(json);
+      fail("deserialization failed to detect incorrect schematic");
+    } catch (RuntimeException e) {
+      if (e.getCause() instanceof UndeclaredAttributeException) {
+        UndeclaredAttributeException uae =
+            (UndeclaredAttributeException) e.getCause();
+        assertEquals("test1", uae.name);
+      } else {
+        fail(e.getMessage());
+      }
+    }
+  }
+
+  @Test
+  public void regressionTestDeserialize_UndeclaredPortAttributeInst_correct()
+      throws JsonSyntaxException, IOException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "port_attribute_undeclared_instantiation_positive.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+  }
+
+  @Test
+  public void regressionTestDeserialize_UndeclaredPortAttributeInst_incorrect()
+    throws JsonSyntaxException, IOException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "port_attribute_undeclared_instantiation_negative.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    try {
+      Schematic sch = new SchematicDeserializer().deserialize(json);
+      fail("deserialization failed to detect incorrect schematic");
+    } catch (RuntimeException e) {
+      if (e.getCause() instanceof UndeclaredAttributeException) {
+        UndeclaredAttributeException uae =
+            (UndeclaredAttributeException) e.getCause();
+        assertEquals("extra", uae.name);
+      } else {
+        fail(e.getMessage());
+      }
+    }
+  }
+
+  @Test
+  public void regressionTestDeserialize_UndeclaredPortAttributeType()
+      throws JsonSyntaxException, IOException {
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "port_attribute_undeclared_type_positive.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+  }
+
 }
