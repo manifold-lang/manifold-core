@@ -1,23 +1,20 @@
 package org.manifold.compiler.middle;
 
+import static org.manifold.compiler.middle.serialization.SerializationConsts.PrimitiveTypes.PRIMITIVE_TYPES;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.manifold.compiler.BooleanTypeValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
-import org.manifold.compiler.IntegerTypeValue;
 import org.manifold.compiler.MultipleAssignmentException;
 import org.manifold.compiler.MultipleDefinitionException;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
-import org.manifold.compiler.RealTypeValue;
-import org.manifold.compiler.StringTypeValue;
-import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredIdentifierException;
 import org.manifold.compiler.UndefinedBehaviourError;
 import org.manifold.compiler.UserDefinedTypeValue;
@@ -77,23 +74,17 @@ public class Schematic {
    * string, and boolean.
    */
   private void populateDefaultType() {
-    TypeValue boolType = BooleanTypeValue.getInstance();
-    TypeValue intType = IntegerTypeValue.getInstance();
-    TypeValue stringType = StringTypeValue.getInstance();
-    TypeValue realType = RealTypeValue.getInstance();
-
-    try {
-      addUserDefinedType("Bool", new UserDefinedTypeValue(boolType));
-      addUserDefinedType("Int", new UserDefinedTypeValue(intType));
-      addUserDefinedType("String", new UserDefinedTypeValue(stringType));
-      addUserDefinedType("Real", new UserDefinedTypeValue(realType));
-    } catch (MultipleDefinitionException mde) {
-      // this should not actually be possible unless there is something wrong
-      // with the compiler itself
-      throw new UndefinedBehaviourError(
-          "could not create default type definitions (" + mde.getMessage()
-              + ")");
-    }
+    PRIMITIVE_TYPES.forEach((name, type) -> {
+        try {
+          addUserDefinedType(name, new UserDefinedTypeValue(type));
+        } catch (MultipleDefinitionException mde) {
+          // this should not actually be possible unless there is something
+          // wrong with the compiler itself
+          throw new UndefinedBehaviourError(
+              "could not create default type definitions (" + mde.getMessage()
+                  + ")");
+        }
+      });
   }
 
   public void addUserDefinedType(String typename, UserDefinedTypeValue td)

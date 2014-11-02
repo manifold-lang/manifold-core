@@ -9,12 +9,12 @@ public class PortTypeValue extends TypeValue {
     return signalType;
   }
 
-  public PortTypeValue(TypeValue signalType, Map<String, TypeValue> attributes){
+  public PortTypeValue(TypeValue signalType, Map<String, AttributeTypeValue> attributes){
     super(attributes);
     this.signalType = signalType;
   }
 
-  public PortTypeValue(TypeValue signalType, Map<String, TypeValue> attributes,
+  public PortTypeValue(TypeValue signalType, Map<String, AttributeTypeValue> attributes,
       PortTypeValue supertype) {
     super(supertype, attributes);
     this.signalType = signalType;

@@ -13,9 +13,10 @@ import com.google.common.collect.ImmutableMap;
 
 
 public class TestConnection {
-  private static final TypeValue boolType = BooleanTypeValue.getInstance();
+  private static final AttributeTypeValue boolType = BooleanTypeValue.getInstance();
   private static final PortTypeValue defaultPortDefinition =
       new PortTypeValue(boolType, new HashMap<>());
+
   private static final String PORT_NAME1 = "testport";
   private static final String PORT_NAME2 = "another port";
 

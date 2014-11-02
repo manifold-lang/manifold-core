@@ -13,9 +13,10 @@ import com.google.common.collect.ImmutableMap;
 
 public class TestPort {
 
-  private static final TypeValue boolType = BooleanTypeValue.getInstance();
+  private static final AttributeTypeValue boolType = BooleanTypeValue.getInstance();
   private static final PortTypeValue defaultPortType =
       new PortTypeValue(boolType, ImmutableMap.of("v", boolType));
+
   private static final String PORT_NAME = "testport";
   private static final Value v = BooleanValue.getInstance(true);
 
@@ -24,10 +25,10 @@ public class TestPort {
 
   @Before
   public void setup() throws SchematicException {
-    Map<String, PortTypeValue> portTypeMap =
-        ImmutableMap.of(PORT_NAME, defaultPortType);
-    Map<String, Map<String, Value>> portMap =
-        ImmutableMap.of(PORT_NAME, ImmutableMap.of("v", v));
+    Map<String, PortTypeValue> portTypeMap = ImmutableMap.of(PORT_NAME,
+        defaultPortType);
+    Map<String, Map<String, Value>> portMap = ImmutableMap.of(PORT_NAME,
+        ImmutableMap.of("v", v));
     NodeTypeValue parentType = new NodeTypeValue(new HashMap<>(), portTypeMap);
     parent = new NodeValue(parentType, new HashMap<>(), portMap);
     port = parent.getPort(PORT_NAME);

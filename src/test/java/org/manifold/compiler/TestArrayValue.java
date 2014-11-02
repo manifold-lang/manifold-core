@@ -7,11 +7,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
-import org.junit.Test;
-import org.manifold.compiler.middle.SchematicException;
 
 public class TestArrayValue {
   private static final IntegerTypeValue intType =
@@ -20,8 +19,10 @@ public class TestArrayValue {
       new ArrayTypeValue(intType);
   private static final NodeTypeValue nodeType =
       new NodeTypeValue(ImmutableMap.of(), ImmutableMap.of());
+  /*
   private static final ArrayTypeValue nodeArrayType =
       new ArrayTypeValue(nodeType);
+   */
 
   private static List<Value> makeIntArray(int... values) {
     List<Value> vals = new ArrayList<>();
@@ -44,6 +45,7 @@ public class TestArrayValue {
     assertEquals(arr.get(1), l.get(1));
   }
 
+  /*
   @Test
   public void testNodeArray() throws SchematicException {
     List<Value> l = ImmutableList.of(
@@ -55,6 +57,7 @@ public class TestArrayValue {
     assertTrue(arr.isRuntimeKnowable());
     assertEquals(arr.get(0), l.get(0));
   }
+  */
 
   @Test(expected = org.manifold.compiler.TypeMismatchException.class)
   public void testInvalidElementType() throws TypeMismatchException {
