@@ -1,13 +1,15 @@
 package org.manifold.compiler.middle.serialization;
 
-
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SIGNAL_TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.TYPE;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.ARRAY_ELEMENT_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
@@ -28,6 +30,7 @@ import org.manifold.compiler.TypeMismatchException;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
 import org.manifold.compiler.UndeclaredIdentifierException;
+import org.manifold.compiler.UserDefinedTypeValue;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
@@ -118,6 +121,53 @@ public class SchematicDeserializer implements SerializationConsts {
     int delim = ref.indexOf(GlobalConsts.NODE_PORT_DELIM);
     NodeValue node = sch.getNode(ref.substring(0, delim));
     return node.getPort(ref.substring(delim + 1));
+  }
+
+  private TypeValue deserializeTypeValue(Schematic sch, JsonElement el)
+      throws UndeclaredIdentifierException {
+    if (el.isJsonPrimitive()) {
+      String typename = el.getAsString();
+      return sch.getUserDefinedType(typename);
+    } else if (el.isJsonObject()) {
+      JsonObject eObj = el.getAsJsonObject();
+      if (eObj.has(TYPE)) {
+        String typename = eObj.get(TYPE).getAsString();
+        if (typename.equals("Array")) {
+          // deserialize element type
+          if (eObj.has(ARRAY_ELEMENT_TYPE)) {
+            TypeValue elementType = deserializeTypeValue(
+                sch, eObj.get(ARRAY_ELEMENT_TYPE));
+            return new ArrayTypeValue(elementType);
+          } else {
+            throw new JsonSyntaxException("array type value '"
+                + el.toString() + "' missing required element '"
+                + ARRAY_ELEMENT_TYPE + "'");
+          }
+        } else {
+          throw new JsonSyntaxException("unknown structured type '"
+              + typename + "'");
+        }
+      } else {
+        throw new JsonSyntaxException("structured type value '" + el.toString()
+            + "' missing required attribute '" + TYPE + "'");
+      }
+    } else {
+      throw new JsonSyntaxException("cannot deserialize type value '"
+          + el.toString() + "'");
+    }
+  }
+
+  private void deserializeUserDefinedTypes(Schematic sch, JsonObject in)
+      throws UndeclaredIdentifierException, MultipleDefinitionException {
+    if (in == null) {
+      // TODO warning?
+      return;
+    }
+
+    for (Entry<String, JsonElement> entry : in.entrySet()) {
+      TypeValue udt = deserializeTypeValue(sch, entry.getValue());
+      sch.addUserDefinedType(entry.getKey(), new UserDefinedTypeValue(udt));
+    }
   }
 
   private void deserializePortTypes(Schematic sch, JsonObject in)
@@ -302,8 +352,16 @@ public class SchematicDeserializer implements SerializationConsts {
       JsonObject portAttrJson = nodeDef.getAsJsonObject(NodeConsts.PORT_ATTRS);
 
       for (Entry<String, JsonElement> p : portAttrJson.entrySet()) {
-        portAttrMap.put(p.getKey(), getValueAttributes(sch, nodeType
-            .getAttributes(), p.getValue().getAsJsonObject()));
+        if (!(nodeType.getPorts().containsKey(p.getKey()))) {
+          throw new UndeclaredIdentifierException(p.getKey());
+        }
+        Map<String, TypeValue> expectedPortAttributes =
+            nodeType.getPorts().get(p.getKey()).getAttributes();
+        portAttrMap.put(p.getKey(), getValueAttributes(
+            sch,
+            // here we want the port attribute map
+            expectedPortAttributes,
+            p.getValue().getAsJsonObject()));
       }
 
       NodeValue node = new NodeValue(nodeType, attributeMap, portAttrMap);
@@ -390,9 +448,8 @@ public class SchematicDeserializer implements SerializationConsts {
         in.get(GlobalConsts.SCHEMATIC_NAME).getAsString());
 
     try {
-      // how to do this? should we have these in the IR at all? or should they
-      // just be unrolled into the base types?
-      // deserializeUserDefinedTypes(sch, in.getAsJsonObject(USER_DEF_TYPES));
+      deserializeUserDefinedTypes(sch, in.getAsJsonObject(
+          SchematicConsts.USER_DEF_TYPES));
       deserializePortTypes(sch, in.getAsJsonObject(SchematicConsts.PORT_TYPES));
       deserializeNodeTypes(sch, in.getAsJsonObject(SchematicConsts.NODE_TYPES));
       deserializeConnectionTypes(sch,

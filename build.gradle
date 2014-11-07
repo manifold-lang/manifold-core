@@ -11,7 +11,7 @@ targetCompatibility = 1.8
 
 group = "org.manifold"
 // name = "manifold-core"
-version = '0.7.0-SNAPSHOT'
+version = '0.8.0-SNAPSHOT'
 
 jar {
   manifest {
@@ -82,7 +82,7 @@ checkstyle {
   configFile = new File(rootDir, "checkstyle.xml")
   ignoreFailures = false
   showViolations = true
-  toolVersion = "5.7"
+  toolVersion = "5.9"
 }
 
 task jenkinsTest {

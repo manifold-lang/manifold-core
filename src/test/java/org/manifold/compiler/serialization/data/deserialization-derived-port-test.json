@@ -1,11 +1,6 @@
 {
   "name": "wowsuchderive",
-  "userDefinedTypes": {
-    "Bool": {},
-    "String": {},
-    "Int": {},
-    "Real": {}
-  },
+  "userDefinedTypes": {},
   "portTypes": {
     "basePort": {
       "signalType": "Bool",

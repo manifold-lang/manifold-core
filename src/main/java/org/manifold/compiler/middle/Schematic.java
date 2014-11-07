@@ -20,6 +20,7 @@ import org.manifold.compiler.StringTypeValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredIdentifierException;
 import org.manifold.compiler.UndefinedBehaviourError;
+import org.manifold.compiler.UserDefinedTypeValue;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -37,7 +38,7 @@ public class Schematic {
 
   // Maps containing object definitions for this schematic; they are all
   // indexed by the (string) type-name of the object.
-  private final Map<String, TypeValue> userDefinedTypes;
+  private final Map<String, UserDefinedTypeValue> userDefinedTypes;
   private final Map<String, PortTypeValue> portTypes;
   private final Map<String, NodeTypeValue> nodeTypes;
   private final Map<String, ConnectionType> connectionTypes;
@@ -82,10 +83,10 @@ public class Schematic {
     TypeValue realType = RealTypeValue.getInstance();
 
     try {
-      addUserDefinedType("Bool", boolType);
-      addUserDefinedType("Int", intType);
-      addUserDefinedType("String", stringType);
-      addUserDefinedType("Real", realType);
+      addUserDefinedType("Bool", new UserDefinedTypeValue(boolType));
+      addUserDefinedType("Int", new UserDefinedTypeValue(intType));
+      addUserDefinedType("String", new UserDefinedTypeValue(stringType));
+      addUserDefinedType("Real", new UserDefinedTypeValue(realType));
     } catch (MultipleDefinitionException mde) {
       // this should not actually be possible unless there is something wrong
       // with the compiler itself
@@ -95,15 +96,16 @@ public class Schematic {
     }
   }
 
-  public void addUserDefinedType(String typename, TypeValue td)
+  public void addUserDefinedType(String typename, UserDefinedTypeValue td)
       throws MultipleDefinitionException {
     if (userDefinedTypes.containsKey(typename)) {
-      throw new MultipleDefinitionException("type-definition", typename);
+      throw new MultipleDefinitionException(
+          "user-defined-type-definition", typename);
     }
     userDefinedTypes.put(typename, td);
   }
 
-  public TypeValue getUserDefinedType(String typename)
+  public UserDefinedTypeValue getUserDefinedType(String typename)
       throws UndeclaredIdentifierException {
     if (userDefinedTypes.containsKey(typename)) {
       return userDefinedTypes.get(typename);
@@ -223,7 +225,7 @@ public class Schematic {
       throw new UndeclaredIdentifierException(instanceName);
     }
   }
-  
+
   public String getConnectionName(ConnectionValue instance) {
     if (reverseConnectionMap.containsKey(instance)) {
       return reverseConnectionMap.get(instance);
@@ -248,7 +250,7 @@ public class Schematic {
       throw new UndeclaredIdentifierException(instanceName);
     }
   }
-  
+
   public String getConstraintName(ConstraintValue instance) {
     if (reverseConstraintMap.containsKey(instance)) {
       return reverseConstraintMap.get(instance);
@@ -256,7 +258,7 @@ public class Schematic {
     throw new NoSuchElementException();
   }
 
-  public Map<String, TypeValue> getUserDefinedTypes() {
+  public Map<String, UserDefinedTypeValue> getUserDefinedTypes() {
     return ImmutableMap.copyOf(userDefinedTypes);
   }
 
