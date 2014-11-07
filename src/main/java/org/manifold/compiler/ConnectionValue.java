@@ -44,7 +44,7 @@ public class ConnectionValue extends Value {
     // type check: the signal type from the source is a subclass
     // of the signal type into the destination
     PortTypeValue portTypeFrom = (PortTypeValue) portFrom.getType();
-    PortTypeValue portTypeTo = (PortTypeValue) portFrom.getType();
+    PortTypeValue portTypeTo = (PortTypeValue) portTo.getType();
     TypeValue signalTypeFrom = portTypeFrom.getSignalType();
     TypeValue signalTypeTo = portTypeTo.getSignalType();
     if (!(signalTypeFrom.isSubtypeOf(signalTypeTo))) {
