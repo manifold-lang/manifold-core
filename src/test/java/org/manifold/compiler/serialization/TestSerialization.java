@@ -72,8 +72,10 @@ public class TestSerialization {
     testSchematic = new Schematic(TEST_SCHEMATIC_NAME);
 
     // port type
-    PortTypeValue din = new PortTypeValue(new HashMap<>());
-    PortTypeValue dout = new PortTypeValue(new HashMap<>());
+    PortTypeValue din = new PortTypeValue(
+        testSchematic.getUserDefinedType("Bool"), new HashMap<>());
+    PortTypeValue dout = new PortTypeValue(
+        testSchematic.getUserDefinedType("Bool"), new HashMap<>());
     testSchematic.addPortType(DIGITAL_IN, din);
     testSchematic.addPortType(DIGITAL_OUT, dout);
 
@@ -196,7 +198,8 @@ public class TestSerialization {
   public void testSerialize_DerivedPort()
       throws UndeclaredIdentifierException, MultipleDefinitionException {
     // add a derived port type to the test schematic
-    PortTypeValue dPortDerived = new PortTypeValue(new HashMap<>(),
+    PortTypeValue dPortDerived = new PortTypeValue(
+        testSchematic.getUserDefinedType("Bool"), new HashMap<>(),
         testSchematic.getPortType(DIGITAL_IN));
     String derivedPortName = DIGITAL_IN + "Derived";
     testSchematic.addPortType(derivedPortName, dPortDerived);

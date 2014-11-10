@@ -110,7 +110,8 @@ public class TestSchematic {
     // add the first port type
     String portTypeName = "TestPort";
     Map<String, TypeValue> portAttributes = new HashMap<>();
-    PortTypeValue portType1 = new PortTypeValue(portAttributes);
+    PortTypeValue portType1 = new PortTypeValue(
+        BooleanTypeValue.getInstance(), portAttributes);
     sch.addPortType(portTypeName, portType1);
     PortTypeValue actual = sch.getPortType(portTypeName);
     assertEquals(portType1, actual);
@@ -182,7 +183,8 @@ public class TestSchematic {
     // create a test port type
     String portTypeName = "TestPort";
     Map<String, TypeValue> portAttributes = new HashMap<>();
-    PortTypeValue portType = new PortTypeValue(portAttributes);
+    PortTypeValue portType = new PortTypeValue(
+        BooleanTypeValue.getInstance(), portAttributes);
     sch.addPortType(portTypeName, portType);
     // create a test node type
     String nodeTypeName = "TestNode";
@@ -272,7 +274,8 @@ public class TestSchematic {
     // create a test port type
     String portTypeName = "TestPort";
     Map<String, TypeValue> portAttributes = new HashMap<>();
-    PortTypeValue portType1 = new PortTypeValue(portAttributes);
+    PortTypeValue portType1 = new PortTypeValue(
+        BooleanTypeValue.getInstance(), portAttributes);
     sch.addPortType(portTypeName, portType1);
 
     // create a test node type
@@ -312,7 +315,8 @@ public class TestSchematic {
     // create a test port type
     String portTypeName = "TestPort";
     Map<String, TypeValue> portAttributes = new HashMap<>();
-    PortTypeValue portType1 = new PortTypeValue(portAttributes);
+    PortTypeValue portType1 = new PortTypeValue(
+        BooleanTypeValue.getInstance(), portAttributes);
     sch.addPortType(portTypeName, portType1);
 
     // create a test node type
@@ -397,13 +401,15 @@ public class TestSchematic {
     String portTypeName = "TestPort";
     Map<String, TypeValue> portAttributes = new HashMap<>();
     try {
-      PortTypeValue portType1 = new PortTypeValue(portAttributes);
+      PortTypeValue portType1 = new PortTypeValue(
+          BooleanTypeValue.getInstance(), portAttributes);
       sch.addPortType(portTypeName, portType1);
     } catch (MultipleDefinitionException e) {
       fail("exception thrown too early");
     }
     // try to add another port type with the same name
-    PortTypeValue portType2 = new PortTypeValue(portAttributes);
+    PortTypeValue portType2 = new PortTypeValue(
+        BooleanTypeValue.getInstance(), portAttributes);
     sch.addPortType(portTypeName, portType2);
   }
 
@@ -499,7 +505,8 @@ public class TestSchematic {
       // create a test port type
       String portTypeName = "TestPort";
       Map<String, TypeValue> portAttributes = new HashMap<>();
-      PortTypeValue portType = new PortTypeValue(portAttributes);
+      PortTypeValue portType = new PortTypeValue(
+          BooleanTypeValue.getInstance(), portAttributes);
       sch.addPortType(portTypeName, portType);
       // create a test node type
       String nodeTypeName = "TestNode";

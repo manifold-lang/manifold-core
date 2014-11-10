@@ -3,9 +3,11 @@
   "userDefinedTypes": {},
   "portTypes": {
     "basePort": {
+      "signalType": "Bool",
       "attributes": {}
     },
     "derivedPort": {
+      "signalType": "Bool",
       "supertype": "basePort",
       "attributes": {}
     }

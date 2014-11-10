@@ -1,6 +1,6 @@
 package org.manifold.compiler.middle.serialization;
 
-
+import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SIGNAL_TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.ARRAY_ELEMENT_TYPE;
@@ -183,6 +183,16 @@ public class SchematicDeserializer implements SerializationConsts {
       Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
           .getValue().getAsJsonObject());
 
+      // get signal type
+      if (!(entry.getValue().getAsJsonObject().has(SIGNAL_TYPE))) {
+        throw new JsonSyntaxException("port type '" + entry.getKey() + "'"
+            + " does not define a signal type;"
+            + " possible schematic version mismatch");
+      }
+      String signalTypeName = entry.getValue().getAsJsonObject()
+          .get(SIGNAL_TYPE).getAsString();
+      TypeValue signalType = sch.getUserDefinedType(signalTypeName);
+
       // get supertype if it exists
       PortTypeValue supertype = null;
       if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
@@ -193,9 +203,9 @@ public class SchematicDeserializer implements SerializationConsts {
 
       PortTypeValue portTypeValue = null;
       if (supertype == null) {
-        portTypeValue = new PortTypeValue(attributeMap);
+        portTypeValue = new PortTypeValue(signalType, attributeMap);
       } else {
-        portTypeValue = new PortTypeValue(attributeMap, supertype);
+        portTypeValue = new PortTypeValue(signalType, attributeMap, supertype);
       }
 
       sch.addPortType(entry.getKey(), portTypeValue);

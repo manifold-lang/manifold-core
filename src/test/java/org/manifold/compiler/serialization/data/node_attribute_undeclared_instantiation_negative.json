@@ -3,9 +3,11 @@
 "portTypes": {
 
 "digitalOut": {
+  "signalType": "Bool",
   "attributes": {}
 },
 "digitalIn": {
+  "signalType": "Bool",
   "attributes": {}
 }
 

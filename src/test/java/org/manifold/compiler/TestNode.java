@@ -5,25 +5,25 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.manifold.compiler.middle.SchematicException;
 
+import com.google.common.collect.ImmutableMap;
+
 public class TestNode {
 
-  private static final PortTypeValue defaultPortDefinition =
-      new PortTypeValue(new HashMap<>());
   private static final TypeValue boolType = BooleanTypeValue.getInstance();
+  private static final PortTypeValue defaultPortDefinition =
+      new PortTypeValue(boolType, new HashMap<>());
   private static final String PORT_NAME = "testport";
   private static final String PORT_ATTR_KEY = "the truth will set you free";
   private static final Map<String, Map<String, Value>> PORT_ATTRS =
       ImmutableMap.of(PORT_NAME, ImmutableMap.of());
-  
+
   private NodeTypeValue hasNoAttrs;
   private NodeTypeValue hasABCNodeAttr;
-  
+
   @Before
   public void setup() {
     Map<String, PortTypeValue> portMap =
@@ -41,7 +41,7 @@ public class TestNode {
     Value v = BooleanValue.getInstance(true);
     new NodeValue(hasABCNodeAttr, ImmutableMap.of("abc", v), new HashMap<>());
   }
-  
+
 
   @Test(
       expected = org.manifold.compiler.UndeclaredIdentifierException.class)
@@ -92,7 +92,7 @@ public class TestNode {
   @Test
   public void testPortsWithValidAttributes() throws SchematicException {
     PortTypeValue portTypeWithAttr =
-        new PortTypeValue(ImmutableMap.of(PORT_ATTR_KEY, boolType));
+        new PortTypeValue(boolType, ImmutableMap.of(PORT_ATTR_KEY, boolType));
     Map<String, PortTypeValue> portTypeMap =
         ImmutableMap.of(PORT_NAME, portTypeWithAttr);
     NodeTypeValue withPortAttrs = new NodeTypeValue(

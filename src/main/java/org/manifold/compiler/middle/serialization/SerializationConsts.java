@@ -7,6 +7,7 @@ public interface SerializationConsts {
     String ATTRIBUTES = "attributes";
     String TYPE = "type";
     String SUPERTYPE = "supertype";
+    String SIGNAL_TYPE = "signalType";
   }
 
   public interface UDTConsts {

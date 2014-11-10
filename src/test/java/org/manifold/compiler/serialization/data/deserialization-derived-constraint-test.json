@@ -3,6 +3,7 @@
   "userDefinedTypes": {},
   "portTypes": {
     "testPort": {
+      "signalType": "Bool",
       "attributes": {
       }
     }
