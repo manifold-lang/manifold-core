@@ -161,11 +161,11 @@ public class SchematicSerializer {
           single.addProperty(SUPERTYPE, rPortTypeMap.get(supertype));
         }
 
-      TypeValue signalType = val.getSignalType();
-      single.addProperty(SIGNAL_TYPE, rUserDefTypeMap.get(signalType));
+        TypeValue signalType = val.getSignalType();
+        single.addProperty(SIGNAL_TYPE, rUserDefTypeMap.get(signalType));
 
-      single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
-      collection.add(key, single);
+        single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
+        collection.add(key, single);
 
       });
 

@@ -19,7 +19,11 @@ public class UserDefinedTypeValue extends TypeValue {
 
   @Override
   public boolean isSubtypeOf(TypeValue other) {
-    return typeAlias.isSubtypeOf(other);
+    if (this == other) {
+      return true;
+    } else {
+      return typeAlias.isSubtypeOf(other);
+    }
   }
 
 }
