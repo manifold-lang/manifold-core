@@ -1,5 +1,15 @@
 package org.manifold.compiler.middle.serialization;
 
+import java.util.Map;
+
+import org.manifold.compiler.AttributeTypeValue;
+import org.manifold.compiler.BooleanTypeValue;
+import org.manifold.compiler.IntegerTypeValue;
+import org.manifold.compiler.RealTypeValue;
+import org.manifold.compiler.StringTypeValue;
+
+import com.google.common.collect.ImmutableMap;
+
 public interface SerializationConsts {
   public interface GlobalConsts {
     String NODE_PORT_DELIM = ":";
@@ -37,5 +47,13 @@ public interface SerializationConsts {
   public interface ConnectionConsts {
     String FROM = "from";
     String TO = "to";
+  }
+
+  public interface PrimitiveTypes {
+    Map<String, AttributeTypeValue> PRIMITIVE_TYPES = ImmutableMap.of(
+        "Bool", BooleanTypeValue.getInstance(),
+        "Int", IntegerTypeValue.getInstance(),
+        "String", StringTypeValue.getInstance(),
+        "Real", RealTypeValue.getInstance());
   }
 }

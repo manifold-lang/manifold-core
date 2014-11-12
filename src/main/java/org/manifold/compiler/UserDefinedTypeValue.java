@@ -1,14 +1,14 @@
 package org.manifold.compiler;
 
-public class UserDefinedTypeValue extends TypeValue {
+public class UserDefinedTypeValue extends AttributeTypeValue {
 
-  private TypeValue typeAlias;
+  private AttributeTypeValue typeAlias;
 
-  public TypeValue getTypeAlias() {
+  public AttributeTypeValue getTypeAlias() {
     return typeAlias;
   }
 
-  public UserDefinedTypeValue(TypeValue typeAlias) {
+  public UserDefinedTypeValue(AttributeTypeValue typeAlias) {
     this.typeAlias = typeAlias;
   }
 
@@ -24,6 +24,11 @@ public class UserDefinedTypeValue extends TypeValue {
     } else {
       return typeAlias.isSubtypeOf(other);
     }
+  }
+
+  @Override
+  public Value instantiate(String s) {
+    return typeAlias.instantiate(s);
   }
 
 }

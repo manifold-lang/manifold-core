@@ -1,6 +1,6 @@
 package org.manifold.compiler;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -8,10 +8,10 @@ public class TestArrayType {
 
   @Test
   public void testGetElementType() {
-    TypeValue elementType = BooleanTypeValue.getInstance();
-    
+    AttributeTypeValue elementType = BooleanTypeValue.getInstance();
+
     ArrayTypeValue arrayType = new ArrayTypeValue(elementType);
-    
+
     assertEquals(
         "element type not Boolean",
         elementType,

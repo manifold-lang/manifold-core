@@ -10,14 +10,14 @@ public class NodeTypeValue extends TypeValue {
   private final Map<String, PortTypeValue> ports;
 
   public NodeTypeValue(
-      Map<String, TypeValue> attributes,
+      Map<String, AttributeTypeValue> attributes,
       Map<String, PortTypeValue> ports) {
     super(attributes);
     this.ports = ImmutableMap.copyOf(ports);
   }
-  
+
   public NodeTypeValue(
-      Map<String, TypeValue> attributes,
+      Map<String, AttributeTypeValue> attributes,
       Map<String, PortTypeValue> ports,
       NodeTypeValue supertype) {
     super(supertype, attributes);
@@ -30,9 +30,10 @@ public class NodeTypeValue extends TypeValue {
   public Map<String, PortTypeValue> getPorts() {
     return this.ports;
   }
-  
+
+  @Override
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
-  
+
 }
