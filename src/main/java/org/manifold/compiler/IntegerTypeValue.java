@@ -14,5 +14,9 @@ public class IntegerTypeValue extends TypeValue {
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
+
+  public String toString() {
+    return "Int";
+  }
   
 }

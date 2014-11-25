@@ -14,4 +14,8 @@ public class RealTypeValue extends TypeValue {
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
+
+  public String toString() {
+    return "Real";
+  }
 }
