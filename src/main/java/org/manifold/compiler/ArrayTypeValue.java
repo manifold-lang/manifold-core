@@ -18,7 +18,7 @@ public class ArrayTypeValue extends TypeValue {
   }
 
   public String toString() {
-    return "Array("+elementType+")";
+    return "Array(" + elementType + ")";
   }
    
 }
