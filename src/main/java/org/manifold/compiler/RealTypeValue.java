@@ -16,6 +16,6 @@ public class RealTypeValue extends TypeValue {
   }
 
   public String toString() {
-    return "String";
+    return "Real";
   }
 }
