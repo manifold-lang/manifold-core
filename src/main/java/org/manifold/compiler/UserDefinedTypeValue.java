@@ -26,4 +26,8 @@ public class UserDefinedTypeValue extends TypeValue {
     }
   }
 
+  public String toString() {
+    return typeAlias;
+  }
+
 }
