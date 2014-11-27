@@ -8,11 +8,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
 
 public class TestSchematic {
+  Map<String, TypeValue> attributes;
+  Map<String, TypeValue> portAttributes;
+
+
+  @Before
+  public void setup() {
+    attributes = new HashMap<>();
+    portAttributes = new HashMap<>();
+  }
 
   @Test(expected = UndeclaredIdentifierException.class)
   public void testGetUserDefinedType_Undeclared_ThrowsException()
@@ -109,9 +119,9 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // add the first port type
     String portTypeName = "TestPort";
-    Map<String, TypeValue> portAttributes = new HashMap<>();
     PortTypeValue portType1 = new PortTypeValue(
         BooleanTypeValue.getInstance(), portAttributes);
+
     sch.addPortType(portTypeName, portType1);
     PortTypeValue actual = sch.getPortType(portTypeName);
     assertEquals(portType1, actual);
@@ -122,7 +132,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // add the first node type
     String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
     Map<String, PortTypeValue> ports = new HashMap<>();
     NodeTypeValue nv1 = new NodeTypeValue(attributes, ports);
     sch.addNodeType(nodeTypeName, nv1);
@@ -135,7 +144,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // add the first connection type
     String connTypeName = "TestConnection";
-    Map<String, TypeValue> attributes = new HashMap<>();
     ConnectionType cv1 = new ConnectionType(attributes);
     sch.addConnectionType(connTypeName, cv1);
     ConnectionType actual = sch.getConnectionType(connTypeName);
@@ -147,7 +155,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // add the first constraint type
     String constraintTypeName = "TestConstraint";
-    Map<String, TypeValue> attributes = new HashMap<>();
     ConstraintType cv1 = new ConstraintType(attributes);
     sch.addConstraintType(constraintTypeName, cv1);
     ConstraintType actual = sch.getConstraintType(constraintTypeName);
@@ -159,7 +166,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // create a test node type
     String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
     Map<String, PortTypeValue> ports = new HashMap<>();
     NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
     sch.addNodeType(nodeTypeName, nodeType);
@@ -182,13 +188,11 @@ public class TestSchematic {
     String connName = "conn1";
     // create a test port type
     String portTypeName = "TestPort";
-    Map<String, TypeValue> portAttributes = new HashMap<>();
     PortTypeValue portType = new PortTypeValue(
         BooleanTypeValue.getInstance(), portAttributes);
     sch.addPortType(portTypeName, portType);
     // create a test node type
     String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
     Map<String, PortTypeValue> ports = new HashMap<>();
     ports.put("p", portType);
     NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
@@ -218,8 +222,7 @@ public class TestSchematic {
   public void testGetConstraint() throws SchematicException {
     Schematic sch = new Schematic("test");
     // create a test constraint type
-    Map<String, TypeValue> typeAttrs = new HashMap<>();
-    ConstraintType cxtType = new ConstraintType(typeAttrs);
+    ConstraintType cxtType = new ConstraintType(attributes);
     String cxtName = "cxt1";
     Map<String, Value> attrs = new HashMap<>();
     ConstraintValue cxt1 = new ConstraintValue(cxtType, attrs);
@@ -234,7 +237,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // create a test node type
     String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
     Map<String, PortTypeValue> ports = new HashMap<>();
     NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
     sch.addNodeType(nodeTypeName, nodeType);
@@ -254,7 +256,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // create a test node type
     String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
     Map<String, PortTypeValue> ports = new HashMap<>();
     NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
     sch.addNodeType(nodeTypeName, nodeType);
@@ -273,14 +274,12 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // create a test port type
     String portTypeName = "TestPort";
-    Map<String, TypeValue> portAttributes = new HashMap<>();
     PortTypeValue portType1 = new PortTypeValue(
         BooleanTypeValue.getInstance(), portAttributes);
     sch.addPortType(portTypeName, portType1);
 
     // create a test node type
     String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
     Map<String, PortTypeValue> ports = new HashMap<>();
     ports.put("p0", portType1);
 
@@ -314,14 +313,12 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // create a test port type
     String portTypeName = "TestPort";
-    Map<String, TypeValue> portAttributes = new HashMap<>();
     PortTypeValue portType1 = new PortTypeValue(
         BooleanTypeValue.getInstance(), portAttributes);
     sch.addPortType(portTypeName, portType1);
 
     // create a test node type
     String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
     Map<String, PortTypeValue> ports = new HashMap<>();
     ports.put("p0", portType1);
 
@@ -351,8 +348,7 @@ public class TestSchematic {
   @Test
   public void testGetConstraintName() throws SchematicException {
     Schematic sch = new Schematic("test");
-    Map<String, TypeValue> attributeTypes = new HashMap<>();
-    ConstraintType cxtType1 = new ConstraintType(attributeTypes);
+    ConstraintType cxtType1 = new ConstraintType(attributes);
     sch.addConstraintType("TestConstraint", cxtType1);
 
     String cxtName = "constraint1";
@@ -367,8 +363,7 @@ public class TestSchematic {
   public void testGetConstraintName_Undeclared_ThrowsException()
       throws SchematicException {
     Schematic sch = new Schematic("test");
-    Map<String, TypeValue> attributeTypes = new HashMap<>();
-    ConstraintType cxtType1 = new ConstraintType(attributeTypes);
+    ConstraintType cxtType1 = new ConstraintType(attributes);
     sch.addConstraintType("TestConstraint", cxtType1);
 
     String cxtName = "constraint1";
@@ -399,7 +394,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // add the first port type
     String portTypeName = "TestPort";
-    Map<String, TypeValue> portAttributes = new HashMap<>();
     try {
       PortTypeValue portType1 = new PortTypeValue(
           BooleanTypeValue.getInstance(), portAttributes);
@@ -419,7 +413,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // add the first node type
     String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
     Map<String, PortTypeValue> ports = new HashMap<>();
     try {
       NodeTypeValue nv1 = new NodeTypeValue(attributes, ports);
@@ -438,7 +431,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // add the first connection type
     String connTypeName = "TestConnection";
-    Map<String, TypeValue> attributes = new HashMap<>();
     try {
       ConnectionType cv1 = new ConnectionType(attributes);
       sch.addConnectionType(connTypeName, cv1);
@@ -456,7 +448,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // add the first constraint type
     String constraintTypeName = "TestConstraint";
-    Map<String, TypeValue> attributes = new HashMap<>();
     try {
       ConstraintType cv1 = new ConstraintType(attributes);
       sch.addConstraintType(constraintTypeName, cv1);
@@ -474,7 +465,6 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // create a test node type
     String nodeTypeName = "TestNode";
-    Map<String, TypeValue> attributes = new HashMap<>();
     Map<String, PortTypeValue> ports = new HashMap<>();
     NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
     sch.addNodeType(nodeTypeName, nodeType);
@@ -504,13 +494,11 @@ public class TestSchematic {
     try {
       // create a test port type
       String portTypeName = "TestPort";
-      Map<String, TypeValue> portAttributes = new HashMap<>();
       PortTypeValue portType = new PortTypeValue(
           BooleanTypeValue.getInstance(), portAttributes);
       sch.addPortType(portTypeName, portType);
       // create a test node type
       String nodeTypeName = "TestNode";
-      Map<String, TypeValue> attributes = new HashMap<>();
       Map<String, PortTypeValue> ports = new HashMap<>();
       ports.put("p", portType);
       NodeTypeValue nodeType = new NodeTypeValue(attributes, ports);
@@ -545,8 +533,7 @@ public class TestSchematic {
       throws SchematicException {
     Schematic sch = new Schematic("test");
     // create a test constraint type
-    Map<String, TypeValue> typeAttrs = new HashMap<>();
-    ConstraintType cxtType = new ConstraintType(typeAttrs);
+    ConstraintType cxtType = new ConstraintType(attributes);
     String cxtName = "cxt1";
     Map<String, Value> attrs = new HashMap<>();
     try {

@@ -6,7 +6,7 @@ public class TypeTypeValue extends TypeValue {
 
   private static TypeTypeValue instance = new TypeTypeValue();
 
-  public static TypeTypeValue getInstance() {    
+  public static TypeTypeValue getInstance() {
     return instance;
   }
 
@@ -19,13 +19,14 @@ public class TypeTypeValue extends TypeValue {
   public boolean isSubtypeOf(TypeValue type) {
     return this == type;
   }
-  
+
+  @Override
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
 
+  @Override
   public String toString() {
     return "Type";
   }
-    
 }

@@ -9,6 +9,7 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Glo
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeConsts.PORT_ATTRS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeTypeConsts.PORT_MAP;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.PrimitiveTypes.PRIMITIVE_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_DEFS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_DEFS;
@@ -70,7 +71,8 @@ public class SchematicSerializer {
     gson = new GsonBuilder().create();
   }
 
-  private JsonObject serializeTypeAttr(Map<String, TypeValue> typeAttr) {
+  private JsonObject serializeTypeAttr(
+      Map<String, TypeValue> typeAttr) {
     JsonObject typeAttrJson = new JsonObject();
 
     typeAttr.forEach((key, val) -> {
@@ -112,8 +114,7 @@ public class SchematicSerializer {
     userDefTypes.forEach((key, val) -> {
         rUserDefTypeMap.put(val, key);
         // do not serialize primitive types
-        if (key.equals("Bool") || key.equals("Int")
-            || key.equals("String") || key.equals("Real")) {
+        if (PRIMITIVE_TYPES.keySet().contains(key)) {
           return;
         }
 

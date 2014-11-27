@@ -15,7 +15,7 @@ public class NodeTypeValue extends TypeValue {
     super(attributes);
     this.ports = ImmutableMap.copyOf(ports);
   }
-  
+
   public NodeTypeValue(
       Map<String, TypeValue> attributes,
       Map<String, PortTypeValue> ports,
@@ -30,9 +30,9 @@ public class NodeTypeValue extends TypeValue {
   public Map<String, PortTypeValue> getPorts() {
     return this.ports;
   }
-  
+
+  @Override
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
-  
 }

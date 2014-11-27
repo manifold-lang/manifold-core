@@ -24,5 +24,4 @@ public class PortTypeValue extends TypeValue {
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
-
 }
