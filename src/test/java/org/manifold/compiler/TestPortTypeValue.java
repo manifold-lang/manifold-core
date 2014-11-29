@@ -29,6 +29,7 @@ public class TestPortTypeValue {
         new PortTypeValue(boolType, ImmutableMap.of("u", boolType));
     PortTypeValue pDerived =
         new PortTypeValue(boolType, ImmutableMap.of("v", intType), pBase);
+
     // pDerived must have both "u" and "v" attributes
     assertTrue(pDerived.getAttributes().containsKey("u"));
     assertTrue(pDerived.getAttributes().containsKey("v"));

@@ -8,13 +8,13 @@ public class ConstraintType extends TypeValue {
     super(attributes);
   }
 
-  public ConstraintType(Map<String, TypeValue> attributes, 
+  public ConstraintType(Map<String, TypeValue> attributes,
       ConstraintType supertype) {
     super(supertype, attributes);
   }
 
+  @Override
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
-
 }

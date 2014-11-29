@@ -10,12 +10,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.manifold.compiler.ArrayTypeValue;
-import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
-import org.manifold.compiler.IntegerValue;
 import org.manifold.compiler.InvalidAttributeException;
 import org.manifold.compiler.MultipleAssignmentException;
 import org.manifold.compiler.MultipleDefinitionException;
@@ -23,9 +21,6 @@ import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.PortValue;
-import org.manifold.compiler.RealValue;
-import org.manifold.compiler.StringTypeValue;
-import org.manifold.compiler.StringValue;
 import org.manifold.compiler.TypeMismatchException;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
@@ -74,39 +69,15 @@ public class SchematicDeserializer implements SerializationConsts {
       return attributeMap;
     }
 
-    // Ideally, some kind of createInstance(String) method on each TypeValue?
-    TypeValue bool = sch.getUserDefinedType("Bool");
-    TypeValue integer = sch.getUserDefinedType("Int");
-    TypeValue str = sch.getUserDefinedType("String");
-    TypeValue real = sch.getUserDefinedType("Real");
-
     for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
       TypeValue type = expectedTypes.get(attrEntry.getKey());
-      Value attrValue = null;
-
       String valueString = attrEntry.getValue().getAsString();
 
       if (type == null) {
         throw new UndeclaredAttributeException(attrEntry.getKey());
       }
 
-      if (type.equals(bool)) {
-        if (!(Boolean.TRUE.toString().equals(valueString) ||
-              Boolean.FALSE.toString().equals(valueString))) {
-          throw new IllegalArgumentException(String.format(
-              "Expected boolean value of true or false, got %s", valueString));
-        }
-        attrValue = BooleanValue.getInstance(Boolean.parseBoolean(valueString));
-      } else if (type.equals(integer)) {
-        attrValue = new IntegerValue(Integer.valueOf(valueString));
-      } else if (type.equals(str)) {
-        attrValue = new StringValue(StringTypeValue.getInstance(), valueString);
-      } else if (type.equals(real)) {
-        attrValue = new RealValue(Double.parseDouble(valueString));
-      } else {
-        throw new UndeclaredAttributeException(attrEntry.getKey());
-      }
-
+      Value attrValue = type.instantiate(valueString);
       attributeMap.put(attrEntry.getKey(), attrValue);
     }
 
@@ -223,8 +194,8 @@ public class SchematicDeserializer implements SerializationConsts {
 
     for (Entry<String, JsonElement> entry : in.entrySet()) {
 
-      Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
-          .getValue().getAsJsonObject());
+      Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch,
+          entry.getValue().getAsJsonObject());
 
       Map<String, PortTypeValue> portMap = new HashMap<>();
       JsonObject portMapJson = entry.getValue().getAsJsonObject()
@@ -263,8 +234,8 @@ public class SchematicDeserializer implements SerializationConsts {
     }
 
     for (Entry<String, JsonElement> entry : in.entrySet()) {
-      Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
-          .getValue().getAsJsonObject());
+      Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch,
+          entry.getValue().getAsJsonObject());
 
       ConnectionType supertype = null;
       if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
@@ -293,8 +264,8 @@ public class SchematicDeserializer implements SerializationConsts {
     }
 
     for (Entry<String, JsonElement> entry : in.entrySet()) {
-      Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch, entry
-          .getValue().getAsJsonObject());
+      Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch,
+          entry.getValue().getAsJsonObject());
 
       ConstraintType supertype = null;
       if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {

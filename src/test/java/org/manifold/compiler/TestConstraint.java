@@ -4,16 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.ImmutableMap;
-
 import org.junit.Test;
 import org.manifold.compiler.middle.SchematicException;
 
+import com.google.common.collect.ImmutableMap;
+
 public class TestConstraint {
 
-  private static final TypeValue boolType = BooleanTypeValue.getInstance();
-  private static final ConstraintType defaultConstraintDefinition =
-      new ConstraintType(ImmutableMap.of("v", boolType));
+  private static final TypeValue boolType = BooleanTypeValue
+      .getInstance();
+  private static final ConstraintType defaultConstraintDefinition
+      = new ConstraintType(ImmutableMap.of("v", boolType));
   private static final Value vTrue = BooleanValue.getInstance(true);
 
   @Test
@@ -46,7 +47,7 @@ public class TestConstraint {
   @Test(expected = org.manifold.compiler.InvalidAttributeException.class)
   public void testExtraAttribute() throws Exception {
     Value v = BooleanValue.getInstance(true);
-    new ConstraintValue(defaultConstraintDefinition,
-        ImmutableMap.of("v", v, "vBogus", v));
+    new ConstraintValue(defaultConstraintDefinition, ImmutableMap.of("v", v,
+        "vBogus", v));
   }
 }

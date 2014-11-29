@@ -8,17 +8,17 @@ import com.google.common.collect.ImmutableMap;
 public class Attributes {
   private final Map<String, Value> data;
 
-  public Attributes(Map<String, TypeValue> types, Map<String, Value> data)
-      throws UndeclaredAttributeException, InvalidAttributeException,
-      TypeMismatchException {
+  public Attributes(Map<String, TypeValue> types,
+      Map<String, Value> data) throws UndeclaredAttributeException,
+      InvalidAttributeException, TypeMismatchException {
     validateAttrNames(types.keySet(), data.keySet());
     validateAttrTypes(types, data);
     this.data = ImmutableMap.copyOf(data);
   }
 
   private static void validateAttrNames(Set<String> typeNames,
-      Set<String> attrNames)
-      throws UndeclaredAttributeException, InvalidAttributeException {
+      Set<String> attrNames) throws UndeclaredAttributeException,
+      InvalidAttributeException {
     for (String name : attrNames) {
       if (!typeNames.contains(name)) {
         throw new InvalidAttributeException(name);

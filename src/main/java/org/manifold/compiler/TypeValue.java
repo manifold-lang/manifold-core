@@ -1,6 +1,5 @@
 package org.manifold.compiler;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -18,17 +17,17 @@ public abstract class TypeValue extends Value {
   *
   *   private abstract TypeValue();
   */
-  
+
   private final TypeValue supertype;
   public TypeValue getSupertype() {
     return supertype;
   }
-  
+
   private final ImmutableMap<String, TypeValue> attributes;
   public ImmutableMap<String, TypeValue> getAttributes() {
     return attributes;
   }
-  
+
   private ImmutableMap<String, TypeValue> inheritAttributes(
       Map<String, TypeValue> derivedAttributes) {
     // add specified attributes to inherited supertype attributes
@@ -40,16 +39,17 @@ public abstract class TypeValue extends Value {
     return b.build();
   }
 
-  public TypeValue(TypeValue supertype, Map<String, TypeValue> attributes) {
+  public TypeValue(TypeValue supertype,
+      Map<String, TypeValue> attributes) {
     super(null);
     this.supertype = supertype;
     this.attributes = inheritAttributes(attributes);
   }
-  
+
   public TypeValue(Map<String, TypeValue> attributes) {
     this(TypeTypeValue.getInstance(), attributes);
   }
-  
+
   public TypeValue() {
     this(TypeTypeValue.getInstance(), ImmutableMap.of());
   }
@@ -58,6 +58,7 @@ public abstract class TypeValue extends Value {
   public TypeValue getType() {
     return TypeTypeValue.getInstance();
   }
+
 
   public boolean isSubtypeOf(TypeValue type) {
     if (this == type) {
@@ -76,5 +77,11 @@ public abstract class TypeValue extends Value {
   @Override
   public boolean isRuntimeKnowable() {
     return false;
+  }
+
+  public Value instantiate(String s) {
+    // By default not implemented, subclasses that want this should override
+    // TODO (max): implement this for non-data types (nodes, ports, etc)
+    throw new UnsupportedOperationException("Not implemented");
   }
 }

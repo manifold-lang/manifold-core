@@ -12,9 +12,12 @@ import com.google.common.collect.ImmutableMap;
 
 public class TestNodeTypeValue {
 
-  private static final TypeValue boolType = BooleanTypeValue.getInstance();
-  private static final TypeValue intType = IntegerTypeValue.getInstance();
-  private static final Map<String, TypeValue> noAttributes = new HashMap<>();
+  private static final TypeValue boolType = BooleanTypeValue
+      .getInstance();
+  private static final TypeValue intType = IntegerTypeValue
+      .getInstance();
+  private static final Map<String, TypeValue> noAttributes
+      = new HashMap<>();
   private static final Map<String, PortTypeValue> noPorts = new HashMap<>();
 
   @Test
@@ -26,10 +29,10 @@ public class TestNodeTypeValue {
 
   @Test
   public void testInheritedAttributes() {
-    NodeTypeValue nBase =
-        new NodeTypeValue(ImmutableMap.of("u", boolType), noPorts);
-    NodeTypeValue nDerived =
-        new NodeTypeValue(ImmutableMap.of("v", intType), noPorts, nBase);
+    NodeTypeValue nBase = new NodeTypeValue(ImmutableMap.of("u", boolType),
+        noPorts);
+    NodeTypeValue nDerived = new NodeTypeValue(ImmutableMap.of("v", intType),
+        noPorts, nBase);
     // nDerived must have both "u" and "v" attributes
     assertTrue(nDerived.getAttributes().containsKey("u"));
     assertTrue(nDerived.getAttributes().containsKey("v"));

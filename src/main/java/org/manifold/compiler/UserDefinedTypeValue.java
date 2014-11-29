@@ -26,8 +26,14 @@ public class UserDefinedTypeValue extends TypeValue {
     }
   }
 
+  @Override
   public String toString() {
     return typeAlias.toString();
+  }
+
+  @Override
+  public Value instantiate(String s) {
+    return typeAlias.instantiate(s);
   }
 
 }
