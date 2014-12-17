@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.BooleanTypeValue;
 import org.manifold.compiler.BooleanValue;
-import org.manifold.compiler.ConnectionTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.MultipleDefinitionException;
@@ -45,7 +44,6 @@ public class TestSerialization {
 
   private static final String TEST_SCHEMATIC_NAME = "dogematics";
   private static final String TEST_TYPE_NAME = "very type";
-  private static final String TEST_CONNECTION_TYPE_NAME = "many connect";
   private static final String TEST_CONSTRAINT_TYPE_NAME = "much constraint";
   private static final String TEST_NODE_TYPE_NAME = "such node";
   private static final String TEST_PORT_TYPE_NAME = "wow port";
@@ -107,11 +105,7 @@ public class TestSerialization {
         outNodeAttr);
     testSchematic.addNode("nOUT", outNode);
 
-    // connection
-    ConnectionTypeValue conType = new ConnectionTypeValue(new HashMap<>());
-    testSchematic.addConnectionType(TEST_CONNECTION_TYPE_NAME, conType);
-
-    ConnectionValue con = new ConnectionValue(conType, inNode
+    ConnectionValue con = new ConnectionValue(inNode
         .getPort(IN_PORT_NAME), outNode.getPort(OUT_PORT_NAME),
         new HashMap<>());
 
@@ -280,51 +274,6 @@ public class TestSerialization {
     NodeTypeValue derivedNode = sch.getNodeType(DERIVED_NODE_NAME);
     assertTrue(derivedNode.isSubtypeOf(baseNode));
 
-  }
-
-  @Test
-  public void testSerialize_DerivedConnection()
-      throws UndeclaredIdentifierException, MultipleDefinitionException {
-    // add a derived connection type to the test schematic
-    ConnectionTypeValue dConnDerived = new ConnectionTypeValue(new HashMap<>(),
-        testSchematic.getConnectionType(TEST_CONNECTION_TYPE_NAME));
-    String derivedConnectionName = TEST_CONNECTION_TYPE_NAME + "Derived";
-    testSchematic.addConnectionType(derivedConnectionName, dConnDerived);
-    // serialize, deserialize, check that the type looks okay
-    JsonObject result = SchematicSerializer.serialize(testSchematic);
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    JsonParser jp = new JsonParser();
-    JsonElement je = jp.parse(result.toString());
-    String prettyJsonString = gson.toJson(je);
-
-    System.out.println(prettyJsonString);
-
-    Schematic sch = new SchematicDeserializer().deserialize(result);
-    ConnectionTypeValue tBase = sch.getConnectionType(TEST_CONNECTION_TYPE_NAME);
-    ConnectionTypeValue tDerived = sch.getConnectionType(derivedConnectionName);
-    assertTrue(tDerived.isSubtypeOf(tBase));
-  }
-
-  @Test
-  public void testDeserialize_DerivedConnection()
-      throws JsonSyntaxException, IOException, UndeclaredIdentifierException {
-    URL url = Resources
-        .getResource("org/manifold/compiler/serialization/data/"
-            + "deserialization-derived-connection-test.json");
-
-    JsonObject json = new JsonParser().parse(
-        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
-    Schematic sch = new SchematicDeserializer().deserialize(json);
-
-    final String BASE_CONNECTION_NAME = "baseConnection";
-    final String DERIVED_CONNECTION_NAME = "derivedConnection";
-
-    ConnectionTypeValue baseConnection =
-        sch.getConnectionType(BASE_CONNECTION_NAME);
-    ConnectionTypeValue derivedConnection =
-        sch.getConnectionType(DERIVED_CONNECTION_NAME);
-    assertTrue(derivedConnection.isSubtypeOf(baseConnection));
   }
 
   @Test

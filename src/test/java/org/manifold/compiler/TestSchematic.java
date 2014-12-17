@@ -46,13 +46,6 @@ public class TestSchematic {
   }
 
   @Test(expected = UndeclaredIdentifierException.class)
-  public void testGetConnectionType_Undeclared_ThrowsException()
-      throws SchematicException {
-    Schematic sch = new Schematic("test");
-    ConnectionTypeValue tv = sch.getConnectionType("bogus");
-  }
-
-  @Test(expected = UndeclaredIdentifierException.class)
   public void testGetConstraintType_Undeclared_ThrowsException()
       throws SchematicException {
     Schematic sch = new Schematic("test");
@@ -140,17 +133,6 @@ public class TestSchematic {
   }
 
   @Test
-  public void testGetConnectionType() throws SchematicException {
-    Schematic sch = new Schematic("test");
-    // add the first connection type
-    String connTypeName = "TestConnection";
-    ConnectionTypeValue cv1 = new ConnectionTypeValue(attributes);
-    sch.addConnectionType(connTypeName, cv1);
-    ConnectionTypeValue actual = sch.getConnectionType(connTypeName);
-    assertEquals(cv1, actual);
-  }
-
-  @Test
   public void testGetConstraintType() throws SchematicException {
     Schematic sch = new Schematic("test");
     // add the first constraint type
@@ -205,14 +187,11 @@ public class TestSchematic {
     sch.addNode("node1", node1);
     node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
     sch.addNode("node2", node2);
-    // create a test connection type
-    String connTypeName = "TestConn";
-    connType = new ConnectionTypeValue(attributes);
-    sch.addConnectionType(connTypeName, connType);
+
     // create the first connection
     connAttrs = new HashMap<>();
     ConnectionValue conn1 = new ConnectionValue(
-        connType, node1.getPort("p"), node2.getPort("p"), connAttrs);
+        node1.getPort("p"), node2.getPort("p"), connAttrs);
     sch.addConnection(connName, conn1);
     ConnectionValue actual = sch.getConnection(connName);
     assertEquals(conn1, actual);
@@ -294,13 +273,8 @@ public class TestSchematic {
     NodeValue node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
     sch.addNode("testNode2", node2);
 
-    // now create a test connection type
-    String connTypeName = "TestConnection";
-    ConnectionTypeValue ct1 = new ConnectionTypeValue(attributes);
-    sch.addConnectionType(connTypeName, ct1);
-    // create a connection based on this type
-    String connName = "testConn1";
-    ConnectionValue conn = new ConnectionValue(ct1,
+        String connName = "testConn1";
+    ConnectionValue conn = new ConnectionValue(
         node1.getPort("p0"), node2.getPort("p0"), nodeAttrs);
     sch.addConnection(connName, conn);
     String retrievedName = sch.getConnectionName(conn);
@@ -333,13 +307,8 @@ public class TestSchematic {
     NodeValue node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
     sch.addNode("testNode2", node2);
 
-    // now create a test connection type
-    String connTypeName = "TestConnection";
-    ConnectionTypeValue ct1 = new ConnectionTypeValue(attributes);
-    sch.addConnectionType(connTypeName, ct1);
-    // create a connection based on this type
     String connName = "testConn1";
-    ConnectionValue conn = new ConnectionValue(ct1,
+    ConnectionValue conn = new ConnectionValue(
         node1.getPort("p0"), node2.getPort("p0"), nodeAttrs);
     //sch.addConnection(connName, conn);
     String retrievedName = sch.getConnectionName(conn);
@@ -426,23 +395,6 @@ public class TestSchematic {
   }
 
   @Test(expected = MultipleDefinitionException.class)
-  public void testAddConnectionType_AlreadyDefined_ThrowsException()
-      throws SchematicException {
-    Schematic sch = new Schematic("test");
-    // add the first connection type
-    String connTypeName = "TestConnection";
-    try {
-      ConnectionTypeValue cv1 = new ConnectionTypeValue(attributes);
-      sch.addConnectionType(connTypeName, cv1);
-    } catch (MultipleDefinitionException e) {
-      fail("exception thrown too early");
-    }
-    // try to add another connection type with the same name
-    ConnectionTypeValue cv2 = new ConnectionTypeValue(attributes);
-    sch.addConnectionType(connTypeName, cv2);
-  }
-
-  @Test(expected = MultipleDefinitionException.class)
   public void testAddConstraintType_AlreadyDefined_ThrowsException()
       throws SchematicException {
     Schematic sch = new Schematic("test");
@@ -511,20 +463,17 @@ public class TestSchematic {
       sch.addNode("node1", node1);
       node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
       sch.addNode("node2", node2);
-      // create a test connection type
-      String connTypeName = "TestConn";
-      connType = new ConnectionTypeValue(attributes);
-      sch.addConnectionType(connTypeName, connType);
+
       // create the first connection
       connAttrs = new HashMap<>();
       ConnectionValue conn1 = new ConnectionValue(
-          connType, node1.getPort("p"), node2.getPort("p"), connAttrs);
+          node1.getPort("p"), node2.getPort("p"), connAttrs);
       sch.addConnection(connName, conn1);
     } catch (MultipleAssignmentException e) {
       fail("exception thrown too early");
     }
     ConnectionValue conn2 = new ConnectionValue(
-        connType, node1.getPort("p"), node2.getPort("p"), connAttrs);
+        node1.getPort("p"), node2.getPort("p"), connAttrs);
     sch.addConnection(connName, conn2);
   }
 

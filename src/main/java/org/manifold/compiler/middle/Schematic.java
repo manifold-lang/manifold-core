@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.manifold.compiler.ConnectionTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
@@ -38,7 +37,6 @@ public class Schematic {
   private final Map<String, UserDefinedTypeValue> userDefinedTypes;
   private final Map<String, PortTypeValue> portTypes;
   private final Map<String, NodeTypeValue> nodeTypes;
-  private final Map<String, ConnectionTypeValue> connectionTypes;
   private final Map<String, ConstraintType> constraintTypes;
 
   // Maps containing instantiated objects for this schematic; they are all
@@ -58,7 +56,6 @@ public class Schematic {
 
     this.portTypes = new HashMap<>();
     this.nodeTypes = new HashMap<>();
-    this.connectionTypes = new HashMap<>();
     this.constraintTypes = new HashMap<>();
 
     this.nodes = new HashMap<>();
@@ -135,23 +132,6 @@ public class Schematic {
 
     if (nodeTypes.containsKey(typename)) {
       return nodeTypes.get(typename);
-    } else {
-      throw new UndeclaredIdentifierException(typename);
-    }
-  }
-
-  public void addConnectionType(String typename, ConnectionTypeValue cd)
-      throws MultipleDefinitionException {
-    if (connectionTypes.containsKey(typename)) {
-      throw new MultipleDefinitionException("connection-definition", typename);
-    }
-    connectionTypes.put(typename, cd);
-  }
-
-  public ConnectionTypeValue getConnectionType(String typename)
-      throws UndeclaredIdentifierException {
-    if (connectionTypes.containsKey(typename)) {
-      return connectionTypes.get(typename);
     } else {
       throw new UndeclaredIdentifierException(typename);
     }
@@ -261,10 +241,6 @@ public class Schematic {
     return ImmutableMap.copyOf(nodeTypes);
   }
 
-  public Map<String, ConnectionTypeValue> getConnectionTypes() {
-    return ImmutableMap.copyOf(connectionTypes);
-  }
-
   public Map<String, ConstraintType> getConstraintTypes() {
     return ImmutableMap.copyOf(constraintTypes);
   }
@@ -281,8 +257,4 @@ public class Schematic {
     return ImmutableMap.copyOf(constraints);
   }
 
-
-  // TODO do we add nodes as a function of their node definition right away, or
-  // just record that the node "will" exist with such-and-such definition and
-  // elaborate it later?
 }
