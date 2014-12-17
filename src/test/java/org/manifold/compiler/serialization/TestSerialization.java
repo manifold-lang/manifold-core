@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.BooleanTypeValue;
 import org.manifold.compiler.BooleanValue;
-import org.manifold.compiler.ConnectionType;
+import org.manifold.compiler.ConnectionTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.MultipleDefinitionException;
@@ -108,7 +108,7 @@ public class TestSerialization {
     testSchematic.addNode("nOUT", outNode);
 
     // connection
-    ConnectionType conType = new ConnectionType(new HashMap<>());
+    ConnectionTypeValue conType = new ConnectionTypeValue(new HashMap<>());
     testSchematic.addConnectionType(TEST_CONNECTION_TYPE_NAME, conType);
 
     ConnectionValue con = new ConnectionValue(conType, inNode
@@ -286,7 +286,7 @@ public class TestSerialization {
   public void testSerialize_DerivedConnection()
       throws UndeclaredIdentifierException, MultipleDefinitionException {
     // add a derived connection type to the test schematic
-    ConnectionType dConnDerived = new ConnectionType(new HashMap<>(),
+    ConnectionTypeValue dConnDerived = new ConnectionTypeValue(new HashMap<>(),
         testSchematic.getConnectionType(TEST_CONNECTION_TYPE_NAME));
     String derivedConnectionName = TEST_CONNECTION_TYPE_NAME + "Derived";
     testSchematic.addConnectionType(derivedConnectionName, dConnDerived);
@@ -301,8 +301,8 @@ public class TestSerialization {
     System.out.println(prettyJsonString);
 
     Schematic sch = new SchematicDeserializer().deserialize(result);
-    ConnectionType tBase = sch.getConnectionType(TEST_CONNECTION_TYPE_NAME);
-    ConnectionType tDerived = sch.getConnectionType(derivedConnectionName);
+    ConnectionTypeValue tBase = sch.getConnectionType(TEST_CONNECTION_TYPE_NAME);
+    ConnectionTypeValue tDerived = sch.getConnectionType(derivedConnectionName);
     assertTrue(tDerived.isSubtypeOf(tBase));
   }
 
@@ -320,9 +320,9 @@ public class TestSerialization {
     final String BASE_CONNECTION_NAME = "baseConnection";
     final String DERIVED_CONNECTION_NAME = "derivedConnection";
 
-    ConnectionType baseConnection =
+    ConnectionTypeValue baseConnection =
         sch.getConnectionType(BASE_CONNECTION_NAME);
-    ConnectionType derivedConnection =
+    ConnectionTypeValue derivedConnection =
         sch.getConnectionType(DERIVED_CONNECTION_NAME);
     assertTrue(derivedConnection.isSubtypeOf(baseConnection));
   }

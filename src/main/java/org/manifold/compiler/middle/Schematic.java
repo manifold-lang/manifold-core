@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.manifold.compiler.ConnectionType;
+import org.manifold.compiler.ConnectionTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
@@ -38,7 +38,7 @@ public class Schematic {
   private final Map<String, UserDefinedTypeValue> userDefinedTypes;
   private final Map<String, PortTypeValue> portTypes;
   private final Map<String, NodeTypeValue> nodeTypes;
-  private final Map<String, ConnectionType> connectionTypes;
+  private final Map<String, ConnectionTypeValue> connectionTypes;
   private final Map<String, ConstraintType> constraintTypes;
 
   // Maps containing instantiated objects for this schematic; they are all
@@ -140,7 +140,7 @@ public class Schematic {
     }
   }
 
-  public void addConnectionType(String typename, ConnectionType cd)
+  public void addConnectionType(String typename, ConnectionTypeValue cd)
       throws MultipleDefinitionException {
     if (connectionTypes.containsKey(typename)) {
       throw new MultipleDefinitionException("connection-definition", typename);
@@ -148,7 +148,7 @@ public class Schematic {
     connectionTypes.put(typename, cd);
   }
 
-  public ConnectionType getConnectionType(String typename)
+  public ConnectionTypeValue getConnectionType(String typename)
       throws UndeclaredIdentifierException {
     if (connectionTypes.containsKey(typename)) {
       return connectionTypes.get(typename);
@@ -261,7 +261,7 @@ public class Schematic {
     return ImmutableMap.copyOf(nodeTypes);
   }
 
-  public Map<String, ConnectionType> getConnectionTypes() {
+  public Map<String, ConnectionTypeValue> getConnectionTypes() {
     return ImmutableMap.copyOf(connectionTypes);
   }
 

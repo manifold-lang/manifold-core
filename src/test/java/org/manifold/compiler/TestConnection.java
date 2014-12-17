@@ -22,7 +22,7 @@ public class TestConnection {
 
   private NodeTypeValue nType;
   private NodeValue n;
-  private ConnectionType conType;
+  private ConnectionTypeValue conType;
   private ConnectionValue ept;
   private Value v;
 
@@ -37,7 +37,7 @@ public class TestConnection {
     nType = new NodeTypeValue(new HashMap<>(), portMap);
     n = new NodeValue(nType, new HashMap<>(), portAttrMap);
     v = BooleanValue.getInstance(true);
-    conType = new ConnectionType(ImmutableMap.of("v", boolType));
+    conType = new ConnectionTypeValue(ImmutableMap.of("v", boolType));
 
     ept = new ConnectionValue(
         conType,

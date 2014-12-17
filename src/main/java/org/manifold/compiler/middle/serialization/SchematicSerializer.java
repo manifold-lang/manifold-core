@@ -11,7 +11,6 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Nod
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeTypeConsts.PORT_MAP;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.PrimitiveTypes.PRIMITIVE_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_DEFS;
-import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_DEFS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.NODE_DEFS;
@@ -25,7 +24,7 @@ import java.util.Map;
 
 import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.BooleanTypeValue;
-import org.manifold.compiler.ConnectionType;
+import org.manifold.compiler.ConnectionTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
@@ -54,7 +53,7 @@ public class SchematicSerializer {
   private Map<UserDefinedTypeValue, String> rUserDefTypeMap;
   private Map<PortTypeValue, String> rPortTypeMap;
   private Map<NodeTypeValue, String> rNodeTypeMap;
-  private Map<ConnectionType, String> rConnectionTypeMap;
+  private Map<ConnectionTypeValue, String> rConnectionTypeMap;
   private Map<ConstraintType, String> rConstraintTypeMap;
 
   private Gson gson;
@@ -206,33 +205,6 @@ public class SchematicSerializer {
     schJson.add(NODE_TYPES, collection);
   }
 
-  public void addConnectionTypes(Map<String, ConnectionType> conTypes) {
-    JsonObject collection = new JsonObject();
-
-    TypeDependencyTree typeDeps = new TypeDependencyTree();
-    conTypes.forEach((key, val) -> {
-        typeDeps.addType(val);
-        rConnectionTypeMap.put(val, key);
-      });
-    // now add each ConnectionType to the collection
-    typeDeps.forEachDFS((t) -> {
-        ConnectionType val = (ConnectionType) t;
-        String key = rConnectionTypeMap.get(val);
-
-        JsonObject single = new JsonObject();
-        single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
-
-        TypeValue supertype = t.getSupertype();
-        if (!(supertype.equals(TypeTypeValue.getInstance()))) {
-          single.addProperty(SUPERTYPE, rConnectionTypeMap.get(supertype));
-        }
-
-        collection.add(key, single);
-      });
-
-    schJson.add(CONNECTION_TYPES, collection);
-  }
-
   public void addConstraintTypes(Map<String, ConstraintType> constraintTypes) {
     JsonObject collection = new JsonObject();
 
@@ -284,8 +256,6 @@ public class SchematicSerializer {
 
     connections.forEach((key, val) -> {
         JsonObject single = new JsonObject();
-        single.add(TYPE, new JsonPrimitive(
-            rConnectionTypeMap.get(val.getType())));
         single.add(ATTRIBUTES, serializeValueAttr(
             val.getAttributes().getAll()));
         single.add(FROM, serializeConnectedPort(val.getFrom()));
@@ -318,7 +288,6 @@ public class SchematicSerializer {
     serializer.addUserDefinedTypes(sch.getUserDefinedTypes());
     serializer.addPortTypes(sch.getPortTypes());
     serializer.addNodeTypes(sch.getNodeTypes());
-    serializer.addConnectionTypes(sch.getConnectionTypes());
     serializer.addConstraintTypes(sch.getConstraintTypes());
 
     serializer.addNodes(sch.getNodes());

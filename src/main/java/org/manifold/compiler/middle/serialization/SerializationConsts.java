@@ -2,11 +2,11 @@ package org.manifold.compiler.middle.serialization;
 
 import java.util.Map;
 
-import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.BooleanTypeValue;
 import org.manifold.compiler.IntegerTypeValue;
 import org.manifold.compiler.RealTypeValue;
 import org.manifold.compiler.StringTypeValue;
+import org.manifold.compiler.TypeValue;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -28,7 +28,6 @@ public interface SerializationConsts {
     String USER_DEF_TYPES = "userDefinedTypes";
     String PORT_TYPES = "portTypes";
     String NODE_TYPES = "nodeTypes";
-    String CONNECTION_TYPES = "connectionTypes";
     String CONSTRAINT_TYPES = "constraintTypes";
 
     String NODE_DEFS = "nodes";

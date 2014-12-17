@@ -21,15 +21,15 @@ public class TestConnectionType {
 
   @Test
   public void testGetSupertype() {
-    ConnectionType cBase = new ConnectionType(noAttributes);
-    ConnectionType cDerived = new ConnectionType(noAttributes, cBase);
+    ConnectionTypeValue cBase = new ConnectionTypeValue(noAttributes);
+    ConnectionTypeValue cDerived = new ConnectionTypeValue(noAttributes, cBase);
     assertEquals(cBase, cDerived.getSupertype());
   }
 
   @Test
   public void testInheritedAttributes() {
-    ConnectionType cBase = new ConnectionType(ImmutableMap.of("u", boolType));
-    ConnectionType cDerived = new ConnectionType(
+    ConnectionTypeValue cBase = new ConnectionTypeValue(ImmutableMap.of("u", boolType));
+    ConnectionTypeValue cDerived = new ConnectionTypeValue(
         ImmutableMap.of("v", intType), cBase);
     // pDerived must have both "u" and "v" attributes
     assertTrue(cDerived.getAttributes().containsKey("u"));

@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.manifold.compiler.ArrayTypeValue;
-import org.manifold.compiler.ConnectionType;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
@@ -225,36 +224,6 @@ public class SchematicDeserializer implements SerializationConsts {
     }
   }
 
-  private void deserializeConnectionTypes(Schematic sch, JsonObject in)
-      throws MultipleDefinitionException, UndeclaredIdentifierException {
-
-    if (in == null) {
-      // TODO warning?
-      return;
-    }
-
-    for (Entry<String, JsonElement> entry : in.entrySet()) {
-      Map<String, TypeValue> attributeMap = getTypeDefAttributes(sch,
-          entry.getValue().getAsJsonObject());
-
-      ConnectionType supertype = null;
-      if (entry.getValue().getAsJsonObject().has(SUPERTYPE)) {
-        String supertypeName = entry.getValue().getAsJsonObject()
-            .get(SUPERTYPE).getAsString();
-        supertype = sch.getConnectionType(supertypeName);
-      }
-
-      ConnectionType connectionType;
-      if (supertype == null) {
-        connectionType = new ConnectionType(attributeMap);
-      } else {
-        connectionType = new ConnectionType(attributeMap, supertype);
-      }
-
-      sch.addConnectionType(entry.getKey(), connectionType);
-    }
-  }
-
   private void deserializeConstraintTypes(Schematic sch, JsonObject in)
       throws MultipleDefinitionException, UndeclaredIdentifierException {
 
@@ -366,11 +335,9 @@ public class SchematicDeserializer implements SerializationConsts {
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       JsonObject obj = entry.getValue().getAsJsonObject();
 
-      ConnectionType conType = sch.getConnectionType(obj.get(GlobalConsts.TYPE)
-          .getAsString());
-      Map<String, Value> attributeMap = getValueAttributes(sch, conType
-          .getAttributes(), obj);
-      ConnectionValue conVal = new ConnectionValue(conType,
+      // TODO: read attributes; non-trivial since we no longer have their type
+      Map<String, Value> attributeMap = new HashMap<>();
+      ConnectionValue conVal = new ConnectionValue(
           getPortValue(sch, obj.get(ConnectionConsts.FROM).getAsString()),
           getPortValue(sch, obj.get(ConnectionConsts.TO).getAsString()),
           attributeMap);
@@ -423,8 +390,6 @@ public class SchematicDeserializer implements SerializationConsts {
           SchematicConsts.USER_DEF_TYPES));
       deserializePortTypes(sch, in.getAsJsonObject(SchematicConsts.PORT_TYPES));
       deserializeNodeTypes(sch, in.getAsJsonObject(SchematicConsts.NODE_TYPES));
-      deserializeConnectionTypes(sch,
-          in.getAsJsonObject(SchematicConsts.CONNECTION_TYPES));
       deserializeConstraintTypes(sch,
           in.getAsJsonObject(SchematicConsts.CONSTRAINT_TYPES));
       deserializeNodes(sch, in.getAsJsonObject(SchematicConsts.NODE_DEFS));

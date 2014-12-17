@@ -49,7 +49,7 @@ public class TestSchematic {
   public void testGetConnectionType_Undeclared_ThrowsException()
       throws SchematicException {
     Schematic sch = new Schematic("test");
-    ConnectionType tv = sch.getConnectionType("bogus");
+    ConnectionTypeValue tv = sch.getConnectionType("bogus");
   }
 
   @Test(expected = UndeclaredIdentifierException.class)
@@ -144,9 +144,9 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     // add the first connection type
     String connTypeName = "TestConnection";
-    ConnectionType cv1 = new ConnectionType(attributes);
+    ConnectionTypeValue cv1 = new ConnectionTypeValue(attributes);
     sch.addConnectionType(connTypeName, cv1);
-    ConnectionType actual = sch.getConnectionType(connTypeName);
+    ConnectionTypeValue actual = sch.getConnectionType(connTypeName);
     assertEquals(cv1, actual);
   }
 
@@ -182,7 +182,7 @@ public class TestSchematic {
   @Test
   public void testGetConnection() throws SchematicException {
     Schematic sch = new Schematic("test");
-    ConnectionType connType = null;
+    ConnectionTypeValue connType = null;
     NodeValue node1 = null, node2 = null;
     Map<String, Value> connAttrs = null;
     String connName = "conn1";
@@ -207,7 +207,7 @@ public class TestSchematic {
     sch.addNode("node2", node2);
     // create a test connection type
     String connTypeName = "TestConn";
-    connType = new ConnectionType(attributes);
+    connType = new ConnectionTypeValue(attributes);
     sch.addConnectionType(connTypeName, connType);
     // create the first connection
     connAttrs = new HashMap<>();
@@ -296,7 +296,7 @@ public class TestSchematic {
 
     // now create a test connection type
     String connTypeName = "TestConnection";
-    ConnectionType ct1 = new ConnectionType(attributes);
+    ConnectionTypeValue ct1 = new ConnectionTypeValue(attributes);
     sch.addConnectionType(connTypeName, ct1);
     // create a connection based on this type
     String connName = "testConn1";
@@ -335,7 +335,7 @@ public class TestSchematic {
 
     // now create a test connection type
     String connTypeName = "TestConnection";
-    ConnectionType ct1 = new ConnectionType(attributes);
+    ConnectionTypeValue ct1 = new ConnectionTypeValue(attributes);
     sch.addConnectionType(connTypeName, ct1);
     // create a connection based on this type
     String connName = "testConn1";
@@ -432,13 +432,13 @@ public class TestSchematic {
     // add the first connection type
     String connTypeName = "TestConnection";
     try {
-      ConnectionType cv1 = new ConnectionType(attributes);
+      ConnectionTypeValue cv1 = new ConnectionTypeValue(attributes);
       sch.addConnectionType(connTypeName, cv1);
     } catch (MultipleDefinitionException e) {
       fail("exception thrown too early");
     }
     // try to add another connection type with the same name
-    ConnectionType cv2 = new ConnectionType(attributes);
+    ConnectionTypeValue cv2 = new ConnectionTypeValue(attributes);
     sch.addConnectionType(connTypeName, cv2);
   }
 
@@ -487,7 +487,7 @@ public class TestSchematic {
   public void testAddConnection_AlreadyDeclared_ThrowsException()
       throws SchematicException {
     Schematic sch = new Schematic("test");
-    ConnectionType connType = null;
+    ConnectionTypeValue connType = null;
     NodeValue node1 = null, node2 = null;
     Map<String, Value> connAttrs = null;
     String connName = "conn1";
@@ -513,7 +513,7 @@ public class TestSchematic {
       sch.addNode("node2", node2);
       // create a test connection type
       String connTypeName = "TestConn";
-      connType = new ConnectionType(attributes);
+      connType = new ConnectionTypeValue(attributes);
       sch.addConnectionType(connTypeName, connType);
       // create the first connection
       connAttrs = new HashMap<>();
