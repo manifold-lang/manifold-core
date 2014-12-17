@@ -273,7 +273,7 @@ public class TestSchematic {
     NodeValue node2 = new NodeValue(nodeType, nodeAttrs, nodePortAttrs);
     sch.addNode("testNode2", node2);
 
-        String connName = "testConn1";
+    String connName = "testConn1";
     ConnectionValue conn = new ConnectionValue(
         node1.getPort("p0"), node2.getPort("p0"), nodeAttrs);
     sch.addConnection(connName, conn);
