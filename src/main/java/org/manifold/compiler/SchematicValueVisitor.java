@@ -30,7 +30,7 @@ public interface SchematicValueVisitor {
 
   void visit(ConnectionValue connectionValue);
 
-  void visit(ConnectionType connectionType);
+  void visit(ConnectionTypeValue connectionType);
 
   void visit(BooleanValue booleanValue);
 

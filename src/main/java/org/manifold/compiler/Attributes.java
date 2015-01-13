@@ -8,6 +8,10 @@ import com.google.common.collect.ImmutableMap;
 public class Attributes {
   private final Map<String, Value> data;
 
+  public Attributes(Map<String, Value> data) {
+    this.data = ImmutableMap.copyOf(data);
+  }
+
   public Attributes(Map<String, TypeValue> types,
       Map<String, Value> data) throws UndeclaredAttributeException,
       InvalidAttributeException, TypeMismatchException {

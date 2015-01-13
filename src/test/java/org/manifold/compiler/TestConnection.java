@@ -22,7 +22,6 @@ public class TestConnection {
 
   private NodeTypeValue nType;
   private NodeValue n;
-  private ConnectionType conType;
   private ConnectionValue ept;
   private Value v;
 
@@ -37,10 +36,8 @@ public class TestConnection {
     nType = new NodeTypeValue(new HashMap<>(), portMap);
     n = new NodeValue(nType, new HashMap<>(), portAttrMap);
     v = BooleanValue.getInstance(true);
-    conType = new ConnectionType(ImmutableMap.of("v", boolType));
 
     ept = new ConnectionValue(
-        conType,
         n.getPort(PORT_NAME1),
         n.getPort(PORT_NAME2),
         ImmutableMap.of("v", v)
@@ -49,9 +46,7 @@ public class TestConnection {
 
   @Test(expected = UndefinedBehaviourError.class)
   public void testIncorrectPortConnection() throws SchematicException {
-
     new ConnectionValue(
-      conType,
       n.getPort(PORT_NAME1),
       n.getPort(PORT_NAME1),
       ImmutableMap.of("v", v)
@@ -67,19 +62,6 @@ public class TestConnection {
   public void testGetAttribute_nonexistent()
       throws UndeclaredAttributeException {
     ept.getAttribute("bogus");
-  }
-
-  @Test(expected = org.manifold.compiler.UndeclaredAttributeException.class)
-  public void testCreateWithUndeclaredAttribute() throws SchematicException {
-    new ConnectionValue(conType, n.getPort(PORT_NAME1), n.getPort(PORT_NAME2),
-        ImmutableMap.of());
-  }
-
-  @Test(expected = org.manifold.compiler.InvalidAttributeException.class)
-  public void testCreateWithInvalidAttribute() throws SchematicException {
-    Value v = BooleanValue.getInstance(true);
-    new ConnectionValue(conType, n.getPort(PORT_NAME1), n.getPort(PORT_NAME2),
-        ImmutableMap.of("v", v, "bogus", v));
   }
 
   @Test
