@@ -22,6 +22,7 @@ public interface SerializationConsts {
 
   public interface UDTConsts {
     String ARRAY_ELEMENT_TYPE = "elementType";
+    String OPTIONAL_TYPE = "optionalType";
   }
 
   public interface SchematicConsts {

@@ -2,8 +2,9 @@ package org.manifold.compiler;
 
 public class IntegerValue extends Value {
 
-  private final Integer val;
-  public IntegerValue(Integer val){
+  private final int val;
+
+  public IntegerValue(int val) {
     super(IntegerTypeValue.getInstance());
     this.val = val;
   }
@@ -18,11 +19,12 @@ public class IntegerValue extends Value {
     return false;
   }
 
+
   @Override
   public String toString() {
     return String.valueOf(val);
   }
-  
+
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }

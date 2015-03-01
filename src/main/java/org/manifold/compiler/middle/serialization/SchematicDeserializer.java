@@ -4,6 +4,7 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Glo
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.ARRAY_ELEMENT_TYPE;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.OPTIONAL_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.manifold.compiler.MultipleAssignmentException;
 import org.manifold.compiler.MultipleDefinitionException;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
+import org.manifold.compiler.OptionalTypeValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.PortValue;
 import org.manifold.compiler.TypeMismatchException;
@@ -110,6 +112,17 @@ public class SchematicDeserializer implements SerializationConsts {
             return new ArrayTypeValue(elementType);
           } else {
             throw new JsonSyntaxException("array type value '"
+                + el.toString() + "' missing required element '"
+                + ARRAY_ELEMENT_TYPE + "'");
+          }
+        } else if (typename.equals("Optional")) {
+          // deserialize element type
+          if (eObj.has(OPTIONAL_TYPE)) {
+            TypeValue elementType = deserializeTypeValue(
+                sch, eObj.get(OPTIONAL_TYPE));
+            return new OptionalTypeValue(elementType);
+          } else {
+            throw new JsonSyntaxException("optional type value '"
                 + el.toString() + "' missing required element '"
                 + ARRAY_ELEMENT_TYPE + "'");
           }

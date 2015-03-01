@@ -36,4 +36,11 @@ public class UserDefinedTypeValue extends TypeValue {
     return typeAlias.instantiate(s);
   }
 
+  public static TypeValue getUnaliasedType(TypeValue tv) {
+    // TODO: account for infinite loops
+    while (tv instanceof UserDefinedTypeValue) {
+      tv = ((UserDefinedTypeValue) tv).getTypeAlias();
+    }
+    return tv;
+  }
 }

@@ -18,6 +18,7 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Sch
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.PORT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.USER_DEF_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.ARRAY_ELEMENT_TYPE;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.OPTIONAL_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
+import org.manifold.compiler.OptionalTypeValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.PortValue;
 import org.manifold.compiler.TypeDependencyTree;
@@ -131,6 +133,15 @@ public class SchematicSerializer {
           arrayJson.add(TYPE, new JsonPrimitive("Array"));
           arrayJson.add(ARRAY_ELEMENT_TYPE, new JsonPrimitive(
               rUserDefTypeMap.get(arrayVal.getElementType())));
+          collection.add(key, arrayJson);
+        } else if (aliasedVal instanceof OptionalTypeValue) {
+          // TODO use a type dependency tree/graph
+          // to ensure we don't have a cycle here as well
+          OptionalTypeValue arrayVal = (OptionalTypeValue) aliasedVal;
+          JsonObject arrayJson = new JsonObject();
+          arrayJson.add(TYPE, new JsonPrimitive("Optional"));
+          arrayJson.add(OPTIONAL_TYPE, new JsonPrimitive(
+              rUserDefTypeMap.get(arrayVal.getOptionalType())));
           collection.add(key, arrayJson);
         } else {
           throw new UndefinedBehaviourError(

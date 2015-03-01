@@ -1,5 +1,6 @@
 package org.manifold.compiler;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,22 +16,42 @@ public class Attributes {
   public Attributes(Map<String, TypeValue> types,
       Map<String, Value> data) throws UndeclaredAttributeException,
       InvalidAttributeException, TypeMismatchException {
-    validateAttrNames(types.keySet(), data.keySet());
+    data = validateAttrsExistForTypesAndAddOptionalValues(types, data);
+    validateAttrNamesInTypes(types.keySet(), data.keySet());
     validateAttrTypes(types, data);
     this.data = ImmutableMap.copyOf(data);
   }
 
-  private static void validateAttrNames(Set<String> typeNames,
+  private Map<String, Value> validateAttrsExistForTypesAndAddOptionalValues(
+      Map<String, TypeValue> types,
+      Map<String, Value> originalData) throws UndeclaredAttributeException {
+    Map<String, Value> data = originalData;
+    for (Map.Entry<String, TypeValue> e : types.entrySet()) {
+      String name = e.getKey();
+      if (!data.containsKey(name)) {
+        TypeValue type = UserDefinedTypeValue.getUnaliasedType(e.getValue());
+
+        if (!(type instanceof OptionalTypeValue)) {
+          throw new UndeclaredAttributeException(name);
+        } else {
+          // Copy and edit it in rare case optional type is added
+          if (data == originalData) {
+            data = new HashMap<>(originalData);
+          }
+          // Add the optional value with no value set.
+          data.put(name, new OptionalValue((OptionalTypeValue) type));
+        }
+      }
+    }
+    return data;
+  }
+
+  private static void validateAttrNamesInTypes(Set<String> typeNames,
       Set<String> attrNames) throws UndeclaredAttributeException,
       InvalidAttributeException {
     for (String name : attrNames) {
       if (!typeNames.contains(name)) {
         throw new InvalidAttributeException(name);
-      }
-    }
-    for (String name : typeNames) {
-      if (!attrNames.contains(name)) {
-        throw new UndeclaredAttributeException(name);
       }
     }
   }
