@@ -38,9 +38,9 @@ public interface SchematicValueVisitor {
 
   void visit(ArrayValue arrayValue);
 
-  void visit(OptionalValue optionalValue);
+  void visit(InferredValue inferredValue);
 
-  void visit(OptionalTypeValue optionalType);
+  void visit(InferredTypeValue inferredType);
 
   void visit(RealTypeValue realTypeValue);
 

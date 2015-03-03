@@ -4,12 +4,12 @@ import com.google.common.base.Throwables;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
-public class OptionalTypeValue extends TypeValue {
+public class InferredTypeValue extends TypeValue {
 
   private final TypeValue elementType;
   private final TypeValue unaliasedType;
 
-  public TypeValue getOptionalType() {
+  public TypeValue getInferredType() {
     return this.elementType;
   }
 
@@ -17,7 +17,7 @@ public class OptionalTypeValue extends TypeValue {
     return this.unaliasedType;
   }
 
-  public OptionalTypeValue(TypeValue elementType) {
+  public InferredTypeValue(TypeValue elementType) {
     this.elementType = elementType;
     this.unaliasedType = UserDefinedTypeValue.getUnaliasedType(elementType);
   }
@@ -29,20 +29,20 @@ public class OptionalTypeValue extends TypeValue {
 
   @Override
   public String toString() {
-    return "Optional(" + elementType + ")";
+    return "Inferred(" + elementType + ")";
   }
 
   @Override
   public Value instantiate(String s) {
     JsonElement element = new JsonParser().parse(s);
     if (element.isJsonNull()) {
-      return new OptionalValue(this);
+      return new InferredValue(this);
     }
 
     Value v = elementType.instantiate(
         element.getAsJsonPrimitive().getAsString());
     try {
-      return new OptionalValue(this, v);
+      return new InferredValue(this, v);
     } catch (TypeMismatchException e) {
       throw Throwables.propagate(e);
     }

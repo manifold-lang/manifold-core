@@ -16,13 +16,13 @@ public class Attributes {
   public Attributes(Map<String, TypeValue> types,
       Map<String, Value> data) throws UndeclaredAttributeException,
       InvalidAttributeException, TypeMismatchException {
-    data = validateAttrsExistForTypesAndAddOptionalValues(types, data);
+    data = validateAttrsExistForTypesAndAddInferredValues(types, data);
     validateAttrNamesInTypes(types.keySet(), data.keySet());
     validateAttrTypes(types, data);
     this.data = ImmutableMap.copyOf(data);
   }
 
-  private Map<String, Value> validateAttrsExistForTypesAndAddOptionalValues(
+  private Map<String, Value> validateAttrsExistForTypesAndAddInferredValues(
       Map<String, TypeValue> types,
       Map<String, Value> originalData) throws UndeclaredAttributeException {
     Map<String, Value> data = originalData;
@@ -31,15 +31,15 @@ public class Attributes {
       if (!data.containsKey(name)) {
         TypeValue type = UserDefinedTypeValue.getUnaliasedType(e.getValue());
 
-        if (!(type instanceof OptionalTypeValue)) {
+        if (!(type instanceof InferredTypeValue)) {
           throw new UndeclaredAttributeException(name);
         } else {
-          // Copy and edit it in rare case optional type is added
+          // Copy and edit it in rare case inferred type is added
           if (data == originalData) {
             data = new HashMap<>(originalData);
           }
-          // Add the optional value with no value set.
-          data.put(name, new OptionalValue((OptionalTypeValue) type));
+          // Add the inferred value with no value set.
+          data.put(name, new InferredValue((InferredTypeValue) type));
         }
       }
     }

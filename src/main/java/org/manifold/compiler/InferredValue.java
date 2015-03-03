@@ -1,38 +1,38 @@
 package org.manifold.compiler;
 
 
-public class OptionalValue extends Value {
-  private final TypeValue optionalType;
-  private final TypeValue unaliasedOptionalType;
+public class InferredValue extends Value {
+  private final TypeValue inferredType;
+  private final TypeValue unaliasedInferredType;
   private final Value element;
 
-  public OptionalValue(OptionalTypeValue t) {
+  public InferredValue(InferredTypeValue t) {
     super(t);
 
-    this.optionalType = t.getOptionalType();
-    this.unaliasedOptionalType = t.getUnaliasedElementType();
+    this.inferredType = t.getInferredType();
+    this.unaliasedInferredType = t.getUnaliasedElementType();
     this.element = null;
   }
 
-  public OptionalValue(OptionalTypeValue t, Value element)
+  public InferredValue(InferredTypeValue t, Value element)
       throws TypeMismatchException {
     super(t);
 
-    this.optionalType = t.getOptionalType();
-    this.unaliasedOptionalType = t.getUnaliasedElementType();
+    this.inferredType = t.getInferredType();
+    this.unaliasedInferredType = t.getUnaliasedElementType();
     this.element = element;
 
     // type-check contents -- Value must have type 'elementType'
     if (element != null) {
       TypeValue vt = element.getType();
-      if (!vt.equals(unaliasedOptionalType)) {
-        throw new TypeMismatchException(unaliasedOptionalType, vt);
+      if (!vt.equals(unaliasedInferredType)) {
+        throw new TypeMismatchException(unaliasedInferredType, vt);
       }
     }
   }
 
-  public TypeValue getOptionalType() {
-    return this.optionalType;
+  public TypeValue getInferredType() {
+    return this.inferredType;
   }
 
   public Value get() {

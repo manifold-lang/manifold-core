@@ -2,8 +2,8 @@
   "name": "dogematics",
   "userDefinedTypes": {
   "MaybeBool": {
-    "type": "Optional",
-    "optionalType": "Bool"
+    "type": "Inferred",
+    "inferredType": "Bool"
   }
   },
   "portTypes": {

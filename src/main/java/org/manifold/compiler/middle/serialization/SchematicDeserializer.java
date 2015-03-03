@@ -4,7 +4,7 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Glo
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.ARRAY_ELEMENT_TYPE;
-import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.OPTIONAL_TYPE;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.INFERRED_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,12 +14,12 @@ import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
+import org.manifold.compiler.InferredTypeValue;
 import org.manifold.compiler.InvalidAttributeException;
 import org.manifold.compiler.MultipleAssignmentException;
 import org.manifold.compiler.MultipleDefinitionException;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
-import org.manifold.compiler.OptionalTypeValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.PortValue;
 import org.manifold.compiler.TypeMismatchException;
@@ -115,14 +115,14 @@ public class SchematicDeserializer implements SerializationConsts {
                 + el.toString() + "' missing required element '"
                 + ARRAY_ELEMENT_TYPE + "'");
           }
-        } else if (typename.equals("Optional")) {
+        } else if (typename.equals("Inferred")) {
           // deserialize element type
-          if (eObj.has(OPTIONAL_TYPE)) {
+          if (eObj.has(INFERRED_TYPE)) {
             TypeValue elementType = deserializeTypeValue(
-                sch, eObj.get(OPTIONAL_TYPE));
-            return new OptionalTypeValue(elementType);
+                sch, eObj.get(INFERRED_TYPE));
+            return new InferredTypeValue(elementType);
           } else {
-            throw new JsonSyntaxException("optional type value '"
+            throw new JsonSyntaxException("inferred type value '"
                 + el.toString() + "' missing required element '"
                 + ARRAY_ELEMENT_TYPE + "'");
           }

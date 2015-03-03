@@ -17,10 +17,10 @@ import org.manifold.compiler.BooleanTypeValue;
 import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
+import org.manifold.compiler.InferredValue;
 import org.manifold.compiler.MultipleDefinitionException;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
-import org.manifold.compiler.OptionalValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
@@ -374,7 +374,7 @@ public class TestSerialization {
   }
 
   @Test
-  public void testDeserializeOptionalAttributes() throws IOException,
+  public void testDeserializeInferredAttributes() throws IOException,
       UndeclaredIdentifierException, UndeclaredAttributeException {
     final String IN_NODE_NAME = "in_node";
     final String OUT_NODE_NAME = "out_node";
@@ -383,7 +383,7 @@ public class TestSerialization {
 
     URL url = Resources
         .getResource("org/manifold/compiler/serialization/data/"
-            + "deserialization-optional-attributes-test.json");
+            + "deserialization-inferred-attributes-test.json");
 
     JsonObject json = new JsonParser().parse(
         Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
@@ -412,17 +412,17 @@ public class TestSerialization {
     assertEquals(digitalIn, andNode.getPort("in1").getType());
 
     assertEquals(BooleanValue.getInstance(false),
-        ((OptionalValue) andNode.getAttribute("is_awesome")).get());
+        ((InferredValue) andNode.getAttribute("is_awesome")).get());
     assertEquals(null,
-        ((OptionalValue) andNode2.getAttribute("is_awesome")).get());
+        ((InferredValue) andNode2.getAttribute("is_awesome")).get());
 
     ConnectionValue conVal = sch.getConnection("con1");
     assertEquals(andNode.getPort("out1"), conVal.getFrom());
     assertEquals(andNode2.getPort("in2"), conVal.getTo());
 
-    OptionalValue foom = (OptionalValue) andNode.getPort("out1")
+    InferredValue foom = (InferredValue) andNode.getPort("out1")
         .getAttributes().get("foom");
-    OptionalValue foom2 = (OptionalValue) andNode2.getPort("out1")
+    InferredValue foom2 = (InferredValue) andNode2.getPort("out1")
         .getAttributes().get("foom");
     assertEquals(null, foom.get());
     assertEquals(BooleanValue.getInstance(true), foom2.get());
