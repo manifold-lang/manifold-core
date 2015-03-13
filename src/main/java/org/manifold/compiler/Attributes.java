@@ -30,11 +30,10 @@ public class Attributes {
       String name = e.getKey();
       if (!data.containsKey(name)) {
         TypeValue type = UserDefinedTypeValue.getUnaliasedType(e.getValue());
-
         if (!(type instanceof InferredTypeValue)) {
           throw new UndeclaredAttributeException(name);
         } else {
-          // Copy and edit it in rare case inferred type is added
+          // Copy and edit the hash map in rare case inferred type is added
           if (data == originalData) {
             data = new HashMap<>(originalData);
           }

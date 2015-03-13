@@ -1,16 +1,16 @@
 package org.manifold.compiler;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 
 public class InferredValue extends Value {
   private final TypeValue inferredType;
-  private final TypeValue unaliasedInferredType;
   private final Value element;
 
   public InferredValue(InferredTypeValue t) {
     super(t);
 
     this.inferredType = t.getInferredType();
-    this.unaliasedInferredType = t.getUnaliasedElementType();
     this.element = null;
   }
 
@@ -19,14 +19,16 @@ public class InferredValue extends Value {
     super(t);
 
     this.inferredType = t.getInferredType();
-    this.unaliasedInferredType = t.getUnaliasedElementType();
+    TypeValue itUnaliased =
+        UserDefinedTypeValue.getUnaliasedType(inferredType);
     this.element = element;
 
     // type-check contents -- Value must have type 'elementType'
     if (element != null) {
       TypeValue vt = element.getType();
-      if (!vt.equals(unaliasedInferredType)) {
-        throw new TypeMismatchException(unaliasedInferredType, vt);
+      TypeValue vtUnaliased = UserDefinedTypeValue.getUnaliasedType(vt);
+      if (!vtUnaliased.equals(itUnaliased)) {
+        throw new TypeMismatchException(inferredType, vt);
       }
     }
   }
@@ -68,4 +70,11 @@ public class InferredValue extends Value {
     visitor.visit(this);
   }
 
+  @Override
+  public JsonElement toJson() {
+    if (element == null) {
+      return JsonNull.INSTANCE;
+    }
+    return element.toJson();
+  }
 }

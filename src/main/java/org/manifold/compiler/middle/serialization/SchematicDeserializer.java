@@ -72,13 +72,12 @@ public class SchematicDeserializer implements SerializationConsts {
 
     for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
       TypeValue type = expectedTypes.get(attrEntry.getKey());
-      String valueString = attrEntry.getValue().getAsString();
 
       if (type == null) {
         throw new UndeclaredAttributeException(attrEntry.getKey());
       }
 
-      Value attrValue = type.instantiate(valueString);
+      Value attrValue = type.instantiate(attrEntry.getValue());
       attributeMap.put(attrEntry.getKey(), attrValue);
     }
 
@@ -149,7 +148,8 @@ public class SchematicDeserializer implements SerializationConsts {
 
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       TypeValue udt = deserializeTypeValue(sch, entry.getValue());
-      sch.addUserDefinedType(entry.getKey(), new UserDefinedTypeValue(udt));
+      String udtName = entry.getKey();
+      sch.addUserDefinedType(new UserDefinedTypeValue(udt, udtName));
     }
   }
 

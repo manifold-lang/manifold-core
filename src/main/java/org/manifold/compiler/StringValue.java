@@ -1,5 +1,8 @@
 package org.manifold.compiler;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+
 public class StringValue extends Value {
 
   private final String val;
@@ -22,6 +25,11 @@ public class StringValue extends Value {
   @Override
   public String toString() {
     return val;
+  }
+
+  @Override
+  public JsonElement toJson() {
+    return new JsonPrimitive(val);
   }
 
   public void accept(SchematicValueVisitor visitor) {

@@ -3,7 +3,7 @@ package org.manifold.compiler;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
+import com.google.gson.JsonElement;
 
 
 public class ArrayTypeValue extends TypeValue {
@@ -29,11 +29,11 @@ public class ArrayTypeValue extends TypeValue {
   }
 
   @Override
-  public Value instantiate(String s) {
-    JsonArray jsonArray = new JsonParser().parse(s).getAsJsonArray();
+  public Value instantiate(JsonElement element) {
+    JsonArray jsonArray = element.getAsJsonArray();
     ImmutableList.Builder<Value> valueList = ImmutableList.builder();
     jsonArray.forEach(value -> valueList.add(
-        elementType.instantiate(value.getAsJsonPrimitive().getAsString())));
+        elementType.instantiate(value)));
     try {
       return new ArrayValue(this, valueList.build());
     } catch (TypeMismatchException e) {

@@ -85,7 +85,7 @@ public class SchematicSerializer {
 
   private JsonObject serializeValueAttr(Map<String, Value> valueAttr) {
     JsonObject attrs = new JsonObject();
-    valueAttr.forEach((key, val) -> attrs.addProperty(key, val.toString()));
+    valueAttr.forEach((key, val) -> attrs.add(key, val.toJson()));
     return attrs;
   }
 

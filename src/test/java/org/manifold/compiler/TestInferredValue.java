@@ -13,7 +13,7 @@ public class TestInferredValue {
   private static final IntegerTypeValue intType =
       IntegerTypeValue.getInstance();
   private static final UserDefinedTypeValue intAliasType =
-      new UserDefinedTypeValue(intType);
+      new UserDefinedTypeValue(intType, "intAlias");
   private static final InferredTypeValue intInferredType =
       new InferredTypeValue(intType);
   private static final InferredTypeValue intAliasInferredType =

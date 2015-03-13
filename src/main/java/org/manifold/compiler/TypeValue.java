@@ -3,6 +3,7 @@ package org.manifold.compiler;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonElement;
 
 public abstract class TypeValue extends Value {
 
@@ -79,7 +80,7 @@ public abstract class TypeValue extends Value {
     return false;
   }
 
-  public Value instantiate(String s) {
+  public Value instantiate(JsonElement s) {
     // By default not implemented, subclasses that want this should override
     // TODO (max): implement this for non-data types (nodes, ports, etc)
     throw new UnsupportedOperationException("Not implemented");

@@ -2,24 +2,17 @@ package org.manifold.compiler;
 
 import com.google.common.base.Throwables;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 public class InferredTypeValue extends TypeValue {
 
   private final TypeValue elementType;
-  private final TypeValue unaliasedType;
 
   public TypeValue getInferredType() {
     return this.elementType;
   }
 
-  public TypeValue getUnaliasedElementType() {
-    return this.unaliasedType;
-  }
-
   public InferredTypeValue(TypeValue elementType) {
     this.elementType = elementType;
-    this.unaliasedType = UserDefinedTypeValue.getUnaliasedType(elementType);
   }
 
   @Override
@@ -33,14 +26,12 @@ public class InferredTypeValue extends TypeValue {
   }
 
   @Override
-  public Value instantiate(String s) {
-    JsonElement element = new JsonParser().parse(s);
+  public Value instantiate(JsonElement element) {
     if (element.isJsonNull()) {
       return new InferredValue(this);
     }
 
-    Value v = elementType.instantiate(
-        element.getAsJsonPrimitive().getAsString());
+    Value v = elementType.instantiate(element);
     try {
       return new InferredValue(this, v);
     } catch (TypeMismatchException e) {
