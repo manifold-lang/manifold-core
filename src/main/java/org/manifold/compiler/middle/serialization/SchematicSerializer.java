@@ -78,13 +78,13 @@ public class SchematicSerializer {
     JsonObject typeAttrJson = new JsonObject();
 
     typeAttr.forEach((key, val) -> {
-      final JsonElement el;
-      if (val instanceof UserDefinedTypeValue) {
-        el = new JsonPrimitive(rUserDefTypeMap.get(val));
-      } else {
-        el = serializeTypeValue(val);
-      }
-      typeAttrJson.add(key, el);
+        final JsonElement el;
+        if (val instanceof UserDefinedTypeValue) {
+          el = new JsonPrimitive(rUserDefTypeMap.get(val));
+        } else {
+          el = serializeTypeValue(val);
+        }
+        typeAttrJson.add(key, el);
       });
 
     return typeAttrJson;
