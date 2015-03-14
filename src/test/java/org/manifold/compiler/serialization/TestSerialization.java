@@ -383,15 +383,11 @@ public class TestSerialization {
     final String INFERRED_TYPE_NAME = "InferredBool";
     InferredTypeValue maybe = new InferredTypeValue(
         testSchematic.getUserDefinedType("Bool"));
-    // add an array UDT to the test schematic
+    // add an inferred UDT to the test schematic
     UserDefinedTypeValue udtMaybe =
         new UserDefinedTypeValue(maybe, INFERRED_TYPE_NAME);
     testSchematic.addUserDefinedType(udtMaybe);
     BooleanValue trueValue = BooleanValue.getInstance(true);
-
-
-    HashMap<String, PortTypeValue> dinPortMap = new HashMap<>();
-
 
     NodeTypeValue testNodeType = new NodeTypeValue(
         ImmutableMap.of("foom", udtMaybe), new HashMap<>());
@@ -430,6 +426,51 @@ public class TestSerialization {
       fail("undeclared identifier '" + e.getIdentifier() + "'; "
           + "the user-defined type may not have been serialized");
     }
+
+    NodeValue n2 = sch.getNode("n2");
+    InferredValue v2 = (InferredValue) n2.getAttribute("foom");
+    assertEquals(trueValue, v2.get());
+    NodeValue n1 = sch.getNode("n1");
+    InferredValue v1 = (InferredValue) n1.getAttribute("foom");
+    assertEquals(null, v1.get());
+  }
+
+  @Test
+  public void testSerializeInferredAttributesWithoutUDT() throws
+      SchematicException {
+
+    final String NODE_TYPE_NAME = "NodeInferred";
+    InferredTypeValue maybe = new InferredTypeValue(
+        BooleanTypeValue.getInstance());
+    BooleanValue trueValue = BooleanValue.getInstance(true);
+
+    NodeTypeValue testNodeType = new NodeTypeValue(
+        ImmutableMap.of("foom", maybe), new HashMap<>());
+    testSchematic.addNodeType(NODE_TYPE_NAME, testNodeType);
+
+    Map<String, Value> withInferred =
+        ImmutableMap.of("foom", new InferredValue(maybe, trueValue));
+    Map<String, Value> withoutInferred =
+        ImmutableMap.of("foom", new InferredValue(maybe));
+
+    NodeValue nodeWithoutInferred =
+        new NodeValue(testNodeType, withoutInferred, new HashMap<>());
+    NodeValue nodeWithInferred =
+        new NodeValue(testNodeType, withInferred, new HashMap<>());
+    testSchematic.addNode("n1", nodeWithoutInferred);
+    testSchematic.addNode("n2", nodeWithInferred);
+
+    // serialize, deserialize, check that the type looks okay
+    JsonObject result = SchematicSerializer.serialize(testSchematic);
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
+
+    Schematic sch = new SchematicDeserializer().deserialize(result);
 
     NodeValue n2 = sch.getNode("n2");
     InferredValue v2 = (InferredValue) n2.getAttribute("foom");

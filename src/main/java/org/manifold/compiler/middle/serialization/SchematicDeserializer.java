@@ -52,9 +52,8 @@ public class SchematicDeserializer implements SerializationConsts {
     }
 
     for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
-      String typeName = attrEntry.getValue().getAsString();
-      // global schematic type lookup?
-      attributeMap.put(attrEntry.getKey(), sch.getUserDefinedType(typeName));
+      attributeMap.put(attrEntry.getKey(), 
+                       deserializeTypeValue(sch, attrEntry.getValue()));
     }
 
     return attributeMap;

@@ -44,6 +44,7 @@ import org.manifold.compiler.middle.Schematic;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -77,7 +78,13 @@ public class SchematicSerializer {
     JsonObject typeAttrJson = new JsonObject();
 
     typeAttr.forEach((key, val) -> {
-        typeAttrJson.addProperty(key, rUserDefTypeMap.get(val));
+      final JsonElement el;
+      if (val instanceof UserDefinedTypeValue) {
+        el = new JsonPrimitive(rUserDefTypeMap.get(val));
+      } else {
+        el = serializeTypeValue(val);
+      }
+      typeAttrJson.add(key, el);
       });
 
     return typeAttrJson;
@@ -121,35 +128,48 @@ public class SchematicSerializer {
 
         // inspect the aliased value
         TypeValue aliasedVal = val.getTypeAlias();
-
-        if (aliasedVal.isSubtypeOf(BooleanTypeValue.getInstance())) {
-          collection.add(key, new JsonPrimitive("Bool"));
-
-        } else if (aliasedVal instanceof ArrayTypeValue) {
-          // TODO use a type dependency tree/graph
-          // to ensure we don't have a cycle
-          ArrayTypeValue arrayVal = (ArrayTypeValue) aliasedVal;
-          JsonObject arrayJson = new JsonObject();
-          arrayJson.add(TYPE, new JsonPrimitive("Array"));
-          arrayJson.add(ARRAY_ELEMENT_TYPE, new JsonPrimitive(
-              rUserDefTypeMap.get(arrayVal.getElementType())));
-          collection.add(key, arrayJson);
-        } else if (aliasedVal instanceof InferredTypeValue) {
-          // TODO use a type dependency tree/graph
-          // to ensure we don't have a cycle here as well
-          InferredTypeValue arrayVal = (InferredTypeValue) aliasedVal;
-          JsonObject arrayJson = new JsonObject();
-          arrayJson.add(TYPE, new JsonPrimitive("Inferred"));
-          arrayJson.add(INFERRED_TYPE, new JsonPrimitive(
-              rUserDefTypeMap.get(arrayVal.getInferredType())));
-          collection.add(key, arrayJson);
-        } else {
-          throw new UndefinedBehaviourError(
-              "don't know how to serialize TypeValue '" + val.toString() + "'");
-        }
+        collection.add(key, serializeTypeValue(aliasedVal));
       });
 
     schJson.add(USER_DEF_TYPES, collection);
+  }
+
+  // Convert a TypeValue to a string/object that can be deserialized
+  // to the same TypeValue.
+  // (val is not a UserDefinedTypeValue)
+  private JsonElement serializeTypeValue(TypeValue val) {
+
+    if (val instanceof UserDefinedTypeValue) {
+      return new JsonPrimitive(((UserDefinedTypeValue) val).getName());
+    } else if (val instanceof BooleanTypeValue) {
+      // TODO: Rewrite? It's possible for Inferred and possibly Array to be
+      // serialized without a UserDefinedType (from frontend code),
+      // but trying to serialize a raw BooleanTypeValue is probably only
+      // possible in unit tests.
+      // Same for String, Integer, Real, etc...
+      return new JsonPrimitive("Bool");
+    } else if (val instanceof ArrayTypeValue) {
+      // TODO use a type dependency tree/graph
+      // to ensure we don't have a cycle
+      ArrayTypeValue arrayVal = (ArrayTypeValue) val;
+      JsonObject arrayJson = new JsonObject();
+      arrayJson.add(TYPE, new JsonPrimitive("Array"));
+      arrayJson.add(ARRAY_ELEMENT_TYPE,
+          serializeTypeValue(arrayVal.getElementType()));
+      return arrayJson;
+    } else if (val instanceof InferredTypeValue) {
+      // TODO use a type dependency tree/graph
+      // to ensure we don't have a cycle here as well
+      InferredTypeValue inferredVal = (InferredTypeValue) val;
+      JsonObject inferredJson = new JsonObject();
+      inferredJson.add(TYPE, new JsonPrimitive("Inferred"));
+      inferredJson.add(INFERRED_TYPE,
+          serializeTypeValue(inferredVal.getInferredType()));
+      return inferredJson;
+    } else {
+      throw new UndefinedBehaviourError(
+          "don't know how to serialize TypeValue '" + val.toString() + "'");
+    }
   }
 
   public void addPortTypes(Map<String, PortTypeValue> portTypes) {
