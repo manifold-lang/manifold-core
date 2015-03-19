@@ -10,37 +10,50 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.manifold.compiler.ArrayTypeValue;
-import org.manifold.compiler.ConnectionValue;
-import org.manifold.compiler.ConstraintType;
-import org.manifold.compiler.ConstraintValue;
-import org.manifold.compiler.InferredTypeValue;
-import org.manifold.compiler.InvalidAttributeException;
-import org.manifold.compiler.MultipleAssignmentException;
-import org.manifold.compiler.MultipleDefinitionException;
-import org.manifold.compiler.NodeTypeValue;
-import org.manifold.compiler.NodeValue;
-import org.manifold.compiler.PortTypeValue;
-import org.manifold.compiler.PortValue;
-import org.manifold.compiler.TypeMismatchException;
-import org.manifold.compiler.TypeValue;
-import org.manifold.compiler.UndeclaredAttributeException;
-import org.manifold.compiler.UndeclaredIdentifierException;
-import org.manifold.compiler.UserDefinedTypeValue;
-import org.manifold.compiler.Value;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import org.manifold.compiler.*;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
 
 import com.google.common.base.Throwables;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 public class SchematicDeserializer implements SerializationConsts {
 
-  private Gson gson = new GsonBuilder().create();
+  /**
+   * A map of all non-primitive components (node, port, connection, map)
+   * from their names in the schematic. This is done since schematic keeps
+   * them in separate maps with different methods, making it difficult
+   * to deserialize references to a previously defined value just by
+   * the reference string. This solves that, yay!
+   *
+   * Except for types, they all have the same TypeValue (TypeTypeValue)
+   * but are still kept in different tables. I'm just going to assume no
+   * collision and keep my sanity.
+   *
+   * Perhaps one day refactor Schematic to use this style of table so things
+   * can be handled more generically
+   */
+  private class ComponentTable {
+    private Table<TypeValue, String, Value> compTable = HashBasedTable.create();
+
+    public void put(String key, Value val) {
+      compTable.put(val.getType(), key, val);
+    }
+
+    public Value get(TypeValue type, String key) {
+      return compTable.get(type, key);
+    }
+
+    public boolean contains(TypeValue type, String key) {
+      return compTable.contains(type, key);
+    }
+  }
+
+  private ComponentTable compTable = new ComponentTable();
 
   private Map<String, TypeValue> getTypeDefAttributes(Schematic sch,
       JsonObject obj) throws UndeclaredIdentifierException {
@@ -52,8 +65,21 @@ public class SchematicDeserializer implements SerializationConsts {
     }
 
     for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
-      attributeMap.put(attrEntry.getKey(), 
-                       deserializeTypeValue(sch, attrEntry.getValue()));
+      JsonElement elem = attrEntry.getValue();
+
+      // uber hacks...
+      TypeValue typeValue;
+      if (elem.isJsonObject()) {
+        // these values (arrays, inferred, other obj attrs)
+        // are NOT referenced & will create a new instance.
+        // TODO: add them as non-anon types?
+        typeValue = deserializeTypeValue(sch, elem);
+      } else {
+        String typeName = attrEntry.getValue().getAsString();
+        typeValue = (TypeValue) compTable.get(
+            TypeTypeValue.getInstance(), typeName);
+      }
+      attributeMap.put(attrEntry.getKey(), typeValue);
     }
 
     return attributeMap;
@@ -71,18 +97,20 @@ public class SchematicDeserializer implements SerializationConsts {
 
     for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
       TypeValue type = expectedTypes.get(attrEntry.getKey());
+      JsonElement value = attrEntry.getValue();
 
       if (type == null) {
         throw new UndeclaredAttributeException(attrEntry.getKey());
       }
 
-      Value attrValue = type.instantiate(attrEntry.getValue());
+      Value attrValue;
+      if (value.isJsonPrimitive() && compTable.contains(type, value.getAsString())) {
+        attrValue = compTable.get(type, value.getAsString());
+      } else {
+        attrValue = type.instantiate(value);
+      }
       attributeMap.put(attrEntry.getKey(), attrValue);
     }
-
-    // TODO (max): read these, dependent on IR attribute/type overhaul
-
-
     return attributeMap;
   }
 
@@ -147,8 +175,9 @@ public class SchematicDeserializer implements SerializationConsts {
 
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       TypeValue udt = deserializeTypeValue(sch, entry.getValue());
-      String udtName = entry.getKey();
-      sch.addUserDefinedType(new UserDefinedTypeValue(udt, udtName));
+      UserDefinedTypeValue newType = new UserDefinedTypeValue(udt, entry.getKey());
+      compTable.put(entry.getKey(), newType);
+      sch.addUserDefinedType(newType);
     }
   }
 
@@ -190,6 +219,7 @@ public class SchematicDeserializer implements SerializationConsts {
         portTypeValue = new PortTypeValue(signalType, attributeMap, supertype);
       }
 
+      compTable.put(entry.getKey(), portTypeValue);
       sch.addPortType(entry.getKey(), portTypeValue);
     }
   }
@@ -231,7 +261,7 @@ public class SchematicDeserializer implements SerializationConsts {
       } else {
         nodeTypeValue = new NodeTypeValue(attributeMap, portMap, supertype);
       }
-
+      compTable.put(entry.getKey(), nodeTypeValue);
       sch.addNodeType(entry.getKey(), nodeTypeValue);
     }
   }
@@ -261,7 +291,7 @@ public class SchematicDeserializer implements SerializationConsts {
       } else {
         constraintType = new ConstraintType(attributeMap, supertype);
       }
-
+      compTable.put(entry.getKey(), constraintType);
       sch.addConstraintType(entry.getKey(), constraintType);
     }
   }
@@ -317,6 +347,9 @@ public class SchematicDeserializer implements SerializationConsts {
       }
 
       NodeValue node = new NodeValue(nodeType, attributeMap, portAttrMap);
+      compTable.put(entry.getKey(), node);
+      node.getPorts()
+          .forEach((key, port) -> compTable.put(key, port));
       sch.addNode(entry.getKey(), node);
     }
   }
@@ -354,6 +387,7 @@ public class SchematicDeserializer implements SerializationConsts {
           getPortValue(sch, obj.get(ConnectionConsts.TO).getAsString()),
           attributeMap);
 
+      compTable.put(entry.getKey(), conVal);
       sch.addConnection(entry.getKey(), conVal);
     }
   }
@@ -389,6 +423,7 @@ public class SchematicDeserializer implements SerializationConsts {
       ConstraintValue conVal = new ConstraintValue(conType,
           attributeMap);
 
+      compTable.put(entry.getKey(), conVal);
       sch.addConstraint(entry.getKey(), conVal);
     }
   }
@@ -396,6 +431,8 @@ public class SchematicDeserializer implements SerializationConsts {
   public Schematic deserialize(JsonObject in) {
     Schematic sch = new Schematic(
         in.get(GlobalConsts.SCHEMATIC_NAME).getAsString());
+
+    sch.getUserDefinedTypes().forEach(compTable::put);
 
     try {
       deserializeUserDefinedTypes(sch, in.getAsJsonObject(

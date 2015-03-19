@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.BooleanTypeValue;
-import org.manifold.compiler.ConnectionTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
@@ -42,8 +41,6 @@ import org.manifold.compiler.UserDefinedTypeValue;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -52,25 +49,16 @@ public class SchematicSerializer {
   private Schematic schematic;
   private JsonObject schJson;
 
+  // This is actually duplicated (though less generally) in schematic itself
+  // TODO: perhaps merge the 2?
   // reverse maps of java obj -> name in schematics
-  private Map<UserDefinedTypeValue, String> rUserDefTypeMap;
-  private Map<PortTypeValue, String> rPortTypeMap;
-  private Map<NodeTypeValue, String> rNodeTypeMap;
-  private Map<ConnectionTypeValue, String> rConnectionTypeMap;
-  private Map<ConstraintType, String> rConstraintTypeMap;
-
-  private Gson gson;
+  private Map<Value, String> rValueMap;
 
   private SchematicSerializer(Schematic sch) {
     schematic = sch;
     schJson = new JsonObject();
     schJson.addProperty(SCHEMATIC_NAME, sch.getName());
-    rUserDefTypeMap = new HashMap<>();
-    rPortTypeMap = new HashMap<>();
-    rNodeTypeMap = new HashMap<>();
-    rConnectionTypeMap = new HashMap<>();
-    rConstraintTypeMap = new HashMap<>();
-    gson = new GsonBuilder().create();
+    rValueMap = new HashMap<>();
   }
 
   private JsonObject serializeTypeAttr(
@@ -78,13 +66,20 @@ public class SchematicSerializer {
     JsonObject typeAttrJson = new JsonObject();
 
     typeAttr.forEach((key, val) -> {
-        final JsonElement el;
-        if (val instanceof UserDefinedTypeValue) {
-          el = new JsonPrimitive(rUserDefTypeMap.get(val));
+        // ideally these might want to be in schematic as well just so we
+        // don't have to do this special case here
+        JsonElement type = null;
+        if (val instanceof InferredTypeValue) {
+          InferredTypeValue inferredVal = (InferredTypeValue) val;
+          JsonObject inferredType = new JsonObject();
+          inferredType.add(TYPE, new JsonPrimitive("Inferred"));
+          inferredType.add(INFERRED_TYPE,
+              new JsonPrimitive(rValueMap.get(inferredVal.getInferredType())));
+          type = inferredType;
         } else {
-          el = serializeTypeValue(val);
+          type = new JsonPrimitive(rValueMap.get(val));
         }
-        typeAttrJson.add(key, el);
+        typeAttrJson.add(key, type);
       });
 
     return typeAttrJson;
@@ -92,11 +87,19 @@ public class SchematicSerializer {
 
   private JsonObject serializeValueAttr(Map<String, Value> valueAttr) {
     JsonObject attrs = new JsonObject();
-    valueAttr.forEach((key, val) -> attrs.add(key, val.toJson()));
+    // unlike types which are always back references, values come in 2 flavours
+    // if they exist in the rValueMap, then they are a reference
+    // otherwise they are a primitive and we call toString
+    valueAttr.forEach((key, val) -> {
+        JsonElement elem = rValueMap.containsKey(val) ?
+            new JsonPrimitive(rValueMap.get(val)) :
+            val.toJson();
+        attrs.add(key, elem);
+      });
     return attrs;
   }
 
-  // serialize from/to ports in the form "nodeName:portName"
+  // serializeAsAttr from/to ports in the form "nodeName:portName"
   private JsonPrimitive serializeConnectedPort(PortValue port) {
     String nodeName = schematic.getNodeName(port.getParent());
     String portName = null;
@@ -119,9 +122,11 @@ public class SchematicSerializer {
       Map<String, UserDefinedTypeValue> userDefTypes) {
     JsonObject collection = new JsonObject();
 
+    PRIMITIVE_TYPES.forEach((key, val) -> rValueMap.put(val, key));
+
     userDefTypes.forEach((key, val) -> {
-        rUserDefTypeMap.put(val, key);
-        // do not serialize primitive types
+        rValueMap.put(val, key);
+        // do not serializeAsAttr primitive types
         if (PRIMITIVE_TYPES.keySet().contains(key)) {
           return;
         }
@@ -178,22 +183,22 @@ public class SchematicSerializer {
     TypeDependencyTree typeDeps = new TypeDependencyTree();
     portTypes.forEach((key, val) -> {
         typeDeps.addType(val);
-        rPortTypeMap.put(val, key);
+        rValueMap.put(val, key);
       });
     // now add each PortTypeValue to the collection
     typeDeps.forEachDFS((t) -> {
         PortTypeValue val = (PortTypeValue) t;
-        String key = rPortTypeMap.get(val);
+        String key = rValueMap.get(val);
 
         JsonObject single = new JsonObject();
 
         TypeValue supertype = t.getSupertype();
         if (!(supertype.equals(TypeTypeValue.getInstance()))) {
-          single.addProperty(SUPERTYPE, rPortTypeMap.get(supertype));
+          single.addProperty(SUPERTYPE, rValueMap.get(supertype));
         }
 
         TypeValue signalType = val.getSignalType();
-        single.addProperty(SIGNAL_TYPE, rUserDefTypeMap.get(signalType));
+        single.addProperty(SIGNAL_TYPE, rValueMap.get(signalType));
 
         single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
         collection.add(key, single);
@@ -209,24 +214,24 @@ public class SchematicSerializer {
     TypeDependencyTree typeDeps = new TypeDependencyTree();
     nodeTypes.forEach((key, val) -> {
         typeDeps.addType(val);
-        rNodeTypeMap.put(val, key);
+        rValueMap.put(val, key);
       });
     // now add each NodeTypeValue to the collection
     typeDeps.forEachDFS((t) -> {
         NodeTypeValue val = (NodeTypeValue) t;
-        String key = rNodeTypeMap.get(val);
+        String key = rValueMap.get(val);
 
         JsonObject single = new JsonObject();
         single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
 
         JsonObject ports = new JsonObject();
         val.getPorts().forEach((pkey, pval) -> {
-            ports.addProperty(pkey, rPortTypeMap.get(pval));
+            ports.addProperty(pkey, rValueMap.get(pval));
           });
 
         TypeValue supertype = t.getSupertype();
         if (!(supertype.equals(TypeTypeValue.getInstance()))) {
-          single.addProperty(SUPERTYPE, rNodeTypeMap.get(supertype));
+          single.addProperty(SUPERTYPE, rValueMap.get(supertype));
         }
 
         single.add(PORT_MAP, ports);
@@ -242,19 +247,19 @@ public class SchematicSerializer {
     TypeDependencyTree typeDeps = new TypeDependencyTree();
     constraintTypes.forEach((key, val) -> {
         typeDeps.addType(val);
-        rConstraintTypeMap.put(val, key);
+        rValueMap.put(val, key);
       });
     // now add each ConstraintType to the collection
     typeDeps.forEachDFS((t) -> {
         ConstraintType val = (ConstraintType) t;
-        String key = rConstraintTypeMap.get(val);
+        String key = rValueMap.get(val);
 
         JsonObject single = new JsonObject();
         single.add(ATTRIBUTES, serializeTypeAttr(val.getAttributes()));
 
         TypeValue supertype = t.getSupertype();
         if (!(supertype.equals(TypeTypeValue.getInstance()))) {
-          single.addProperty(SUPERTYPE, rConstraintTypeMap.get(supertype));
+          single.addProperty(SUPERTYPE, rValueMap.get(supertype));
         }
 
         collection.add(key, single);
@@ -267,14 +272,17 @@ public class SchematicSerializer {
     JsonObject collection = new JsonObject();
 
     nodes.forEach((key, val) -> {
+        rValueMap.put(val, key);
         JsonObject single = new JsonObject();
-        single.add(TYPE, new JsonPrimitive(rNodeTypeMap.get(val.getType())));
+        single.add(TYPE, new JsonPrimitive(rValueMap.get(val.getType())));
         single.add(ATTRIBUTES, serializeValueAttr(
             val.getAttributes().getAll()));
         JsonObject portAttrs = new JsonObject();
-        val.getPorts().forEach(
-              (pkey, pval) -> portAttrs.add(
-                  pkey, serializeValueAttr(pval.getAttributes().getAll())));
+        val.getPorts().forEach((pkey, pval) -> {
+            rValueMap.put(pval, pkey);
+            portAttrs.add(
+                pkey, serializeValueAttr(pval.getAttributes().getAll()));
+          });
         single.add(PORT_ATTRS, portAttrs);
         collection.add(key, single);
       });
@@ -286,6 +294,7 @@ public class SchematicSerializer {
     JsonObject collection = new JsonObject();
 
     connections.forEach((key, val) -> {
+        rValueMap.put(val, key);
         JsonObject single = new JsonObject();
         single.add(ATTRIBUTES, serializeValueAttr(
             val.getAttributes().getAll()));
@@ -300,8 +309,9 @@ public class SchematicSerializer {
   public void addConstraints(Map<String, ConstraintValue> constraints) {
     JsonObject collection = new JsonObject();
     constraints.forEach((key, val) -> {
+        rValueMap.put(val, key);
         JsonObject single = new JsonObject();
-        single.add(TYPE, new JsonPrimitive(rConstraintTypeMap.get(
+        single.add(TYPE, new JsonPrimitive(rValueMap.get(
             val.getType())));
         single.add(ATTRIBUTES, serializeValueAttr(
             val.getAttributes().getAll()));
