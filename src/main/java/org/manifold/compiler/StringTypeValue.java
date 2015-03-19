@@ -1,5 +1,7 @@
 package org.manifold.compiler;
 
+import com.google.gson.JsonElement;
+
 public class StringTypeValue extends TypeValue {
 
   private static final StringTypeValue instance = new StringTypeValue();
@@ -21,7 +23,7 @@ public class StringTypeValue extends TypeValue {
   }
 
   @Override
-  public Value instantiate(String s) {
-    return new StringValue(instance, s);
+  public Value instantiate(JsonElement e) {
+    return new StringValue(instance, e.getAsString());
   }
 }

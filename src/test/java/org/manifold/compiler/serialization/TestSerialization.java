@@ -17,6 +17,8 @@ import org.manifold.compiler.BooleanTypeValue;
 import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
+import org.manifold.compiler.InferredTypeValue;
+import org.manifold.compiler.InferredValue;
 import org.manifold.compiler.MultipleDefinitionException;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
@@ -32,6 +34,7 @@ import org.manifold.compiler.middle.serialization.SchematicDeserializer;
 import org.manifold.compiler.middle.serialization.SchematicSerializer;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -328,8 +331,8 @@ public class TestSerialization {
     TypeValue bitvectorType = new ArrayTypeValue(
         testSchematic.getUserDefinedType("Bool"));
     String typename = "Bitvector";
-    testSchematic.addUserDefinedType(typename,
-        new UserDefinedTypeValue(bitvectorType));
+    testSchematic.addUserDefinedType(
+        new UserDefinedTypeValue(bitvectorType, typename));
     // serialize, deserialize, check that the type looks okay
     JsonObject result = SchematicSerializer.serialize(testSchematic);
 
@@ -370,6 +373,169 @@ public class TestSerialization {
     ArrayTypeValue arrayType = (ArrayTypeValue) udt.getTypeAlias();
     assertTrue(arrayType.getElementType()
         .isSubtypeOf(BooleanTypeValue.getInstance()));
+  }
+
+  @Test
+  public void testSerializeInferredAttributes() throws
+      SchematicException {
+
+    final String NODE_TYPE_NAME = "NodeInferred";
+    final String INFERRED_TYPE_NAME = "InferredBool";
+    InferredTypeValue maybe = new InferredTypeValue(
+        testSchematic.getUserDefinedType("Bool"));
+    // add an inferred UDT to the test schematic
+    UserDefinedTypeValue udtMaybe =
+        new UserDefinedTypeValue(maybe, INFERRED_TYPE_NAME);
+    testSchematic.addUserDefinedType(udtMaybe);
+    BooleanValue trueValue = BooleanValue.getInstance(true);
+
+    NodeTypeValue testNodeType = new NodeTypeValue(
+        ImmutableMap.of("foom", udtMaybe), new HashMap<>());
+    testSchematic.addNodeType(NODE_TYPE_NAME, testNodeType);
+
+    Map<String, Value> withInferred =
+        ImmutableMap.of("foom", new InferredValue(maybe, trueValue));
+    Map<String, Value> withoutInferred =
+        ImmutableMap.of("foom", new InferredValue(maybe));
+
+    NodeValue nodeWithoutInferred =
+        new NodeValue(testNodeType, withoutInferred, new HashMap<>());
+    NodeValue nodeWithInferred =
+        new NodeValue(testNodeType, withInferred, new HashMap<>());
+    testSchematic.addNode("n1", nodeWithoutInferred);
+    testSchematic.addNode("n2", nodeWithInferred);
+
+    // serialize, deserialize, check that the type looks okay
+    JsonObject result = SchematicSerializer.serialize(testSchematic);
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
+
+    Schematic sch = new SchematicDeserializer().deserialize(result);
+    try {
+      UserDefinedTypeValue udt = sch.getUserDefinedType(INFERRED_TYPE_NAME);
+      assertTrue(udt.getTypeAlias() instanceof InferredTypeValue);
+      InferredTypeValue inferredType = (InferredTypeValue) udt.getTypeAlias();
+      assertTrue(inferredType.getInferredType()
+          .isSubtypeOf(BooleanTypeValue.getInstance()));
+    } catch (UndeclaredIdentifierException e) {
+      fail("undeclared identifier '" + e.getIdentifier() + "'; "
+          + "the user-defined type may not have been serialized");
+    }
+
+    NodeValue n2 = sch.getNode("n2");
+    InferredValue v2 = (InferredValue) n2.getAttribute("foom");
+    assertEquals(trueValue, v2.get());
+    NodeValue n1 = sch.getNode("n1");
+    InferredValue v1 = (InferredValue) n1.getAttribute("foom");
+    assertEquals(null, v1.get());
+  }
+
+  @Test
+  public void testSerializeInferredAttributesWithoutUDT() throws
+      SchematicException {
+
+    final String NODE_TYPE_NAME = "NodeInferred";
+    InferredTypeValue maybe = new InferredTypeValue(
+        BooleanTypeValue.getInstance());
+    BooleanValue trueValue = BooleanValue.getInstance(true);
+
+    NodeTypeValue testNodeType = new NodeTypeValue(
+        ImmutableMap.of("foom", maybe), new HashMap<>());
+    testSchematic.addNodeType(NODE_TYPE_NAME, testNodeType);
+
+    Map<String, Value> withInferred =
+        ImmutableMap.of("foom", new InferredValue(maybe, trueValue));
+    Map<String, Value> withoutInferred =
+        ImmutableMap.of("foom", new InferredValue(maybe));
+
+    NodeValue nodeWithoutInferred =
+        new NodeValue(testNodeType, withoutInferred, new HashMap<>());
+    NodeValue nodeWithInferred =
+        new NodeValue(testNodeType, withInferred, new HashMap<>());
+    testSchematic.addNode("n1", nodeWithoutInferred);
+    testSchematic.addNode("n2", nodeWithInferred);
+
+    // serialize, deserialize, check that the type looks okay
+    JsonObject result = SchematicSerializer.serialize(testSchematic);
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    JsonParser jp = new JsonParser();
+    JsonElement je = jp.parse(result.toString());
+    String prettyJsonString = gson.toJson(je);
+
+    System.out.println(prettyJsonString);
+
+    Schematic sch = new SchematicDeserializer().deserialize(result);
+
+    NodeValue n2 = sch.getNode("n2");
+    InferredValue v2 = (InferredValue) n2.getAttribute("foom");
+    assertEquals(trueValue, v2.get());
+    NodeValue n1 = sch.getNode("n1");
+    InferredValue v1 = (InferredValue) n1.getAttribute("foom");
+    assertEquals(null, v1.get());
+  }
+
+  @Test
+  public void testDeserializeInferredAttributes() throws IOException,
+      UndeclaredIdentifierException, UndeclaredAttributeException {
+    final String IN_NODE_NAME = "in_node";
+    final String OUT_NODE_NAME = "out_node";
+    final String DIGITAL_IN_PORT_NAME = "digital_in";
+    final String DIGITAL_OUT_PORT_NAME = "digital_out";
+
+    URL url = Resources
+        .getResource("org/manifold/compiler/serialization/data/"
+            + "deserialization-inferred-attributes-test.json");
+
+    JsonObject json = new JsonParser().parse(
+        Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
+    Schematic sch = new SchematicDeserializer().deserialize(json);
+
+    Map<String, PortTypeValue> outNodePorts = sch.getNodeType(OUT_NODE_NAME)
+        .getPorts();
+    Map<String, PortTypeValue> inNodePorts = sch.getNodeType(IN_NODE_NAME)
+        .getPorts();
+
+    PortTypeValue digitalIn = sch.getPortType(DIGITAL_IN_PORT_NAME);
+    PortTypeValue digitalOut = sch.getPortType(DIGITAL_OUT_PORT_NAME);
+
+    assertEquals(TEST_SCHEMATIC_NAME, sch.getName());
+
+    assertEquals(digitalIn, inNodePorts.get("in1"));
+    assertEquals(digitalIn, inNodePorts.get("in2"));
+    assertEquals(digitalOut, outNodePorts.get("out2"));
+    assertEquals(digitalOut, outNodePorts.get("out2"));
+
+    NodeValue andNode = sch.getNode("and_node");
+    NodeValue andNode2 = sch.getNode("and_node2");
+
+    assertEquals(sch.getNodeType("and"), andNode.getType());
+    assertEquals(andNode.getType(), andNode2.getType());
+    assertEquals(digitalIn, andNode.getPort("in1").getType());
+
+    assertEquals(BooleanValue.getInstance(false),
+        ((InferredValue) andNode.getAttribute("is_awesome")).get());
+    assertEquals(null,
+        ((InferredValue) andNode2.getAttribute("is_awesome")).get());
+
+    ConnectionValue conVal = sch.getConnection("con1");
+    assertEquals(andNode.getPort("out1"), conVal.getFrom());
+    assertEquals(andNode2.getPort("in2"), conVal.getTo());
+
+    InferredValue foom = (InferredValue) andNode.getPort("out1")
+        .getAttributes().get("foom");
+    InferredValue foom2 = (InferredValue) andNode2.getPort("out1")
+        .getAttributes().get("foom");
+    assertEquals(null, foom.get());
+    assertEquals(BooleanValue.getInstance(true), foom2.get());
+
+    assertEquals(sch.getUserDefinedType("Bool"),
+        ((InferredTypeValue) foom.getType()).getInferredType());
   }
 
   @Test

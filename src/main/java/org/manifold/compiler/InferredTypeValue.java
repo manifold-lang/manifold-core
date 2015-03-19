@@ -1,20 +1,17 @@
 package org.manifold.compiler;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
-
-public class ArrayTypeValue extends TypeValue {
+public class InferredTypeValue extends TypeValue {
 
   private final TypeValue elementType;
 
-  public TypeValue getElementType() {
+  public TypeValue getInferredType() {
     return this.elementType;
   }
 
-  public ArrayTypeValue(TypeValue elementType) {
+  public InferredTypeValue(TypeValue elementType) {
     this.elementType = elementType;
   }
 
@@ -25,19 +22,21 @@ public class ArrayTypeValue extends TypeValue {
 
   @Override
   public String toString() {
-    return "Array(" + elementType + ")";
+    return "Inferred(" + elementType + ")";
   }
 
   @Override
   public Value instantiate(JsonElement element) {
-    JsonArray jsonArray = element.getAsJsonArray();
-    ImmutableList.Builder<Value> valueList = ImmutableList.builder();
-    jsonArray.forEach(value -> valueList.add(
-        elementType.instantiate(value)));
+    if (element.isJsonNull()) {
+      return new InferredValue(this);
+    }
+
+    Value v = elementType.instantiate(element);
     try {
-      return new ArrayValue(this, valueList.build());
+      return new InferredValue(this, v);
     } catch (TypeMismatchException e) {
       throw Throwables.propagate(e);
     }
+
   }
 }

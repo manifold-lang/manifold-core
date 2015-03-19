@@ -101,8 +101,8 @@ public class TestSchematic {
     Schematic sch = new Schematic("test");
     String udtName = "TestUDT";
     UserDefinedTypeValue tv = new UserDefinedTypeValue(
-        BooleanTypeValue.getInstance());
-    sch.addUserDefinedType(udtName, tv);
+        BooleanTypeValue.getInstance(), udtName);
+    sch.addUserDefinedType(tv);
     TypeValue actual = sch.getUserDefinedType(udtName);
     assertEquals(tv, actual);
   }
@@ -349,12 +349,12 @@ public class TestSchematic {
     String udtName = "TestUDT";
     TypeValue tv = BooleanTypeValue.getInstance();
     try {
-      sch.addUserDefinedType(udtName, new UserDefinedTypeValue(tv));
+      sch.addUserDefinedType(new UserDefinedTypeValue(tv, udtName));
     } catch (MultipleDefinitionException e) {
       fail("exception thrown too early");
     }
     // try to add another UDT with the same name
-    sch.addUserDefinedType(udtName, new UserDefinedTypeValue(tv));
+    sch.addUserDefinedType(new UserDefinedTypeValue(tv, udtName));
   }
 
   @Test(expected = MultipleDefinitionException.class)

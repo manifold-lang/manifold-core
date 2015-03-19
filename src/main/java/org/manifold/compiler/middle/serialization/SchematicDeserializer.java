@@ -4,6 +4,7 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Glo
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.SUPERTYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.GlobalConsts.TYPE;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.ARRAY_ELEMENT_TYPE;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.UDTConsts.INFERRED_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
+import org.manifold.compiler.InferredTypeValue;
 import org.manifold.compiler.InvalidAttributeException;
 import org.manifold.compiler.MultipleAssignmentException;
 import org.manifold.compiler.MultipleDefinitionException;
@@ -50,9 +52,8 @@ public class SchematicDeserializer implements SerializationConsts {
     }
 
     for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
-      String typeName = attrEntry.getValue().getAsString();
-      // global schematic type lookup?
-      attributeMap.put(attrEntry.getKey(), sch.getUserDefinedType(typeName));
+      attributeMap.put(attrEntry.getKey(), 
+                       deserializeTypeValue(sch, attrEntry.getValue()));
     }
 
     return attributeMap;
@@ -70,13 +71,12 @@ public class SchematicDeserializer implements SerializationConsts {
 
     for (Entry<String, JsonElement> attrEntry : attributeMapJson.entrySet()) {
       TypeValue type = expectedTypes.get(attrEntry.getKey());
-      String valueString = attrEntry.getValue().getAsString();
 
       if (type == null) {
         throw new UndeclaredAttributeException(attrEntry.getKey());
       }
 
-      Value attrValue = type.instantiate(valueString);
+      Value attrValue = type.instantiate(attrEntry.getValue());
       attributeMap.put(attrEntry.getKey(), attrValue);
     }
 
@@ -113,6 +113,17 @@ public class SchematicDeserializer implements SerializationConsts {
                 + el.toString() + "' missing required element '"
                 + ARRAY_ELEMENT_TYPE + "'");
           }
+        } else if (typename.equals("Inferred")) {
+          // deserialize element type
+          if (eObj.has(INFERRED_TYPE)) {
+            TypeValue elementType = deserializeTypeValue(
+                sch, eObj.get(INFERRED_TYPE));
+            return new InferredTypeValue(elementType);
+          } else {
+            throw new JsonSyntaxException("inferred type value '"
+                + el.toString() + "' missing required element '"
+                + ARRAY_ELEMENT_TYPE + "'");
+          }
         } else {
           throw new JsonSyntaxException("unknown structured type '"
               + typename + "'");
@@ -136,7 +147,8 @@ public class SchematicDeserializer implements SerializationConsts {
 
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       TypeValue udt = deserializeTypeValue(sch, entry.getValue());
-      sch.addUserDefinedType(entry.getKey(), new UserDefinedTypeValue(udt));
+      String udtName = entry.getKey();
+      sch.addUserDefinedType(new UserDefinedTypeValue(udt, udtName));
     }
   }
 

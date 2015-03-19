@@ -73,7 +73,7 @@ public class Schematic {
   private void populateDefaultType() {
     PRIMITIVE_TYPES.forEach((name, type) -> {
         try {
-          addUserDefinedType(name, new UserDefinedTypeValue(type));
+          addUserDefinedType(new UserDefinedTypeValue(type, name));
         } catch (MultipleDefinitionException mde) {
           // this should not actually be possible unless there is something
           // wrong with the compiler itself
@@ -84,8 +84,9 @@ public class Schematic {
       });
   }
 
-  public void addUserDefinedType(String typename, UserDefinedTypeValue td)
+  public void addUserDefinedType(UserDefinedTypeValue td)
       throws MultipleDefinitionException {
+    String typename = td.getName();
     if (userDefinedTypes.containsKey(typename)) {
       throw new MultipleDefinitionException(
           "user-defined-type-definition", typename);

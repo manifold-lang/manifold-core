@@ -22,6 +22,7 @@ public interface SerializationConsts {
 
   public interface UDTConsts {
     String ARRAY_ELEMENT_TYPE = "elementType";
+    String INFERRED_TYPE = "inferredType";
   }
 
   public interface SchematicConsts {

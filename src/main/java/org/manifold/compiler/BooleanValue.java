@@ -1,5 +1,8 @@
 package org.manifold.compiler;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+
 public class BooleanValue extends Value {
 
   private static final BooleanValue highInstance = new BooleanValue(true);
@@ -41,9 +44,14 @@ public class BooleanValue extends Value {
   public String toString() {
     return String.valueOf(value);
   }
-  
+
+  @Override
+  public JsonElement toJson() {
+    return new JsonPrimitive(String.valueOf(value));
+  }
+
   public void accept(SchematicValueVisitor visitor) {
     visitor.visit(this);
   }
-  
+
 }

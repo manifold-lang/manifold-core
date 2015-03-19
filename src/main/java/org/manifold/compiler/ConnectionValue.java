@@ -45,7 +45,9 @@ public class ConnectionValue extends Value {
     PortTypeValue portTypeTo = (PortTypeValue) portTo.getType();
     TypeValue signalTypeFrom = portTypeFrom.getSignalType();
     TypeValue signalTypeTo = portTypeTo.getSignalType();
-    if (!(signalTypeFrom.isSubtypeOf(signalTypeTo))) {
+    TypeValue signalTypeToUnaliased =
+        UserDefinedTypeValue.getUnaliasedType(signalTypeTo);
+    if (!(signalTypeFrom.isSubtypeOf(signalTypeToUnaliased))) {
       throw new TypeMismatchException(signalTypeFrom, signalTypeTo);
     }
   }

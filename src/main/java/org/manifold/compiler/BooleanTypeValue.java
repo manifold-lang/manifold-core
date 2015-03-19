@@ -1,5 +1,7 @@
 package org.manifold.compiler;
 
+import com.google.gson.JsonElement;
+
 public class BooleanTypeValue extends TypeValue {
 
   private static final BooleanTypeValue instance = new BooleanTypeValue();
@@ -21,7 +23,9 @@ public class BooleanTypeValue extends TypeValue {
   }
 
   @Override
-  public Value instantiate(String s) {
+  public Value instantiate(JsonElement e) {
+    // TODO: consider using JSON true, false instead. (also for int).
+    String s = e.getAsString();
     if (!(Boolean.TRUE.toString().equals(s) ||
         Boolean.FALSE.toString().equals(s))) {
       throw new IllegalArgumentException(String.format(

@@ -1,5 +1,6 @@
 package org.manifold.compiler;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,22 +16,41 @@ public class Attributes {
   public Attributes(Map<String, TypeValue> types,
       Map<String, Value> data) throws UndeclaredAttributeException,
       InvalidAttributeException, TypeMismatchException {
-    validateAttrNames(types.keySet(), data.keySet());
+    data = validateAttrsExistForTypesAndAddInferredValues(types, data);
+    validateAttrNamesInTypes(types.keySet(), data.keySet());
     validateAttrTypes(types, data);
     this.data = ImmutableMap.copyOf(data);
   }
 
-  private static void validateAttrNames(Set<String> typeNames,
+  private Map<String, Value> validateAttrsExistForTypesAndAddInferredValues(
+      Map<String, TypeValue> types,
+      Map<String, Value> originalData) throws UndeclaredAttributeException {
+    Map<String, Value> data = originalData;
+    for (Map.Entry<String, TypeValue> e : types.entrySet()) {
+      String name = e.getKey();
+      if (!data.containsKey(name)) {
+        TypeValue type = UserDefinedTypeValue.getUnaliasedType(e.getValue());
+        if (!(type instanceof InferredTypeValue)) {
+          throw new UndeclaredAttributeException(name);
+        } else {
+          // Copy and edit the hash map in rare case inferred type is added
+          if (data == originalData) {
+            data = new HashMap<>(originalData);
+          }
+          // Add the inferred value with no value set.
+          data.put(name, new InferredValue((InferredTypeValue) type));
+        }
+      }
+    }
+    return data;
+  }
+
+  private static void validateAttrNamesInTypes(Set<String> typeNames,
       Set<String> attrNames) throws UndeclaredAttributeException,
       InvalidAttributeException {
     for (String name : attrNames) {
       if (!typeNames.contains(name)) {
         throw new InvalidAttributeException(name);
-      }
-    }
-    for (String name : typeNames) {
-      if (!attrNames.contains(name)) {
-        throw new UndeclaredAttributeException(name);
       }
     }
   }

@@ -1,5 +1,7 @@
 package org.manifold.compiler;
 
+import com.google.gson.JsonElement;
+
 public class RealTypeValue extends TypeValue {
   private static final RealTypeValue instance = new RealTypeValue();
 
@@ -22,7 +24,7 @@ public class RealTypeValue extends TypeValue {
   }
 
   @Override
-  public Value instantiate(String s) {
-    return new RealValue(Double.parseDouble(s));
+  public Value instantiate(JsonElement e) {
+    return new RealValue(Double.parseDouble(e.getAsString()));
   }
 }
