@@ -25,6 +25,6 @@ public class RealTypeValue extends TypeValue {
 
   @Override
   public Value instantiate(JsonElement e) {
-    return new RealValue(e.getAsDouble());
+    return new RealValue(Double.parseDouble(e.getAsString()));
   }
 }

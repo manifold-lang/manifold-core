@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 
 public class TestRealValue {
   private static final RealValue real = new RealValue(Math.PI);
@@ -37,10 +37,12 @@ public class TestRealValue {
 
   @Test
   public void testToJson() throws Exception {
-    JsonElement o = real.toJson();
+    JsonPrimitive o = (JsonPrimitive) real.toJson();
     RealTypeValue realType = RealTypeValue.getInstance();
 
     RealValue realCopy = (RealValue) realType.instantiate(o);
+    assertTrue("should serialize real numbers as strings in the intermediate",
+        o.isString());
     assertEquals(realCopy.toDouble(), real.toDouble(), 0);
   }
 }

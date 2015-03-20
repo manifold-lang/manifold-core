@@ -36,6 +36,6 @@ public class RealValue extends Value {
 
   @Override
   public JsonElement toJson() {
-    return new JsonPrimitive(val);
+    return new JsonPrimitive(Double.toString(val));
   }
 }
