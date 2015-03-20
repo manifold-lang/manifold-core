@@ -1,6 +1,7 @@
 package org.manifold.compiler;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -52,4 +53,8 @@ public class TestBooleanValue {
     getInstance(true).verify();
   }
 
+  @Test
+  public void testToJson() throws Exception {
+    assertEquals("true", getInstance(true).toJson().getAsString());
+  }
 }
