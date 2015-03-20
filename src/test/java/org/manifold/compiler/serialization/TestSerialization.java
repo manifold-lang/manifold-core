@@ -10,7 +10,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,6 +20,7 @@ import org.manifold.compiler.middle.serialization.SchematicDeserializer;
 import org.manifold.compiler.middle.serialization.SchematicSerializer;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -296,7 +296,9 @@ public class TestSerialization {
   }
 
   @Test
-  @Ignore // not currently being used & breaks attribute serial/deserial. TODO: fix attr serial/deserial
+  @Ignore
+  // not currently being used & breaks attribute serial/deserial.
+  // TODO: fix attr serial/deserial
   public void testSerialize_DerivedConstraint()
       throws UndeclaredIdentifierException, MultipleDefinitionException {
     // add a derived constraint type to the test schematic
