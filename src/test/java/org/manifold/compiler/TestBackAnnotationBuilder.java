@@ -1,4 +1,4 @@
-package org.manifold.compiler.backannotation;
+package org.manifold.compiler;
 
 import static org.junit.Assert.assertTrue;
 
@@ -21,6 +21,7 @@ import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
 import org.manifold.compiler.UndeclaredIdentifierException;
 import org.manifold.compiler.Value;
+import org.manifold.compiler.middle.BackAnnotationBuilder;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
 

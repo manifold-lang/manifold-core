@@ -1,4 +1,4 @@
-package org.manifold.compiler.backannotation;
+package org.manifold.compiler.middle;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,6 @@ import org.manifold.compiler.TypeValue;
 import org.manifold.compiler.UndeclaredAttributeException;
 import org.manifold.compiler.UndeclaredIdentifierException;
 import org.manifold.compiler.Value;
-import org.manifold.compiler.middle.Schematic;
 
 // Produces a back-annotated schematic, which has the same structure
 // as an existing schematic but may have modifications to attributes.
