@@ -11,11 +11,15 @@ import org.manifold.compiler.BooleanValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
+import org.manifold.compiler.IntegerValue;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
 import org.manifold.compiler.StringValue;
+import org.manifold.compiler.TypeMismatchException;
 import org.manifold.compiler.TypeValue;
+import org.manifold.compiler.UndeclaredAttributeException;
+import org.manifold.compiler.UndeclaredIdentifierException;
 import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
@@ -153,7 +157,32 @@ public class TestBackAnnotationBuilder {
     assertTrue("back-annotation failed",
         inModified.getAttribute(NODE_ATTR_FOO).equals(
             BooleanValue.getInstance(false)));
+  }
 
+  @Test(expected=UndeclaredIdentifierException.class)
+  public void testModifyNodeAttribute_NodeDoesNotExist()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateNodeAttribute("nBOGUS", NODE_ATTR_FOO,
+        BooleanValue.getInstance(false));
+  }
+
+  @Test(expected=UndeclaredAttributeException.class)
+  public void testModifyNodeAttribute_AttributeDoesNotExist()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateNodeAttribute("nIN", "Bogus_Attribute",
+        BooleanValue.getInstance(false));
+  }
+
+  @Test(expected=TypeMismatchException.class)
+  public void testModifyNodeAttribute_ValueHasIncompatibleType()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateNodeAttribute("nIN", NODE_ATTR_FOO, new IntegerValue(13));
   }
 
 }
