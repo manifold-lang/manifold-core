@@ -39,6 +39,29 @@ public class BackAnnotationBuilder {
   private Map<String, Map<String, Map<String, Value>>> portAttributeAnnotations
       = new HashMap<>();
 
+  // connectionAttributeAnnotations[connectionName][attrName] = attrValue
+  // This map only contains entries that have been updated;
+  // the original values should be pulled from the schematic.
+  private Map<String, Map<String, Value>> connectionAttributeAnnotations =
+      new HashMap<>();
+
+  public void annotateConnectionAttribute(
+      String connectionName, String attrName, Value attrValue)
+      throws UndeclaredIdentifierException {
+    // make sure the original schematic contains this connection
+    if (!(originalSchematic.getConnections().containsKey(connectionName))) {
+      throw new UndeclaredIdentifierException(
+          "connection '" + connectionName +
+          "' not present on original schematic");
+    }
+    // record the change
+    if (!(connectionAttributeAnnotations.containsKey(connectionName))) {
+      connectionAttributeAnnotations.put(
+          connectionName, new HashMap<String, Value>());
+    }
+    connectionAttributeAnnotations.get(connectionName).put(attrName, attrValue);
+  }
+
   public void annotatePortAttribute(
       String nodeName, String portName, String attrName, Value attrValue)
           throws UndeclaredIdentifierException, UndeclaredAttributeException,
@@ -228,8 +251,20 @@ public class BackAnnotationBuilder {
       PortValue originalPortTo = originalConnection.getTo();
       PortValue newPortTo = nodeIsomorphisms.get(originalPortTo.getParent())
           .getPort(getPortName(originalPortTo));
-      Map<String, Value> newAttributes = originalConnection.getAttributes()
-          .getAll(); // TODO connection attribute edits
+      Map<String, Value> newAttributes = new HashMap<>();
+      // do this in two steps:
+      // first, copy all old attributes, then overwrite them with new ones
+      // this also adds new attributes that didn't exist before
+      for (Map.Entry<String, Value> entry :
+          originalConnection.getAttributes().getAll().entrySet()) {
+        newAttributes.put(entry.getKey(), entry.getValue());
+      }
+      if (connectionAttributeAnnotations.containsKey(connectionName)) {
+        for (Map.Entry<String, Value> entry :
+            connectionAttributeAnnotations.get(connectionName).entrySet()) {
+          newAttributes.put(entry.getKey(), entry.getValue());
+        }
+      }
       ConnectionValue newConnection = new ConnectionValue(
           newPortFrom, newPortTo, newAttributes);
       newSchematic.addConnection(connectionName, newConnection);

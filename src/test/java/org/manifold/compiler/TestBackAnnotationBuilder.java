@@ -39,6 +39,9 @@ public class TestBackAnnotationBuilder {
 
   private static final String CONNECTION_NAME = "wire";
 
+  private static final String CONN_ATTR_XYZZY = "xyzzy";
+  private static final String CONN_ATTR_ASDF = "asdf";
+
   private static final String CONSTRAINT_NAME = "rope";
 
   private Schematic originalSchematic;
@@ -100,9 +103,12 @@ public class TestBackAnnotationBuilder {
         outNodePortAttrs);
     originalSchematic.addNode("nOUT", outNode);
 
+    Map<String, Value> connAttrs = new HashMap<>();
+    connAttrs.put(CONN_ATTR_ASDF, BooleanValue.getInstance(false));
+    connAttrs.put(CONN_ATTR_XYZZY, BooleanValue.getInstance(false));
     ConnectionValue con = new ConnectionValue(inNode
         .getPort(IN_PORT_NAME), outNode.getPort(OUT_PORT_NAME),
-        new HashMap<>());
+        connAttrs);
 
     originalSchematic.addConnection(CONNECTION_NAME, con);
 
@@ -133,14 +139,22 @@ public class TestBackAnnotationBuilder {
         new BackAnnotationBuilder(originalSchematic);
     Schematic modifiedSchematic = builder.build();
 
-    NodeValue inOriginal = originalSchematic.getNode("nIN");
-    NodeValue inModified = modifiedSchematic.getNode("nIN");
-    assertTrue(inOriginal.getAttributes().equals(inModified.getAttributes()));
+    NodeValue inNodeOriginal = originalSchematic.getNode("nIN");
+    NodeValue inNodeModified = modifiedSchematic.getNode("nIN");
+    assertTrue(inNodeOriginal.getAttributes().
+        equals(inNodeModified.getAttributes()));
 
-    PortValue inPortOriginal = inOriginal.getPort(IN_PORT_NAME);
-    PortValue inPortModified = inModified.getPort(IN_PORT_NAME);
+    PortValue inPortOriginal = inNodeOriginal.getPort(IN_PORT_NAME);
+    PortValue inPortModified = inNodeModified.getPort(IN_PORT_NAME);
     assertTrue(inPortOriginal.getAttributes().
         equals(inPortModified.getAttributes()));
+
+    ConnectionValue inConnOriginal = originalSchematic.
+        getConnection(CONNECTION_NAME);
+    ConnectionValue inConnModified = modifiedSchematic.
+        getConnection(CONNECTION_NAME);
+    assertTrue(inConnOriginal.getAttributes().
+        equals(inConnModified.getAttributes()));
   }
 
   @Test
@@ -294,6 +308,63 @@ public class TestBackAnnotationBuilder {
         new BackAnnotationBuilder(originalSchematic);
     builder.annotatePortAttribute("nIN", IN_PORT_NAME, PORT_ATTR_BAZ,
         new IntegerValue(13));
+  }
+
+  @Test
+  public void testModifyConnectionAttribute()
+      throws SchematicException {
+    // Modify the "xyzzy" attribute on connection "wire" to be False instead of True.
+
+    ConnectionValue cOriginal = originalSchematic.getConnection(
+        CONNECTION_NAME);
+    assertTrue("precondition failed",
+        cOriginal.getAttribute(CONN_ATTR_XYZZY).equals(
+            BooleanValue.getInstance(false)));
+
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateConnectionAttribute(CONNECTION_NAME, CONN_ATTR_XYZZY,
+        BooleanValue.getInstance(true));
+    Schematic modifiedSchematic = builder.build();
+
+    ConnectionValue cModified = modifiedSchematic.getConnection(
+        CONNECTION_NAME);
+    assertTrue("back-annotation failed",
+        cModified.getAttribute(CONN_ATTR_XYZZY).equals(
+            BooleanValue.getInstance(true)));
+  }
+
+  @Test
+  public void testModifyConnectionAttribute_PreservesOthers()
+      throws SchematicException {
+    // Check that modifying one connection attribute doesn't modify any others.
+
+    ConnectionValue cOriginal = originalSchematic.getConnection(
+        CONNECTION_NAME);
+    assertTrue("precondition failed",
+        cOriginal.getAttribute(CONN_ATTR_ASDF).equals(
+            BooleanValue.getInstance(false)));
+
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateConnectionAttribute(CONNECTION_NAME, CONN_ATTR_XYZZY,
+        BooleanValue.getInstance(true));
+    Schematic modifiedSchematic = builder.build();
+
+    ConnectionValue cModified = modifiedSchematic.getConnection(
+        CONNECTION_NAME);
+    assertTrue("back-annotation smashed unmodified connection attribute",
+        cModified.getAttribute(CONN_ATTR_ASDF).equals(
+            BooleanValue.getInstance(false)));
+  }
+
+  @Test(expected = UndeclaredIdentifierException.class)
+  public void testModifyConnectionAttribute_ConnectionDoesNotExist()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateConnectionAttribute("cBOGUS", CONN_ATTR_XYZZY,
+        BooleanValue.getInstance(false));
   }
 
 }
