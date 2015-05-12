@@ -7,20 +7,6 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.manifold.compiler.BooleanValue;
-import org.manifold.compiler.ConnectionValue;
-import org.manifold.compiler.ConstraintType;
-import org.manifold.compiler.ConstraintValue;
-import org.manifold.compiler.IntegerValue;
-import org.manifold.compiler.NodeTypeValue;
-import org.manifold.compiler.NodeValue;
-import org.manifold.compiler.PortTypeValue;
-import org.manifold.compiler.StringValue;
-import org.manifold.compiler.TypeMismatchException;
-import org.manifold.compiler.TypeValue;
-import org.manifold.compiler.UndeclaredAttributeException;
-import org.manifold.compiler.UndeclaredIdentifierException;
-import org.manifold.compiler.Value;
 import org.manifold.compiler.middle.BackAnnotationBuilder;
 import org.manifold.compiler.middle.Schematic;
 import org.manifold.compiler.middle.SchematicException;
@@ -160,7 +146,7 @@ public class TestBackAnnotationBuilder {
             BooleanValue.getInstance(false)));
   }
 
-  @Test(expected=UndeclaredIdentifierException.class)
+  @Test(expected = UndeclaredIdentifierException.class)
   public void testModifyNodeAttribute_NodeDoesNotExist()
       throws SchematicException {
     BackAnnotationBuilder builder =
@@ -169,7 +155,7 @@ public class TestBackAnnotationBuilder {
         BooleanValue.getInstance(false));
   }
 
-  @Test(expected=UndeclaredAttributeException.class)
+  @Test(expected = UndeclaredAttributeException.class)
   public void testModifyNodeAttribute_AttributeDoesNotExist()
       throws SchematicException {
     BackAnnotationBuilder builder =
@@ -178,7 +164,7 @@ public class TestBackAnnotationBuilder {
         BooleanValue.getInstance(false));
   }
 
-  @Test(expected=TypeMismatchException.class)
+  @Test(expected = TypeMismatchException.class)
   public void testModifyNodeAttribute_ValueHasIncompatibleType()
       throws SchematicException {
     BackAnnotationBuilder builder =

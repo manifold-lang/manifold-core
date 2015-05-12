@@ -52,7 +52,7 @@ public class BackAnnotationBuilder {
     // make sure the value has the correct type for the attribute
     TypeValue expectedType = originalNodeType.getAttributes().get(attrName);
     if (expectedType instanceof UserDefinedTypeValue) {
-      expectedType = ((UserDefinedTypeValue)expectedType).getTypeAlias();
+      expectedType = ((UserDefinedTypeValue) expectedType).getTypeAlias();
     }
     TypeValue actualType = attrValue.getType();
     if (!actualType.isSubtypeOf(expectedType)) {
