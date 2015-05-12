@@ -28,6 +28,9 @@ public class TestBackAnnotationBuilder {
   private static final String IN_PORT_NAME = "in_port_name";
   private static final String OUT_PORT_NAME = "out_port_name";
 
+  private static final String PORT_ATTR_BAZ = "baz";
+  private static final String PORT_ATTR_PLUGH = "plugh";
+
   private static final String DIGITAL_IN = "digital_in";
   private static final String DIGITAL_OUT = "digital_out";
 
@@ -46,8 +49,13 @@ public class TestBackAnnotationBuilder {
     originalSchematic = new Schematic(TEST_SCHEMATIC_NAME);
 
     // port type
+    HashMap<String, TypeValue> portDinAttrMap = new HashMap<>();
+    portDinAttrMap.put(PORT_ATTR_BAZ,
+        originalSchematic.getUserDefinedType("Bool"));
+    portDinAttrMap.put(PORT_ATTR_PLUGH,
+        originalSchematic.getUserDefinedType("Bool"));
     PortTypeValue din = new PortTypeValue(
-        originalSchematic.getUserDefinedType("Bool"), new HashMap<>());
+        originalSchematic.getUserDefinedType("Bool"), portDinAttrMap);
     PortTypeValue dout = new PortTypeValue(
         originalSchematic.getUserDefinedType("Bool"), new HashMap<>());
     originalSchematic.addPortType(DIGITAL_IN, din);
@@ -77,7 +85,10 @@ public class TestBackAnnotationBuilder {
     inNodeAttrs.put(NODE_ATTR_BAR, BooleanValue.getInstance(true));
 
     Map<String, Map<String, Value>> inNodePortAttrs = new HashMap<>();
-    inNodePortAttrs.put(IN_PORT_NAME, new HashMap<>());
+    Map<String, Value> inPortAttrs = new HashMap<>();
+    inPortAttrs.put(PORT_ATTR_BAZ, BooleanValue.getInstance(false));
+    inPortAttrs.put(PORT_ATTR_PLUGH, BooleanValue.getInstance(false));
+    inNodePortAttrs.put(IN_PORT_NAME, inPortAttrs);
 
     Map<String, Map<String, Value>> outNodePortAttrs = new HashMap<>();
     outNodePortAttrs.put(OUT_PORT_NAME, new HashMap<>());
@@ -124,8 +135,12 @@ public class TestBackAnnotationBuilder {
 
     NodeValue inOriginal = originalSchematic.getNode("nIN");
     NodeValue inModified = modifiedSchematic.getNode("nIN");
-
     assertTrue(inOriginal.getAttributes().equals(inModified.getAttributes()));
+
+    PortValue inPortOriginal = inOriginal.getPort(IN_PORT_NAME);
+    PortValue inPortModified = inModified.getPort(IN_PORT_NAME);
+    assertTrue(inPortOriginal.getAttributes().
+        equals(inPortModified.getAttributes()));
   }
 
   @Test
@@ -166,7 +181,7 @@ public class TestBackAnnotationBuilder {
     Schematic modifiedSchematic = builder.build();
 
     NodeValue inModified = modifiedSchematic.getNode("nIN");
-    assertTrue("back-annotation smashed unmodified attribute",
+    assertTrue("back-annotation smashed unmodified node attribute",
         inModified.getAttribute(NODE_ATTR_BAR).equals(
             BooleanValue.getInstance(true)));
   }
@@ -195,6 +210,90 @@ public class TestBackAnnotationBuilder {
     BackAnnotationBuilder builder =
         new BackAnnotationBuilder(originalSchematic);
     builder.annotateNodeAttribute("nIN", NODE_ATTR_FOO, new IntegerValue(13));
+  }
+
+  @Test
+  public void testModifyPortAttribute()
+      throws SchematicException {
+    // Modify the "baz" attribute on nIN:in_port_name to be True instead of False.
+
+    PortValue inOriginal = originalSchematic.getNode("nIN").
+        getPort(IN_PORT_NAME);
+    assertTrue("precondition failed",
+        inOriginal.getAttribute(PORT_ATTR_BAZ).equals(
+            BooleanValue.getInstance(false)));
+
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotatePortAttribute("nIN", IN_PORT_NAME, PORT_ATTR_BAZ,
+        BooleanValue.getInstance(true));
+    Schematic modifiedSchematic = builder.build();
+
+    PortValue inModified = modifiedSchematic.getNode("nIN").
+        getPort(IN_PORT_NAME);
+    assertTrue("back-annotation failed",
+        inModified.getAttribute(PORT_ATTR_BAZ).equals(
+            BooleanValue.getInstance(true)));
+  }
+
+  @Test
+  public void testModifyPortAttribute_PreservesOthers()
+      throws SchematicException {
+    // Check that modifying one port attribute doesn't modify any others.
+    PortValue inOriginal = originalSchematic.getNode("nIN").
+        getPort(IN_PORT_NAME);
+    assertTrue("precondition failed",
+        inOriginal.getAttribute(PORT_ATTR_PLUGH).equals(
+            BooleanValue.getInstance(false)));
+
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotatePortAttribute("nIN", IN_PORT_NAME, PORT_ATTR_BAZ,
+        BooleanValue.getInstance(true));
+    Schematic modifiedSchematic = builder.build();
+
+    PortValue inModified = modifiedSchematic.getNode("nIN").
+        getPort(IN_PORT_NAME);
+    // > Nothing happens.
+    assertTrue("back-annotation smashed unmodified port attribute",
+        inModified.getAttribute(PORT_ATTR_PLUGH).equals(
+            BooleanValue.getInstance(false)));
+  }
+
+  @Test(expected = UndeclaredIdentifierException.class)
+  public void testModifyPortAttribute_NodeDoesNotExist()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotatePortAttribute("nBOGUS", IN_PORT_NAME, PORT_ATTR_BAZ,
+        BooleanValue.getInstance(false));
+  }
+
+  @Test(expected = UndeclaredIdentifierException.class)
+  public void testModifyPortAttribute_PortDoesNotExist()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotatePortAttribute("nIN", "pBOGUS", PORT_ATTR_BAZ,
+        BooleanValue.getInstance(false));
+  }
+
+  @Test(expected = UndeclaredAttributeException.class)
+  public void testModifyPortAttribute_AttributeDoesNotExist()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotatePortAttribute("nIN", IN_PORT_NAME, "attrBOGUS",
+        BooleanValue.getInstance(false));
+  }
+
+  @Test(expected = TypeMismatchException.class)
+  public void testModifyPortAttribute_ValueHasIncompatibleType()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotatePortAttribute("nIN", IN_PORT_NAME, PORT_ATTR_BAZ,
+        new IntegerValue(13));
   }
 
 }

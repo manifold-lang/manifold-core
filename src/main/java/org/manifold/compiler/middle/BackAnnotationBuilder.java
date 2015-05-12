@@ -33,6 +33,54 @@ public class BackAnnotationBuilder {
   private Map<String, Map<String, Value>> nodeAttributeAnnotations =
       new HashMap<>();
 
+  // portAttributeAnnotations[nodeName][portName][attrName] = attrValue
+  // This map only contains entries that have been updated;
+  // the original values should be pulled from the schematic.
+  private Map<String, Map<String, Map<String, Value>>> portAttributeAnnotations
+      = new HashMap<>();
+
+  public void annotatePortAttribute(
+      String nodeName, String portName, String attrName, Value attrValue)
+          throws UndeclaredIdentifierException, UndeclaredAttributeException,
+          TypeMismatchException {
+    // make sure the original schematic contains this node
+    if (!(originalSchematic.getNodes().containsKey(nodeName))) {
+      throw new UndeclaredIdentifierException(
+          "node '" + nodeName + "' not present on original schematic");
+    }
+    // make sure the node has such a port
+    NodeValue originalNode = originalSchematic.getNode(nodeName);
+    if (!(originalNode.getPorts().containsKey(portName))) {
+      throw new UndeclaredIdentifierException(
+          "port '" + portName + "' not present on original node");
+    }
+    // make sure the port has such an attribute
+    PortValue originalPort = originalNode.getPort(portName);
+    PortTypeValue originalPortType = (PortTypeValue) originalPort.getType();
+    if (!(originalPortType.getAttributes().containsKey(attrName))) {
+      throw new UndeclaredAttributeException(
+          "attribute '" + attrName + "' not present on this port type");
+    }
+    // make sure the value has the correct type for the attribute
+    TypeValue expectedType = originalPortType.getAttributes().get(attrName);
+    if (expectedType instanceof UserDefinedTypeValue) {
+      expectedType = ((UserDefinedTypeValue) expectedType).getTypeAlias();
+    }
+    TypeValue actualType = attrValue.getType();
+    if (!actualType.isSubtypeOf(expectedType)) {
+      throw new TypeMismatchException(expectedType, actualType);
+    }
+    // record the change
+    if (!(portAttributeAnnotations.containsKey(nodeName))) {
+      portAttributeAnnotations.put(nodeName, new HashMap<>());
+    }
+    if (!(portAttributeAnnotations.get(nodeName).containsKey(portName))) {
+      portAttributeAnnotations.get(nodeName).put(portName, new HashMap<>());
+    }
+    portAttributeAnnotations.get(nodeName).get(portName)
+      .put(attrName, attrValue);
+  }
+
   public void annotateNodeAttribute(
       String nodeName, String attrName, Value attrValue)
           throws UndeclaredIdentifierException, UndeclaredAttributeException,
@@ -113,14 +161,14 @@ public class BackAnnotationBuilder {
       boolean modifiedNode;
       boolean modifiedPorts;
       modifiedNode = (nodeAttributeAnnotations.containsKey(nodeName));
-      modifiedPorts = false; // TODO port attribute edits
+      modifiedPorts = (portAttributeAnnotations.containsKey(nodeName));
       if (modifiedNode || modifiedPorts) {
         NodeTypeValue nodeType = (NodeTypeValue) originalNode.getType();
         // apply all node attribute edits
-        Map<String, Value> originalAttributes = originalNode.getAttributes()
+        Map<String, Value> originalNodeAttributes = originalNode.getAttributes()
             .getAll();
         Map<String, Value> nodeAttributes = new HashMap<>();
-        for (String attrName : originalAttributes.keySet()) {
+        for (String attrName : originalNodeAttributes.keySet()) {
           if (nodeAttributeAnnotations.containsKey(nodeName)
               && nodeAttributeAnnotations.get(nodeName).containsKey(attrName)) {
             // use new value
@@ -128,14 +176,31 @@ public class BackAnnotationBuilder {
                 .get(attrName));
           } else {
             // use original value
-            nodeAttributes.put(attrName, originalAttributes.get(attrName));
+            nodeAttributes.put(attrName, originalNodeAttributes.get(attrName));
           }
         }
-        // TODO port attribute edits
+        // apply all port attribute edits
         Map<String, Map<String, Value>> portAttributes = new HashMap<>();
         for (String portName : originalNode.getPorts().keySet()) {
+          portAttributes.put(portName, new HashMap<>());
           PortValue originalPort = originalNode.getPort(portName);
-          portAttributes.put(portName, originalPort.getAttributes().getAll());
+          Map<String, Value> originalPortAttributes = originalPort
+              .getAttributes().getAll();
+          for (String attrName : originalPortAttributes.keySet()) {
+            if (portAttributeAnnotations.containsKey(nodeName)
+                && portAttributeAnnotations.get(nodeName).containsKey(portName)
+                && portAttributeAnnotations.get(nodeName).get(portName).
+                    containsKey(attrName)) {
+              // use new value
+              portAttributes.get(portName).put(attrName,
+                  portAttributeAnnotations.get(nodeName).get(portName)
+                  .get(attrName));
+            } else {
+              // use original value
+              portAttributes.get(portName).put(attrName,
+                  originalPortAttributes.get(attrName));
+            }
+          }
         }
 
         // create a new node with the new attributes
