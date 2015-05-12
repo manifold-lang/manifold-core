@@ -23,6 +23,7 @@ public class TestBackAnnotationBuilder {
   private static final String TEST_PORT_TYPE_ATTRIBUTE_NAME = "much attributes";
 
   private static final String NODE_ATTR_FOO = "foo";
+  private static final String NODE_ATTR_BAR = "bar";
 
   private static final String IN_PORT_NAME = "in_port_name";
   private static final String OUT_PORT_NAME = "out_port_name";
@@ -55,6 +56,7 @@ public class TestBackAnnotationBuilder {
     // node type
     HashMap<String, TypeValue> dinAttrMap = new HashMap<>();
     dinAttrMap.put(NODE_ATTR_FOO, originalSchematic.getUserDefinedType("Bool"));
+    dinAttrMap.put(NODE_ATTR_BAR, originalSchematic.getUserDefinedType("Bool"));
 
     HashMap<String, PortTypeValue> dinPortMap = new HashMap<>();
     dinPortMap.put(IN_PORT_NAME, din);
@@ -72,6 +74,7 @@ public class TestBackAnnotationBuilder {
     // node
     Map<String, Value> inNodeAttrs = new HashMap<>();
     inNodeAttrs.put(NODE_ATTR_FOO, BooleanValue.getInstance(true));
+    inNodeAttrs.put(NODE_ATTR_BAR, BooleanValue.getInstance(true));
 
     Map<String, Map<String, Value>> inNodePortAttrs = new HashMap<>();
     inNodePortAttrs.put(IN_PORT_NAME, new HashMap<>());
@@ -144,6 +147,28 @@ public class TestBackAnnotationBuilder {
     assertTrue("back-annotation failed",
         inModified.getAttribute(NODE_ATTR_FOO).equals(
             BooleanValue.getInstance(false)));
+  }
+
+  @Test
+  public void testModifyNodeAttribute_PreservesOthers()
+      throws SchematicException {
+    // Check that modifying one node attribute doesn't modify any others.
+
+    NodeValue inOriginal = originalSchematic.getNode("nIN");
+    assertTrue("precondition failed",
+        inOriginal.getAttribute(NODE_ATTR_BAR).equals(
+            BooleanValue.getInstance(true)));
+
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateNodeAttribute("nIN", NODE_ATTR_FOO,
+        BooleanValue.getInstance(false));
+    Schematic modifiedSchematic = builder.build();
+
+    NodeValue inModified = modifiedSchematic.getNode("nIN");
+    assertTrue("back-annotation smashed unmodified attribute",
+        inModified.getAttribute(NODE_ATTR_BAR).equals(
+            BooleanValue.getInstance(true)));
   }
 
   @Test(expected = UndeclaredIdentifierException.class)
