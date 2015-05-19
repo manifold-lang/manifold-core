@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
+import org.manifold.compiler.ConstraintValue;
 import org.manifold.compiler.NodeTypeValue;
 import org.manifold.compiler.NodeValue;
 import org.manifold.compiler.PortTypeValue;
@@ -44,6 +45,25 @@ public class BackAnnotationBuilder {
   // the original values should be pulled from the schematic.
   private Map<String, Map<String, Value>> connectionAttributeAnnotations =
       new HashMap<>();
+
+  // constraintAttributeAnnotations[constraintName][attrName] = attrValue
+  // This map only contains entries that have been updated;
+  // the original values should be pulled from the schematic.
+  private Map<String, Map<String, Value>> constraintAttributeAnnotations =
+      new HashMap<>();
+
+  public void annotateConstraintAttribute(
+      String constraintName, String attrName, Value attrValue)
+          throws UndeclaredIdentifierException, UndeclaredAttributeException,
+          TypeMismatchException {
+    // TODO safety checks
+    // record the change
+    if (!(constraintAttributeAnnotations.containsKey(constraintName))) {
+      constraintAttributeAnnotations.put(
+          constraintName, new HashMap<String, Value>());
+    }
+    constraintAttributeAnnotations.get(constraintName).put(attrName, attrValue);
+  }
 
   public void annotateConnectionAttribute(
       String connectionName, String attrName, Value attrValue)
@@ -270,7 +290,73 @@ public class BackAnnotationBuilder {
       newSchematic.addConnection(connectionName, newConnection);
       connectionIsomorphisms.put(originalConnection, newConnection);
     }
-    // TODO constraints
+
+    // constraints are tricky
+    // we iterate over each one and inspect its attributes
+    // in particular, we check the type of each value
+
+    for (Map.Entry<String, ConstraintValue> originalEntry : originalSchematic
+        .getConstraints().entrySet()) {
+      String constraintName = originalEntry.getKey();
+      ConstraintValue originalConstraint = originalEntry.getValue();
+      ConstraintType constraintType = (ConstraintType) originalConstraint
+          .getType();
+
+      Map<String, Value> newAttributes = new HashMap<>();
+      for (Map.Entry<String, Value> originalAttribute : originalConstraint
+          .getAttributes().getAll().entrySet()) {
+        String attrName = originalAttribute.getKey();
+        Value originalAttrValue = originalAttribute.getValue();
+        TypeValue originalAttrType = constraintType.getAttributes()
+            .get(attrName);
+        if (originalAttrType instanceof NodeTypeValue) {
+          // pull the new node from the isomorphism table
+          newAttributes.put(attrName, nodeIsomorphisms.get(originalAttrValue));
+        } else if (originalAttrValue instanceof ConnectionValue) {
+          // no connection types, so we have to test the value's type
+          // pull the new connection from the isomorphism table
+          newAttributes.put(attrName, connectionIsomorphisms.get(
+              originalAttrValue));
+        } else if (originalAttrType instanceof PortTypeValue) {
+          // find the port's parent node, pull a node from the
+          // node isomorphism table, find the corresponding port on *that* node,
+          // and use that port instead
+          PortValue originalPort = (PortValue) originalAttrValue;
+          String portName = getPortName(originalPort);
+          NodeValue originalParent = originalPort.getParent();
+          NodeValue newParent = nodeIsomorphisms.get(originalParent);
+          PortValue newPort = newParent.getPort(portName);
+          newAttributes.put(attrName, newPort);
+        } else if (originalAttrType instanceof ConstraintType) {
+          // throw an exception because there is a difficult
+          // case where the order in which constraints are built matters
+          // that I don't want to handle yet
+          throw new UnsupportedOperationException(
+              "backannotation does not yet support dependent constraints");
+        } else {
+          // assume the value doesn't depend on any schematic objects
+          // that might have been recreated;
+          // in this case, we pull the value from the
+          // constraint annotation table if it exists and use the
+          // original value otherwise
+          // TODO constraint attribute annotations
+          if (constraintAttributeAnnotations.containsKey(constraintName)
+              && constraintAttributeAnnotations.get(constraintName)
+              .containsKey(attrName)) {
+            // use new value
+            newAttributes.put(attrName, constraintAttributeAnnotations
+                .get(constraintName).get(attrName));
+          } else {
+            // use original value
+            newAttributes.put(attrName, originalAttrValue);
+          }
+        }
+      }
+
+      ConstraintValue newConstraint = new ConstraintValue(
+          constraintType, newAttributes);
+      newSchematic.addConstraint(constraintName, newConstraint);
+    }
     return newSchematic;
   }
 

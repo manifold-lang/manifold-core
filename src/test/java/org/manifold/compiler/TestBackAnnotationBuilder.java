@@ -1,6 +1,8 @@
 package org.manifold.compiler;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -365,6 +367,69 @@ public class TestBackAnnotationBuilder {
         new BackAnnotationBuilder(originalSchematic);
     builder.annotateConnectionAttribute("cBOGUS", CONN_ATTR_XYZZY,
         BooleanValue.getInstance(false));
+  }
+
+  @Test
+  public void testModifyConstraintAttribute()
+      throws SchematicException {
+    // Modify the "foo" attribute on constraint "c1" to be the string "xyzzy".
+    TypeValue stringType = originalSchematic.getUserDefinedType("String");
+
+    StringValue strOriginal = (StringValue) originalSchematic
+        .getConstraint("c1").getAttribute("foo");
+    assertEquals("precondition failed",
+        new StringValue(stringType, "bar"), strOriginal);
+
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateConstraintAttribute("c1", "foo",
+        new StringValue(stringType, "xyzzy"));
+    Schematic modifiedSchematic = builder.build();
+
+    StringValue strNew = (StringValue) modifiedSchematic
+        .getConstraint("c1").getAttribute("foo");
+    assertEquals("back-annotation failed",
+        new StringValue(stringType, "xyzzy"), strNew);
+
+  }
+
+  @Test
+  public void testCopyConstraint_RecreatedNode()
+      throws SchematicException {
+    // Check that a constraint referencing a node actually refers
+    // to the correct node in the backannotated copy.
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    Schematic modifiedSchematic = builder.build();
+
+    NodeValue expectedNode = modifiedSchematic.getNode("nIN");
+    ConstraintValue cxt = modifiedSchematic.getConstraint("c1");
+    NodeValue actualNode = (NodeValue) cxt.getAttribute("din_reference");
+    assertEquals(expectedNode, actualNode);
+  }
+
+  @Test
+  public void testCopyConstraint_RecreatedPort()
+      throws SchematicException {
+    // Check that a constraint referencing a port actually refers
+    // to the correct port in the backannotated copy.
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    Schematic modifiedSchematic = builder.build();
+
+    PortValue expectedPort = modifiedSchematic.getNode("nIN")
+        .getPort(IN_PORT_NAME);
+    ConstraintValue cxt = modifiedSchematic.getConstraint("c1");
+    PortValue actualPort = (PortValue) cxt.getAttribute("port_reference");
+    assertEquals(expectedPort, actualPort);
+  }
+
+  @Test
+  public void testCopyConstraint_RecreatedConnection()
+      throws SchematicException {
+    // Check that a constraint referencing a connection actually refers
+    // to the correct connection in the backannotated copy.
+    fail("not yet implemented");
   }
 
 }
