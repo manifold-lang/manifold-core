@@ -430,4 +430,30 @@ public class TestBackAnnotationBuilder {
     fail("not yet implemented");
   }
 
+  @Test(expected = UndeclaredIdentifierException.class)
+  public void testModifyConstraintAttribute_ConstraintDoesNotExist()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateConstraintAttribute("nBOGUS", NODE_ATTR_FOO,
+        BooleanValue.getInstance(false));
+  }
+
+  @Test(expected = UndeclaredAttributeException.class)
+  public void testModifyConstraintAttribute_AttributeDoesNotExist()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateConstraintAttribute("c1", "Bogus_Attribute",
+        BooleanValue.getInstance(false));
+  }
+
+  @Test(expected = TypeMismatchException.class)
+  public void testModifyConstraintAttribute_ValueHasIncompatibleType()
+      throws SchematicException {
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateConstraintAttribute("c1", "foo", new IntegerValue(13));
+  }
+
 }

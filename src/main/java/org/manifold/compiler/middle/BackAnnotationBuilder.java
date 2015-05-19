@@ -56,7 +56,31 @@ public class BackAnnotationBuilder {
       String constraintName, String attrName, Value attrValue)
           throws UndeclaredIdentifierException, UndeclaredAttributeException,
           TypeMismatchException {
-    // TODO safety checks
+    // make sure the original schematic contains this constraint
+    if (!(originalSchematic.getConstraints().containsKey(constraintName))) {
+      throw new UndeclaredIdentifierException(
+          "constraint '" + constraintName
+          + "' not present on original schematic");
+    }
+    // make sure the constraint has such an attribute
+    ConstraintValue originalConstraint =
+        originalSchematic.getConstraint(constraintName);
+    ConstraintType originalConstraintType = (ConstraintType)
+        originalConstraint.getType();
+    if (!(originalConstraintType.getAttributes().containsKey(attrName))) {
+      throw new UndeclaredAttributeException(
+          "attribute '" + attrName + "' not present on this constraint type");
+    }
+    // make sure the value has the correct type for the attribute
+    TypeValue expectedType = originalConstraintType.getAttributes()
+        .get(attrName);
+    if (expectedType instanceof UserDefinedTypeValue) {
+      expectedType = ((UserDefinedTypeValue) expectedType).getTypeAlias();
+    }
+    TypeValue actualType = attrValue.getType();
+    if (!actualType.isSubtypeOf(expectedType)) {
+      throw new TypeMismatchException(expectedType, actualType);
+    }
     // record the change
     if (!(constraintAttributeAnnotations.containsKey(constraintName))) {
       constraintAttributeAnnotations.put(
@@ -339,7 +363,6 @@ public class BackAnnotationBuilder {
           // in this case, we pull the value from the
           // constraint annotation table if it exists and use the
           // original value otherwise
-          // TODO constraint attribute annotations
           if (constraintAttributeAnnotations.containsKey(constraintName)
               && constraintAttributeAnnotations.get(constraintName)
               .containsKey(attrName)) {
