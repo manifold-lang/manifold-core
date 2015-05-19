@@ -377,8 +377,7 @@ public class TestBackAnnotationBuilder {
 
     StringValue strOriginal = (StringValue) originalSchematic
         .getConstraint("c1").getAttribute("foo");
-    assertEquals("precondition failed",
-        new StringValue(stringType, "bar"), strOriginal);
+    assertEquals("precondition failed", "bar", strOriginal.toString());
 
     BackAnnotationBuilder builder =
         new BackAnnotationBuilder(originalSchematic);
@@ -388,8 +387,7 @@ public class TestBackAnnotationBuilder {
 
     StringValue strNew = (StringValue) modifiedSchematic
         .getConstraint("c1").getAttribute("foo");
-    assertEquals("back-annotation failed",
-        new StringValue(stringType, "xyzzy"), strNew);
+    assertEquals("back-annotation failed", "xyzzy", strNew.toString());
 
   }
 
