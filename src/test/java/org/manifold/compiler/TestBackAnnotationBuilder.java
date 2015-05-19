@@ -2,7 +2,6 @@ package org.manifold.compiler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -119,14 +118,16 @@ public class TestBackAnnotationBuilder {
     ConstraintType constraintType = new ConstraintType(ImmutableMap.of(
         "foo", stringType,
         "din_reference", dinNodeType,
-        "port_reference", din));
+        "port_reference", din,
+        "conn_reference", ConnectionTypeValue.getInstance()));
     originalSchematic.addConstraintType(TEST_CONSTRAINT_TYPE_NAME, constraintType);
 
     ConstraintValue constraintValue = new ConstraintValue(constraintType,
         ImmutableMap.of(
             "foo", new StringValue(stringType, "bar"),
             "din_reference", inNode,
-            "port_reference", inNode.getPort(IN_PORT_NAME)));
+            "port_reference", inNode.getPort(IN_PORT_NAME),
+            "conn_reference", con));
 
     originalSchematic.addConstraint("c1", constraintValue);
   }
@@ -427,7 +428,16 @@ public class TestBackAnnotationBuilder {
       throws SchematicException {
     // Check that a constraint referencing a connection actually refers
     // to the correct connection in the backannotated copy.
-    fail("not yet implemented");
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    Schematic modifiedSchematic = builder.build();
+
+    ConnectionValue expectedConn = modifiedSchematic
+        .getConnection(CONNECTION_NAME);
+    ConstraintValue cxt = modifiedSchematic.getConstraint("c1");
+    ConnectionValue actualConn = (ConnectionValue)
+        cxt.getAttribute("conn_reference");
+    assertEquals(expectedConn, actualConn);
   }
 
   @Test(expected = UndeclaredIdentifierException.class)

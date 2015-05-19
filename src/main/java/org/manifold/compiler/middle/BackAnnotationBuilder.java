@@ -336,7 +336,7 @@ public class BackAnnotationBuilder {
         if (originalAttrType instanceof NodeTypeValue) {
           // pull the new node from the isomorphism table
           newAttributes.put(attrName, nodeIsomorphisms.get(originalAttrValue));
-        } else if (originalAttrValue instanceof ConnectionValue) {
+        } else if (originalAttrValue instanceof ConnectionValue) { // TODO ...instanceof ConnectionTypeValue?
           // no connection types, so we have to test the value's type
           // pull the new connection from the isomorphism table
           newAttributes.put(attrName, connectionIsomorphisms.get(
