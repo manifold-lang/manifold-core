@@ -1,6 +1,7 @@
 package org.manifold.compiler;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -52,6 +53,13 @@ public class TestBackAnnotationBuilder {
 
     originalSchematic = new Schematic(TEST_SCHEMATIC_NAME);
 
+    // UDT
+    InferredTypeValue maybeBool = new InferredTypeValue(
+        originalSchematic.getUserDefinedType("Bool"));
+    UserDefinedTypeValue udtMaybe =
+        new UserDefinedTypeValue(maybeBool, "MaybeBool");
+    originalSchematic.addUserDefinedType(udtMaybe);
+
     // port type
     HashMap<String, TypeValue> portDinAttrMap = new HashMap<>();
     portDinAttrMap.put(PORT_ATTR_BAZ,
@@ -68,7 +76,7 @@ public class TestBackAnnotationBuilder {
     // node type
     HashMap<String, TypeValue> dinAttrMap = new HashMap<>();
     dinAttrMap.put(NODE_ATTR_FOO, originalSchematic.getUserDefinedType("Bool"));
-    dinAttrMap.put(NODE_ATTR_BAR, originalSchematic.getUserDefinedType("Bool"));
+    dinAttrMap.put(NODE_ATTR_BAR, maybeBool);
 
     HashMap<String, PortTypeValue> dinPortMap = new HashMap<>();
     dinPortMap.put(IN_PORT_NAME, din);
@@ -86,7 +94,8 @@ public class TestBackAnnotationBuilder {
     // node
     Map<String, Value> inNodeAttrs = new HashMap<>();
     inNodeAttrs.put(NODE_ATTR_FOO, BooleanValue.getInstance(true));
-    inNodeAttrs.put(NODE_ATTR_BAR, BooleanValue.getInstance(true));
+    inNodeAttrs.put(NODE_ATTR_BAR, new InferredValue(
+        maybeBool, BooleanValue.getInstance(true)));
 
     Map<String, Map<String, Value>> inNodePortAttrs = new HashMap<>();
     Map<String, Value> inPortAttrs = new HashMap<>();
@@ -187,8 +196,9 @@ public class TestBackAnnotationBuilder {
     // Check that modifying one node attribute doesn't modify any others.
 
     NodeValue inOriginal = originalSchematic.getNode("nIN");
+    InferredValue vBar = (InferredValue) inOriginal.getAttribute(NODE_ATTR_BAR);
     assertTrue("precondition failed",
-        inOriginal.getAttribute(NODE_ATTR_BAR).equals(
+        vBar.get().equals(
             BooleanValue.getInstance(true)));
 
     BackAnnotationBuilder builder =
@@ -198,8 +208,9 @@ public class TestBackAnnotationBuilder {
     Schematic modifiedSchematic = builder.build();
 
     NodeValue inModified = modifiedSchematic.getNode("nIN");
+    vBar = (InferredValue) inModified.getAttribute(NODE_ATTR_BAR);
     assertTrue("back-annotation smashed unmodified node attribute",
-        inModified.getAttribute(NODE_ATTR_BAR).equals(
+        vBar.get().equals(
             BooleanValue.getInstance(true)));
   }
 
@@ -464,6 +475,31 @@ public class TestBackAnnotationBuilder {
     BackAnnotationBuilder builder =
         new BackAnnotationBuilder(originalSchematic);
     builder.annotateConstraintAttribute("c1", "foo", new IntegerValue(13));
+  }
+
+  @Test
+  public void testModifyNodeAttribute_ToInferred()
+      throws SchematicException {
+    // Modify the "iBaz" attribute on node "nIN" to be <Inferred> instead of True
+
+    NodeValue inOriginal = originalSchematic.getNode("nIN");
+    InferredValue vBar = (InferredValue) inOriginal.getAttribute(NODE_ATTR_BAR);
+    assertTrue("precondition failed",
+        vBar.get().equals(
+            BooleanValue.getInstance(true)));
+
+    InferredTypeValue maybeBool = new InferredTypeValue(
+        originalSchematic.getUserDefinedType("Bool"));
+    Value newValue = new InferredValue(maybeBool);
+
+    BackAnnotationBuilder builder =
+        new BackAnnotationBuilder(originalSchematic);
+    builder.annotateNodeAttribute("nIN", NODE_ATTR_BAR, newValue);
+    Schematic modifiedSchematic = builder.build();
+
+    NodeValue inModified = modifiedSchematic.getNode("nIN");
+    vBar = (InferredValue) inModified.getAttribute(NODE_ATTR_BAR);
+    assertFalse("back-annotation failed", vBar.get() == null);
   }
 
 }
