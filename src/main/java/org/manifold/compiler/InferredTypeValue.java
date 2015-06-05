@@ -26,6 +26,15 @@ public class InferredTypeValue extends TypeValue {
   }
 
   @Override
+  public boolean isSubtypeOf(TypeValue other) {
+    if (!(other instanceof InferredTypeValue)) {
+      return false;
+    }
+    InferredTypeValue otherType = (InferredTypeValue) other;
+    return (this.getInferredType().isSubtypeOf(otherType.getInferredType()));
+  }
+
+  @Override
   public Value instantiate(JsonElement element) {
     if (element.isJsonNull()) {
       return new InferredValue(this);

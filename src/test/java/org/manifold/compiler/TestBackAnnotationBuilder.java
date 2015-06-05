@@ -484,6 +484,7 @@ public class TestBackAnnotationBuilder {
 
     NodeValue inOriginal = originalSchematic.getNode("nIN");
     InferredValue vBar = (InferredValue) inOriginal.getAttribute(NODE_ATTR_BAR);
+    assertTrue("precondition failed", vBar.isSet());
     assertTrue("precondition failed",
         vBar.get().equals(
             BooleanValue.getInstance(true)));
@@ -499,7 +500,7 @@ public class TestBackAnnotationBuilder {
 
     NodeValue inModified = modifiedSchematic.getNode("nIN");
     vBar = (InferredValue) inModified.getAttribute(NODE_ATTR_BAR);
-    assertFalse("back-annotation failed", vBar.get() == null);
+    assertFalse("back-annotation failed", vBar.isSet());
   }
 
 }
