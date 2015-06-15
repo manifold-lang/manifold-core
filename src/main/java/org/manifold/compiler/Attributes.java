@@ -9,6 +9,18 @@ import com.google.common.collect.ImmutableMap;
 public class Attributes {
   private final Map<String, Value> data;
 
+  @Override
+  public boolean equals(Object aThat) {
+    if (this == aThat) {
+      return true;
+    }
+    if (!(aThat instanceof Attributes)) {
+      return false;
+    }
+    Attributes that = (Attributes) aThat;
+    return (this.getAll().equals(that.getAll()));
+  }
+
   public Attributes(Map<String, Value> data) {
     this.data = ImmutableMap.copyOf(data);
   }
