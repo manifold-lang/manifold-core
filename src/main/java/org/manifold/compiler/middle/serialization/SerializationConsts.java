@@ -30,6 +30,7 @@ public interface SerializationConsts {
     String PORT_TYPES = "portTypes";
     String NODE_TYPES = "nodeTypes";
     String CONSTRAINT_TYPES = "constraintTypes";
+    String CONNECTION_TYPES = "connectionTypes";
 
     String NODE_DEFS = "nodes";
     String CONNECTION_DEFS = "connections";

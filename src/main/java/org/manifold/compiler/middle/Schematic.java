@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.manifold.compiler.ConnectionTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
@@ -38,6 +39,7 @@ public class Schematic {
   private final Map<String, PortTypeValue> portTypes;
   private final Map<String, NodeTypeValue> nodeTypes;
   private final Map<String, ConstraintType> constraintTypes;
+  private final Map<String, ConnectionTypeValue> connectionTypes;
 
   // Maps containing instantiated objects for this schematic; they are all
   // indexed by the (string) instance-name of the object.
@@ -52,6 +54,7 @@ public class Schematic {
     this.name = name;
 
     this.userDefinedTypes = new HashMap<>();
+    this.connectionTypes = new HashMap<>();
     populateDefaultType();
 
     this.portTypes = new HashMap<>();
@@ -82,6 +85,16 @@ public class Schematic {
                   + ")");
         }
       });
+
+      // TODO: Should this be a Primitive type as well?
+      try {
+        addConnectionType("Connection", ConnectionTypeValue.getInstance());
+      } catch (MultipleDefinitionException mde) {
+        // this should never happen
+        throw new UndefinedBehaviourError(
+                "could not create default connection type definitions (" + mde.getMessage()
+                        + ")");
+      }
   }
 
   public void addUserDefinedType(UserDefinedTypeValue td)
@@ -150,6 +163,23 @@ public class Schematic {
       throws UndeclaredIdentifierException {
     if (constraintTypes.containsKey(typename)) {
       return constraintTypes.get(typename);
+    } else {
+      throw new UndeclaredIdentifierException(typename);
+    }
+  }
+
+  public void addConnectionType(String typename, ConnectionTypeValue connectionType)
+      throws MultipleDefinitionException {
+    if (connectionTypes.containsKey(typename)) {
+      throw new MultipleDefinitionException("connection-definition", typename);
+    }
+    connectionTypes.put(typename, connectionType);
+  }
+
+  public ConnectionTypeValue getConnectionType(String typename)
+          throws UndeclaredIdentifierException {
+    if (connectionTypes.containsKey(typename)) {
+      return connectionTypes.get(typename);
     } else {
       throw new UndeclaredIdentifierException(typename);
     }
@@ -244,6 +274,10 @@ public class Schematic {
 
   public Map<String, ConstraintType> getConstraintTypes() {
     return ImmutableMap.copyOf(constraintTypes);
+  }
+
+  public Map<String, ConnectionTypeValue> getConnectionTypes() {
+    return ImmutableMap.copyOf(connectionTypes);
   }
 
   public Map<String, NodeValue> getNodes() {
