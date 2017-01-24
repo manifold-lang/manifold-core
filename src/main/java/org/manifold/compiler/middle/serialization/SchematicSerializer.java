@@ -270,7 +270,8 @@ public class SchematicSerializer {
     schJson.add(CONSTRAINT_TYPES, collection);
   }
 
-  public void addConnectionTypes(Map<String, ConnectionTypeValue> connectionTypes) {
+  public void addConnectionTypes(
+          Map<String, ConnectionTypeValue> connectionTypes) {
     JsonObject collection = new JsonObject();
 
     connectionTypes.forEach((key, val) -> rValueMap.put(val, key));

@@ -81,20 +81,20 @@ public class Schematic {
           // this should not actually be possible unless there is something
           // wrong with the compiler itself
           throw new UndefinedBehaviourError(
-              "could not create default type definitions (" + mde.getMessage()
-                  + ")");
+             "could not create default type definitions ("
+              + mde.getMessage() + ")");
         }
       });
 
-      // TODO: Should this be a Primitive type as well?
-      try {
-        addConnectionType("Connection", ConnectionTypeValue.getInstance());
-      } catch (MultipleDefinitionException mde) {
-        // this should never happen
-        throw new UndefinedBehaviourError(
-                "could not create default connection type definitions (" + mde.getMessage()
-                        + ")");
-      }
+    // TODO: Should this be a Primitive type as well?
+    try {
+      addConnectionType("Connection", ConnectionTypeValue.getInstance());
+    } catch (MultipleDefinitionException mde) {
+      // this should never happen
+      throw new UndefinedBehaviourError(
+          "could not create default connection type definitions ("
+          + mde.getMessage() + ")");
+    }
   }
 
   public void addUserDefinedType(UserDefinedTypeValue td)
@@ -168,7 +168,8 @@ public class Schematic {
     }
   }
 
-  public void addConnectionType(String typename, ConnectionTypeValue connectionType)
+  public void addConnectionType(String typename,
+                                ConnectionTypeValue connectionType)
       throws MultipleDefinitionException {
     if (connectionTypes.containsKey(typename)) {
       throw new MultipleDefinitionException("connection-definition", typename);

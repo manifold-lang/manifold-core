@@ -129,7 +129,8 @@ public class TestBackAnnotationBuilder {
         "din_reference", dinNodeType,
         "port_reference", din,
         "conn_reference", ConnectionTypeValue.getInstance()));
-    originalSchematic.addConstraintType(TEST_CONSTRAINT_TYPE_NAME, constraintType);
+    originalSchematic.addConstraintType(TEST_CONSTRAINT_TYPE_NAME,
+        constraintType);
 
     ConstraintValue constraintValue = new ConstraintValue(constraintType,
         ImmutableMap.of(
@@ -243,7 +244,8 @@ public class TestBackAnnotationBuilder {
   @Test
   public void testModifyPortAttribute()
       throws SchematicException {
-    // Modify the "baz" attribute on nIN:in_port_name to be True instead of False.
+    // Modify the "baz" attribute on nIN:in_port_name to be True instead of
+    // False.
 
     PortValue inOriginal = originalSchematic.getNode("nIN").
         getPort(IN_PORT_NAME);
@@ -327,7 +329,8 @@ public class TestBackAnnotationBuilder {
   @Test
   public void testModifyConnectionAttribute()
       throws SchematicException {
-    // Modify the "xyzzy" attribute on connection "wire" to be False instead of True.
+    // Modify the "xyzzy" attribute on connection "wire" to be False instead of
+    // True.
 
     ConnectionValue cOriginal = originalSchematic.getConnection(
         CONNECTION_NAME);
@@ -480,7 +483,8 @@ public class TestBackAnnotationBuilder {
   @Test
   public void testModifyNodeAttribute_ToInferred()
       throws SchematicException {
-    // Modify the "iBaz" attribute on node "nIN" to be <Inferred> instead of True
+    // Modify the "iBaz" attribute on node "nIN" to be <Inferred> instead of
+    // True
 
     NodeValue inOriginal = originalSchematic.getNode("nIN");
     InferredValue vBar = (InferredValue) inOriginal.getAttribute(NODE_ATTR_BAR);
