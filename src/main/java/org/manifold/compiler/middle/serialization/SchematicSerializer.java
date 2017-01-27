@@ -11,6 +11,7 @@ import static org.manifold.compiler.middle.serialization.SerializationConsts.Nod
 import static org.manifold.compiler.middle.serialization.SerializationConsts.NodeTypeConsts.PORT_MAP;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.PrimitiveTypes.PRIMITIVE_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_DEFS;
+import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONNECTION_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_DEFS;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.CONSTRAINT_TYPES;
 import static org.manifold.compiler.middle.serialization.SerializationConsts.SchematicConsts.NODE_DEFS;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import org.manifold.compiler.ArrayTypeValue;
 import org.manifold.compiler.BooleanTypeValue;
+import org.manifold.compiler.ConnectionTypeValue;
 import org.manifold.compiler.ConnectionValue;
 import org.manifold.compiler.ConstraintType;
 import org.manifold.compiler.ConstraintValue;
@@ -268,6 +270,15 @@ public class SchematicSerializer {
     schJson.add(CONSTRAINT_TYPES, collection);
   }
 
+  public void addConnectionTypes(
+          Map<String, ConnectionTypeValue> connectionTypes) {
+    JsonObject collection = new JsonObject();
+
+    connectionTypes.forEach((key, val) -> rValueMap.put(val, key));
+
+    schJson.add(CONNECTION_TYPES, collection);
+  }
+
   public void addNodes(Map<String, NodeValue> nodes) {
     JsonObject collection = new JsonObject();
 
@@ -327,6 +338,7 @@ public class SchematicSerializer {
   public static JsonObject serialize(Schematic sch) {
     SchematicSerializer serializer = new SchematicSerializer(sch);
     serializer.addUserDefinedTypes(sch.getUserDefinedTypes());
+    serializer.addConnectionTypes(sch.getConnectionTypes());
     serializer.addPortTypes(sch.getPortTypes());
     serializer.addNodeTypes(sch.getNodeTypes());
     serializer.addConstraintTypes(sch.getConstraintTypes());

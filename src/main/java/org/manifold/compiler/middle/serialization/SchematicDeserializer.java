@@ -104,7 +104,8 @@ public class SchematicDeserializer implements SerializationConsts {
       }
 
       Value attrValue;
-      if (value.isJsonPrimitive() && compTable.contains(type, value.getAsString())) {
+      if (value.isJsonPrimitive() &&
+          compTable.contains(type, value.getAsString())) {
         attrValue = compTable.get(type, value.getAsString());
       } else {
         attrValue = type.instantiate(value);
@@ -175,7 +176,8 @@ public class SchematicDeserializer implements SerializationConsts {
 
     for (Entry<String, JsonElement> entry : in.entrySet()) {
       TypeValue udt = deserializeTypeValue(sch, entry.getValue());
-      UserDefinedTypeValue newType = new UserDefinedTypeValue(udt, entry.getKey());
+      UserDefinedTypeValue newType =
+          new UserDefinedTypeValue(udt, entry.getKey());
       compTable.put(entry.getKey(), newType);
       sch.addUserDefinedType(newType);
     }

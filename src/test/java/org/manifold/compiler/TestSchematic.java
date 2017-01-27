@@ -53,6 +53,13 @@ public class TestSchematic {
   }
 
   @Test(expected = UndeclaredIdentifierException.class)
+  public void testGetConnectionType_Undeclared_ThrowsException()
+          throws SchematicException {
+    Schematic sch = new Schematic("test");
+    ConnectionTypeValue tv = sch.getConnectionType("bogus");
+  }
+
+  @Test(expected = UndeclaredIdentifierException.class)
   public void testGetNode_Undeclared_ThrowsException()
       throws SchematicException {
     Schematic sch = new Schematic("test");
@@ -140,6 +147,17 @@ public class TestSchematic {
     ConstraintType cv1 = new ConstraintType(attributes);
     sch.addConstraintType(constraintTypeName, cv1);
     ConstraintType actual = sch.getConstraintType(constraintTypeName);
+    assertEquals(cv1, actual);
+  }
+
+  @Test
+  public void testGetConnectionType() throws SchematicException {
+    Schematic sch = new Schematic("test");
+    // add the first constraint type
+    String connectionTypeName = "TestConstraint";
+    ConnectionTypeValue cv1 = ConnectionTypeValue.getInstance();
+    sch.addConnectionType(connectionTypeName, cv1);
+    ConnectionTypeValue actual = sch.getConnectionType(connectionTypeName);
     assertEquals(cv1, actual);
   }
 
@@ -409,6 +427,23 @@ public class TestSchematic {
     // try to add another constraint type with the same name
     ConstraintType cv2 = new ConstraintType(attributes);
     sch.addConstraintType(constraintTypeName, cv2);
+  }
+
+  @Test(expected = MultipleDefinitionException.class)
+  public void testAddConnectionType_AlreadyDefined_ThrowsException()
+      throws SchematicException {
+    Schematic sch = new Schematic("test");
+    // add the first constraint type
+    String connectionTypeName = "TestConnection";
+    try {
+      ConnectionTypeValue cv1 = ConnectionTypeValue.getInstance();
+      sch.addConnectionType(connectionTypeName, cv1);
+    } catch (MultipleDefinitionException e) {
+      fail("exception thrown too early");
+    }
+    // try to add another constraint type with the same name
+    ConnectionTypeValue cv2 = ConnectionTypeValue.getInstance();
+    sch.addConnectionType(connectionTypeName, cv2);
   }
 
   @Test(expected = MultipleAssignmentException.class)

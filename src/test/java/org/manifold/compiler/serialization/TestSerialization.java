@@ -510,7 +510,6 @@ public class TestSerialization {
     URL url = Resources
         .getResource("org/manifold/compiler/serialization/data/"
             + "deserialization-inferred-attributes-test.json");
-
     JsonObject json = new JsonParser().parse(
         Resources.toString(url, Charsets.UTF_8)).getAsJsonObject();
     Schematic sch = new SchematicDeserializer().deserialize(json);
