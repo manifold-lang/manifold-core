@@ -1,6 +1,7 @@
 package org.manifold.compiler;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -45,5 +46,13 @@ public class TestInferredType {
     assertEquals(inferredBitType, v.getType());
     Value withinV = ((InferredValue) v).get();
     assertEquals(BooleanValue.getInstance(false), withinV);
+  }
+
+  @Test
+  public void testSubTypeOfInferredType() {
+    UserDefinedTypeValue bitType = new UserDefinedTypeValue(boolType, "Bit");
+    InferredTypeValue inferredBitType = new InferredTypeValue(bitType);
+
+    assertTrue("inferred is subtype", inferredBitType.isSubtypeOf(bitType));
   }
 }
