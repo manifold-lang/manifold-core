@@ -71,10 +71,10 @@ public class Attributes {
       Map<String, Value> data) throws TypeMismatchException {
     for (Map.Entry<String, TypeValue> entry : types.entrySet()) {
       String attrName = entry.getKey();
-      TypeValue expectedType = data.get(attrName).getType();
-      TypeValue actualType = entry.getValue();
-      if (!actualType.isSubtypeOf(expectedType)) {
-        throw new TypeMismatchException(expectedType, actualType);
+      TypeValue dataType = data.get(attrName).getType();
+      TypeValue expectedType = UserDefinedTypeValue.getUnaliasedType(entry.getValue());
+      if (!dataType.isSubtypeOf(expectedType)) {
+        throw new TypeMismatchException(expectedType, dataType);
       }
     }
   }

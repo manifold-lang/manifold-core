@@ -28,7 +28,7 @@ public class InferredTypeValue extends TypeValue {
   @Override
   public boolean isSubtypeOf(TypeValue other) {
     if (!(other instanceof InferredTypeValue)) {
-      return false;
+      return this.getInferredType().isSubtypeOf(other);
     }
     InferredTypeValue otherType = (InferredTypeValue) other;
     return (this.getInferredType().isSubtypeOf(otherType.getInferredType()));
