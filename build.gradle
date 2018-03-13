@@ -3,7 +3,6 @@ apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'checkstyle'
-apply plugin: 'application'
 apply plugin: 'maven'
 
 sourceCompatibility = 1.8
@@ -48,10 +47,8 @@ buildscript {
   }
 }
 
-apply plugin: 'jacoco'
-
 jacoco {
-  toolVersion = "0.7.1.201405082137"
+  toolVersion = "0.8.0"
   reportsDir = file("$buildDir/reports/jacoco")
 }
 
@@ -64,7 +61,7 @@ test {
   jacoco {
     append = false
     destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
-    classDumpFile = file("$buildDir/jacoco/classpathdumps")
+    classDumpDir = file("$buildDir/jacoco/classpathdumps")
   }
 }
 
